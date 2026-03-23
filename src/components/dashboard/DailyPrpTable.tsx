@@ -80,7 +80,7 @@ function StationDailyCharts({ data }: { data: StationDailyPrpProgress[] }) {
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                 <XAxis dataKey="dateLabel" tick={{ fontSize: CHART_FONT.axis }} interval="preserveStartEnd" />
                 <YAxis yAxisId="left" tick={{ fontSize: CHART_FONT.axis }} label={{ value: '日別%', angle: -90, position: 'insideLeft', fontSize: CHART_FONT.axisLabel }} />
-                <YAxis yAxisId="right" orientation="right" tick={{ fontSize: CHART_FONT.axis }} domain={[0, (max: number) => Math.max(max, 110)]} label={{ value: '累積達成率%', angle: 90, position: 'insideRight', fontSize: CHART_FONT.axisLabel }} />
+                <YAxis yAxisId="right" orientation="right" tick={{ fontSize: CHART_FONT.axis }} domain={[0, 100]} label={{ value: '累積達成率%', angle: 90, position: 'insideRight', fontSize: CHART_FONT.axisLabel }} />
                 <Tooltip contentStyle={{ fontSize: CHART_FONT.tooltip }} formatter={pctFormatter} />
                 <Legend wrapperStyle={{ fontSize: CHART_FONT.legend }} />
                 <Bar yAxisId="left" dataKey="dailyRate" name="日別%" fill={color} radius={[2, 2, 0, 0]} maxBarSize={20} label={(props) => <BarLabel {...(props as Record<string, unknown>)} value={(props as Record<string, unknown>).value as number} suffix="%" />} />
@@ -139,7 +139,7 @@ function RegionDailyCharts({ data, regionStationData }: {
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                   <XAxis dataKey="dateLabel" tick={{ fontSize: CHART_FONT.axis }} interval="preserveStartEnd" />
                   <YAxis yAxisId="left" tick={{ fontSize: CHART_FONT.axis }} label={{ value: '日別%', angle: -90, position: 'insideLeft', fontSize: CHART_FONT.axisLabel }} />
-                  <YAxis yAxisId="right" orientation="right" tick={{ fontSize: CHART_FONT.axis }} domain={[0, (max: number) => Math.max(max, 110)]} label={{ value: '累積達成率%', angle: 90, position: 'insideRight', fontSize: CHART_FONT.axisLabel }} />
+                  <YAxis yAxisId="right" orientation="right" tick={{ fontSize: CHART_FONT.axis }} domain={[0, 100]} label={{ value: '累積達成率%', angle: 90, position: 'insideRight', fontSize: CHART_FONT.axisLabel }} />
                   <Tooltip contentStyle={{ fontSize: CHART_FONT.tooltip }} formatter={pctFormatter} />
                   <Legend wrapperStyle={{ fontSize: CHART_FONT.legend }} />
                   <Bar yAxisId="left" dataKey="dailyRate" name="日別%" fill={region.color} radius={[2, 2, 0, 0]} maxBarSize={20} label={(props) => <BarLabel {...(props as Record<string, unknown>)} value={(props as Record<string, unknown>).value as number} suffix="%" />} />
@@ -205,7 +205,7 @@ function StationDailyModal({ region, data, onClose }: {
                       <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                       <XAxis dataKey="dateLabel" tick={{ fontSize: CHART_FONT.axis }} interval="preserveStartEnd" />
                       <YAxis yAxisId="left" tick={{ fontSize: CHART_FONT.axis }} label={{ value: '日別%', angle: -90, position: 'insideLeft', fontSize: CHART_FONT.axisLabel }} />
-                      <YAxis yAxisId="right" orientation="right" tick={{ fontSize: CHART_FONT.axis }} domain={[0, (max: number) => Math.max(max, 110)]} label={{ value: '累積達成率%', angle: 90, position: 'insideRight', fontSize: CHART_FONT.axisLabel }} />
+                      <YAxis yAxisId="right" orientation="right" tick={{ fontSize: CHART_FONT.axis }} domain={[0, 100]} label={{ value: '累積達成率%', angle: 90, position: 'insideRight', fontSize: CHART_FONT.axisLabel }} />
                       <Tooltip contentStyle={{ fontSize: CHART_FONT.tooltip }} formatter={pctFormatter} />
                       <Legend wrapperStyle={{ fontSize: CHART_FONT.legend }} />
                       <Bar yAxisId="left" dataKey="dailyRate" name="日別%" fill={color} radius={[2, 2, 0, 0]} maxBarSize={20} label={(props) => <BarLabel {...(props as Record<string, unknown>)} value={(props as Record<string, unknown>).value as number} suffix="%" />} />
