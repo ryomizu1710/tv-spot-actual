@@ -1,14 +1,11 @@
 import { useLocation } from 'react-router'
 import { useCampaignStore } from '../../stores/campaign-store'
 import { useUiStore } from '../../stores/ui-store'
-import { REGION_LABELS, REGIONS } from '../../constants'
 
 export function Header() {
   const campaigns = useCampaignStore((s) => s.campaigns)
   const selectedCampaignId = useUiStore((s) => s.selectedCampaignId)
-  const selectedRegion = useUiStore((s) => s.selectedRegion)
   const setSelectedCampaign = useUiStore((s) => s.setSelectedCampaign)
-  const setSelectedRegion = useUiStore((s) => s.setSelectedRegion)
   const location = useLocation()
   const isDashboard = location.pathname === '/' || location.pathname === '/dashboard'
 
@@ -32,48 +29,8 @@ export function Header() {
             </select>
           </div>
 
-          <div className="flex shrink-0 items-center gap-1 rounded-lg bg-gray-100 p-0.5">
-            <RegionButton
-              active={selectedRegion === 'all'}
-              onClick={() => setSelectedRegion('all')}
-            >
-              全体
-            </RegionButton>
-            {REGIONS.map((r) => (
-              <RegionButton
-                key={r}
-                active={selectedRegion === r}
-                onClick={() => setSelectedRegion(r)}
-              >
-                {REGION_LABELS[r]}
-              </RegionButton>
-            ))}
-          </div>
         </>
       )}
     </header>
-  )
-}
-
-function RegionButton({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean
-  onClick: () => void
-  children: React.ReactNode
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`rounded-md px-3 py-1 text-xs font-medium whitespace-nowrap transition-colors ${
-        active
-          ? 'bg-white text-amazon shadow-sm'
-          : 'text-gray-500 hover:text-gray-700'
-      }`}
-    >
-      {children}
-    </button>
   )
 }
