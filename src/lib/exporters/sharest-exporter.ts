@@ -1,4 +1,5 @@
 import * as XLSX from 'xlsx'
+import ExcelJS from 'exceljs'
 
 /** TG表記の選択肢 */
 export const SHAREST_TG_OPTIONS = [
@@ -55,27 +56,27 @@ const REGION_FILE_LABELS: Record<RegionKey, string> = {
   nagoya: '名古屋',
 }
 
-/** Sharestヘッダー行 */
+/** Sharestヘッダー（改行付き） */
 const SHAREST_HEADERS = [
-  '',                    // A: 連番
-  'ブランド\n固定',       // B
-  '視聴率\n固定',         // C
-  'JOB No.\n提供No',     // D
-  '区\n分',              // E
-  '放送局',              // F
-  '放送日',              // G
-  '曜\n日',              // H
-  '開始\n時間',           // I
-  '終了\n時間',           // J
-  '番組タイトル/提供名',   // K
-  'ジャンル名',           // L
-  '秒数',               // M
-  'タイム\nランク',       // N
-  'ブランド\nコード',     // O
-  'ブランド名',           // P
-  '世帯',               // Q
-  'ＡＬＬ',             // R
-  '',                   // S: TG（動的）
+  '',                      // A: 連番
+  'ブランド\r\n固定',       // B
+  '視聴率\r\n固定',         // C
+  'JOB No.\r\n提供No',     // D
+  '区\r\n分',              // E
+  '放送局',                // F
+  '放送日',                // G
+  '曜\r\n日',              // H
+  '開始\r\n時間',           // I
+  '終了\r\n時間',           // J
+  '番組タイトル/提供名',     // K
+  'ジャンル名',             // L
+  '秒数',                 // M
+  'タイム\r\nランク',       // N
+  'ブランド\r\nコード',     // O
+  'ブランド名',             // P
+  '世帯',                 // Q
+  'ＡＬＬ',               // R
+  '',                     // S: TG（動的）
 ]
 
 /** Excel日付セルの値をYYYY/MM/DD文字列に変換 */
@@ -95,6 +96,41 @@ export interface SharestExportResult {
   fileName: string
   blob: Blob
   rowCount: number
+}
+
+/** ヘッダーセルのスタイル */
+const headerStyle: Partial<ExcelJS.Style> = {
+  font: { name: 'ＭＳ Ｐゴシック', size: 11 },
+  fill: {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: 'FFF0F0F0' },
+  },
+  alignment: {
+    vertical: 'middle',
+    horizontal: 'center',
+    wrapText: true,
+  },
+  border: {
+    top: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+    bottom: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+    left: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+    right: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+  },
+}
+
+/** データセルのスタイル */
+const dataStyle: Partial<ExcelJS.Style> = {
+  font: { name: 'ＭＳ Ｐゴシック', size: 11 },
+  alignment: {
+    vertical: 'middle',
+  },
+  border: {
+    top: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+    bottom: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+    left: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+    right: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+  },
 }
 
 /**
@@ -132,31 +168,24 @@ export async function generateSharestFiles(
     if (!cCell) continue
     const regionStr = String(cCell.v)
 
-    // A列: 連番
     const aCell = ws[XLSX.utils.encode_cell({ r, c: 0 })]
     const seqNo = aCell ? Number(aCell.v) : 0
 
-    // B列: JOB No.
     const bCell = ws[XLSX.utils.encode_cell({ r, c: 1 })]
     const jobNo = bCell ? String(bCell.v) : ''
 
-    // D列: 放送局
     const dCell = ws[XLSX.utils.encode_cell({ r, c: 3 })]
     const station = dCell ? String(dCell.v) : ''
 
-    // E列: 放送日
     const eCell = ws[XLSX.utils.encode_cell({ r, c: 4 })]
     const date = formatDateValue(eCell)
 
-    // F列: 曜日
     const fCell = ws[XLSX.utils.encode_cell({ r, c: 5 })]
     const dayOfWeek = fCell ? String(fCell.v) : ''
 
-    // G列: 開始時間
     const gCell = ws[XLSX.utils.encode_cell({ r, c: 6 })]
     const startTime = gCell ? String(gCell.v) : ''
 
-    // H列: 終了時間
     const hCell = ws[XLSX.utils.encode_cell({ r, c: 7 })]
     const endTime = hCell ? String(hCell.v) : ''
 
@@ -170,50 +199,69 @@ export async function generateSharestFiles(
     }
   }
 
-  // エリアごとにExcelファイルを生成
+  // エリアごとにExcelJSでスタイル付きExcelファイルを生成
   const results: SharestExportResult[] = []
 
   for (const region of regions) {
     const rows = regionRows[region]
     if (rows.length === 0) continue
 
-    const newWb = XLSX.utils.book_new()
-    const sheetData: (string | number | null)[][] = []
+    const ewb = new ExcelJS.Workbook()
+    const ews = ewb.addWorksheet(REGION_SHEET_NAMES[region])
+
+    // 列幅を設定（全列 8.17 = 元ファイルと同じ）
+    for (let i = 1; i <= 19; i++) {
+      ews.getColumn(i).width = 9
+    }
+
+    // 全データセルのデフォルト書式を「文字列」に設定
+    for (let i = 1; i <= 19; i++) {
+      ews.getColumn(i).numFmt = '@'
+    }
 
     // ヘッダー行
     const headers = [...SHAREST_HEADERS]
-    headers[18] = selectedTg  // S列にTGを設定
-    sheetData.push(headers)
+    headers[18] = selectedTg
+    const headerRow = ews.addRow(headers)
+    headerRow.height = 22.5
+    headerRow.eachCell({ includeEmpty: true }, (cell) => {
+      cell.style = headerStyle as ExcelJS.Style
+    })
+    // 空セル（A1）にもスタイル適用
+    for (let c = 1; c <= 19; c++) {
+      const cell = headerRow.getCell(c)
+      cell.style = headerStyle as ExcelJS.Style
+    }
 
     // データ行
     for (const row of rows) {
-      sheetData.push([
-        row.seqNo,      // A: 連番
-        null,            // B: ブランド固定
-        null,            // C: 視聴率固定
-        row.jobNo,       // D: JOB No.
-        null,            // E: 区分
-        row.station,     // F: 放送局
-        row.date,        // G: 放送日
-        row.dayOfWeek,   // H: 曜日
-        row.startTime,   // I: 開始時間
-        row.endTime,     // J: 終了時間
-        null,            // K: 番組タイトル
-        null,            // L: ジャンル名
-        null,            // M: 秒数
-        null,            // N: タイムランク
-        null,            // O: ブランドコード
-        null,            // P: ブランド名
-        null,            // Q: 世帯（空）
-        null,            // R: ALL（空）
-        null,            // S: TG（空）
+      const dataRow = ews.addRow([
+        String(row.seqNo),  // A: 連番（文字列として）
+        '',                  // B: ブランド固定
+        '',                  // C: 視聴率固定
+        row.jobNo,           // D: JOB No.
+        '',                  // E: 区分
+        row.station,         // F: 放送局
+        row.date,            // G: 放送日
+        row.dayOfWeek,       // H: 曜日
+        row.startTime,       // I: 開始時間
+        row.endTime,         // J: 終了時間
+        '',                  // K: 番組タイトル
+        '',                  // L: ジャンル名
+        '',                  // M: 秒数
+        '',                  // N: タイムランク
+        '',                  // O: ブランドコード
+        '',                  // P: ブランド名
+        null,                // Q: 世帯（空）
+        null,                // R: ALL（空）
+        null,                // S: TG（空）
       ])
+      for (let c = 1; c <= 19; c++) {
+        dataRow.getCell(c).style = dataStyle as ExcelJS.Style
+      }
     }
 
-    const newWs = XLSX.utils.aoa_to_sheet(sheetData)
-    XLSX.utils.book_append_sheet(newWb, newWs, REGION_SHEET_NAMES[region])
-
-    const xlsxBuf = XLSX.write(newWb, { type: 'array', bookType: 'xlsx' })
+    const xlsxBuf = await ewb.xlsx.writeBuffer()
     const blob = new Blob([xlsxBuf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
 
     results.push({
