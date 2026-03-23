@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import { Upload, CheckCircle, AlertCircle, FileSpreadsheet, Target, BarChart3 } from 'lucide-react'
+import { Upload, CheckCircle, AlertCircle, FileSpreadsheet, Target, BarChart3, Download } from 'lucide-react'
 import { toast } from 'sonner'
 import { useCampaignStore } from '../../stores/campaign-store'
 import { useSpotStore } from '../../stores/spot-store'
@@ -15,6 +15,7 @@ import {
   type IclimaxParseResult,
 } from '../../lib/parsers/iclimax-parser'
 import { REGION_LABELS } from '../../constants'
+import { generateSharestFiles, SHAREST_TG_OPTIONS } from '../../lib/exporters/sharest-exporter'
 import type { ImportBatch, StationTarget } from '../../types'
 
 export function ImportPage() {
@@ -51,6 +52,10 @@ export function ImportPage() {
   const [iclimaxResult, setIclimaxResult] = useState<IclimaxParseResult | null>(null)
   const [iclimaxImporting, setIclimaxImporting] = useState(false)
   const [iclimaxDone, setIclimaxDone] = useState(false)
+
+  // Sharest フォーマット作成
+  const [sharestTg, setSharestTg] = useState(SHAREST_TG_OPTIONS[0])
+  const [sharestExporting, setSharestExporting] = useState(false)
 
   // --- Sharest handlers ---
   const handleSharestFilesSelect = (files: FileList | null) => {
@@ -164,6 +169,31 @@ export function ImportPage() {
     } catch {
       toast.error('iClimaxファイルのヘッダー読込に失敗しました')
     }
+  }
+
+  const handleSharestExport = async () => {
+    if (!iclimaxFile) { toast.error('iClimaxファイルを先に選択してください'); return }
+    setSharestExporting(true)
+    try {
+      const results = await generateSharestFiles(iclimaxFile, sharestTg)
+      if (results.length === 0) {
+        toast.error('エリアデータが見つかりませんでした')
+        setSharestExporting(false)
+        return
+      }
+      for (const r of results) {
+        const url = URL.createObjectURL(r.blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = r.fileName
+        a.click()
+        URL.revokeObjectURL(url)
+      }
+      toast.success(`${results.length}エリアのSharestフォーマットを出力しました（TG: ${sharestTg}）`)
+    } catch (err) {
+      toast.error(`出力エラー: ${err instanceof Error ? err.message : '不明'}`)
+    }
+    setSharestExporting(false)
   }
 
   const handleIclimaxImport = async () => {
@@ -380,6 +410,38 @@ export function ImportPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Sharest用フォーマット作成 */}
+        {iclimaxFile && (
+          <div className="mt-4 border-t border-gray-200 pt-4">
+            <div className="mb-3 flex items-center gap-2">
+              <Download size={16} className="text-teal-600" />
+              <h3 className="text-sm font-bold text-gray-800">Sharest用フォーマット作成</h3>
+            </div>
+            <p className="mb-3 text-xs text-gray-500">
+              上記iClimaxファイルからSharest用のExcelを関東・関西・名古屋ごとに出力します。Q・R・S列は空欄で出力されます。
+            </p>
+            <div className="flex items-end gap-3">
+              <div className="w-64">
+                <label className="mb-1 block text-xs text-gray-500">TG（S列ヘッダー）</label>
+                <select
+                  value={sharestTg}
+                  onChange={(e) => setSharestTg(e.target.value)}
+                  className="w-full rounded border border-gray-300 px-3 py-2 text-sm">
+                  {SHAREST_TG_OPTIONS.map((tg) => (
+                    <option key={tg} value={tg}>{tg}</option>
+                  ))}
+                </select>
+              </div>
+              <button onClick={handleSharestExport}
+                disabled={sharestExporting}
+                className="flex items-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 disabled:opacity-40">
+                <Download size={14} />
+                {sharestExporting ? '出力中...' : 'フォーマット出力'}
+              </button>
+            </div>
           </div>
         )}
       </div>
