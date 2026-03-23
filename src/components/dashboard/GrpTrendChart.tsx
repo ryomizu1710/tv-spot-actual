@@ -30,8 +30,8 @@ export function GrpTrendChart({ dailyActuals }: Props) {
     <ResponsiveContainer width="100%" height={280}>
       <LineChart data={data}>
         <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-        <XAxis dataKey="dateLabel" tick={{ fontSize: 11 }} />
-        <YAxis tick={{ fontSize: 11 }} />
+        <XAxis dataKey="dateLabel" tick={{ fontSize: 12 }} />
+        <YAxis tick={{ fontSize: 12 }} />
         <Tooltip
           contentStyle={{ fontSize: 12 }}
           formatter={(value: unknown) => Number(value).toFixed(1)}

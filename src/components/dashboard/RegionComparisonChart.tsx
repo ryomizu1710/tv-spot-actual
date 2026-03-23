@@ -13,7 +13,7 @@ export function RegionComparisonChart({ data }: Props) {
       <BarChart data={data}>
         <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
         <XAxis dataKey="label" tick={{ fontSize: 12 }} />
-        <YAxis tick={{ fontSize: 11 }} />
+        <YAxis tick={{ fontSize: 12 }} />
         <Tooltip contentStyle={{ fontSize: 12 }} />
         <Legend wrapperStyle={{ fontSize: 12 }} />
         <Bar dataKey="householdGrp" name="世帯GRP" fill="#3B82F6" radius={[4, 4, 0, 0]} />

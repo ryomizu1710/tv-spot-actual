@@ -43,20 +43,20 @@ function SingleDailyChart({ dailyProgress, totalTargetPrp }: { dailyProgress: Da
     <ResponsiveContainer width="100%" height={320}>
       <BarChart data={data}>
         <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-        <XAxis dataKey="dateLabel" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
+        <XAxis dataKey="dateLabel" tick={{ fontSize: 12 }} interval="preserveStartEnd" />
         <YAxis
-          tick={{ fontSize: 10 }}
-          label={{ value: '日別 %', angle: -90, position: 'insideLeft', fontSize: 10 }}
+          tick={{ fontSize: 12 }}
+          label={{ value: '日別 %', angle: -90, position: 'insideLeft', fontSize: 12 }}
         />
         <Tooltip
-          contentStyle={{ fontSize: 11 }}
+          contentStyle={{ fontSize: 12 }}
           formatter={(value: unknown) => {
             const v = Number(value)
             return [`${v.toFixed(1)}%`]
           }}
           labelFormatter={(label) => `${label}`}
         />
-        <Legend wrapperStyle={{ fontSize: 11 }} />
+        <Legend wrapperStyle={{ fontSize: 12 }} />
         <Bar
           dataKey="dailyPrpRate"
           name="日別PRP %"
@@ -82,13 +82,13 @@ function RegionDailyChart({ data }: { data: RegionDailyPrpProgress[] }) {
     <ResponsiveContainer width="100%" height={360}>
       <BarChart data={data}>
         <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-        <XAxis dataKey="dateLabel" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
+        <XAxis dataKey="dateLabel" tick={{ fontSize: 12 }} interval="preserveStartEnd" />
         <YAxis
-          tick={{ fontSize: 10 }}
-          label={{ value: '日別 %', angle: -90, position: 'insideLeft', fontSize: 10 }}
+          tick={{ fontSize: 12 }}
+          label={{ value: '日別 %', angle: -90, position: 'insideLeft', fontSize: 12 }}
         />
         <Tooltip
-          contentStyle={{ fontSize: 11 }}
+          contentStyle={{ fontSize: 12 }}
           formatter={(value: unknown, name: unknown) => {
             const v = Number(value)
             const n = String(name ?? '')
@@ -98,7 +98,7 @@ function RegionDailyChart({ data }: { data: RegionDailyPrpProgress[] }) {
         />
         <Legend
           content={() => (
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 16, fontSize: 11, marginTop: 4 }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 16, fontSize: 12, marginTop: 4 }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <span style={{ display: 'inline-block', width: 10, height: 10, backgroundColor: REGION_COLORS.kanto }} />
                 関東 %
