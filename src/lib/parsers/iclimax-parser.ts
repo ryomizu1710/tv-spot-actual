@@ -34,27 +34,37 @@ function colIndexToLetter(idx: number): string {
   return s
 }
 
-/** iClimaxファイルのU列〜AD列（index 20〜29）の1行目ヘッダーを読み取る */
+/** iClimaxファイルのU列〜AD列（index 20〜29）のヘッダーを読み取る
+ *  1行目（row 0）を最優先で探し、見つからなければ最初の5行をスキャンする */
 export async function readIclimaxColumnHeaders(file: File): Promise<IclimaxColumnHeader[]> {
   const buffer = await file.arrayBuffer()
   const wb = XLSX.read(buffer, { type: 'array' })
   const ws = wb.Sheets[wb.SheetNames[0]]
   if (!ws) return []
 
-  const headers: IclimaxColumnHeader[] = []
-  // U列(20) 〜 AD列(29)
-  for (let c = 20; c <= 29; c++) {
-    const cell = ws[XLSX.utils.encode_cell({ r: 0, c })]
-    if (!cell) continue
-    const label = String(cell.v).trim()
-    if (!label) continue
-    headers.push({
-      columnLetter: colIndexToLetter(c),
-      columnIndex: c,
-      label,
-    })
+  // 最初の5行（row 0〜4）をスキャンしてヘッダー行を探す
+  for (let r = 0; r < 5; r++) {
+    const headers: IclimaxColumnHeader[] = []
+    for (let c = 20; c <= 29; c++) {
+      const cell = ws[XLSX.utils.encode_cell({ r, c })]
+      if (!cell) continue
+      const val = cell.v
+      // 数値のみのセルはヘッダーではなくデータ行 → スキップ
+      if (typeof val === 'number') continue
+      const label = String(val).trim()
+      if (!label) continue
+      headers.push({
+        columnLetter: colIndexToLetter(c),
+        columnIndex: c,
+        label,
+      })
+    }
+    // 2列以上テキストヘッダーが見つかればヘッダー行と判定
+    if (headers.length >= 2) {
+      return headers
+    }
   }
-  return headers
+  return []
 }
 
 /** 局別のiClimax集計結果 */
