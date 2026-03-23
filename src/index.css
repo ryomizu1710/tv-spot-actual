@@ -23,3 +23,17 @@ body {
 * {
   box-sizing: border-box;
 }
+
+/* Windows環境でフォントサイズを少し拡大（Macは影響なし） */
+@media screen and (-webkit-min-device-pixel-ratio: 1) {
+  @supports (-moz-appearance: none) {
+    /* Firefox on Windows */
+    html { font-size: 17px; }
+  }
+}
+@media screen and (hover: hover) and (pointer: fine) {
+  /* デスクトップ環境でRetina以外（= 主にWindows） */
+  @media (max-resolution: 1.5dppx) {
+    html { font-size: 17px; }
+  }
+}
