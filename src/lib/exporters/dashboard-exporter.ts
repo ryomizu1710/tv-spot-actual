@@ -44,10 +44,9 @@ export async function exportStationActualsToExcel(
   const wb = new ExcelJS.Workbook()
   const ws = wb.addWorksheet('局別アクチュアル')
 
-  // カラム定義
+  // カラム定義（エリア列を削除、局がA列）
   const columns = [
-    { header: 'エリア', key: 'region', width: 10 },
-    { header: '局', key: 'station', width: 8 },
+    { header: '局', key: 'station', width: 12 },
     { header: 'PRP\n発注', key: 'prpTarget', width: 10 },
     { header: 'PRP\n予測', key: 'prpActual', width: 10 },
     { header: 'PRP\n達成率', key: 'prpRate', width: 10 },
@@ -78,13 +77,9 @@ export async function exportStationActualsToExcel(
     const subtotal = regionSubtotals.find((s) => s.region === region)
     if (regionStations.length === 0) continue
 
-    // 中央の局にエリア名を表示
-    const midIndex = Math.floor(regionStations.length / 2)
-
-    for (let i = 0; i < regionStations.length; i++) {
-      const sa = regionStations[i]
+    // 局別データ
+    for (const sa of regionStations) {
       const row = ws.addRow([
-        i === midIndex ? REGION_LABELS[region] : '',
         sa.stationCode,
         sa.targetPrp > 0 ? sa.targetPrp : null,
         sa.actualPrp,
@@ -101,17 +96,15 @@ export async function exportStationActualsToExcel(
         cell.alignment = CENTER
         cell.border = THIN_BORDER
       })
-      // 達成率の色
-      if (sa.prpAchievement > 0) applyAchievementStyle(row.getCell(5), sa.prpAchievement)
-      if (sa.tgAchievement > 0) applyAchievementStyle(row.getCell(8), sa.tgAchievement)
-      if (sa.primeShare > 0) applyAchievementStyle(row.getCell(10), sa.primeShare, 60)
+      if (sa.prpAchievement > 0) applyAchievementStyle(row.getCell(4), sa.prpAchievement)
+      if (sa.tgAchievement > 0) applyAchievementStyle(row.getCell(7), sa.tgAchievement)
+      if (sa.primeShare > 0) applyAchievementStyle(row.getCell(9), sa.primeShare, 60)
     }
 
-    // エリア小計
+    // エリア小計（A列に「関東 小計」）
     if (subtotal) {
       const row = ws.addRow([
         `${REGION_LABELS[region]} 小計`,
-        '',
         subtotal.targetPrp,
         subtotal.actualPrp,
         subtotal.prpAchievement > 0 ? subtotal.prpAchievement / 100 : null,
@@ -128,28 +121,27 @@ export async function exportStationActualsToExcel(
         cell.border = THIN_BORDER
         cell.fill = SUBTOTAL_FILL
       })
-      if (subtotal.prpAchievement > 0) applyAchievementStyle(row.getCell(5), subtotal.prpAchievement)
-      if (subtotal.tgAchievement > 0) applyAchievementStyle(row.getCell(8), subtotal.tgAchievement)
-      if (subtotal.primeShare > 0) applyAchievementStyle(row.getCell(10), subtotal.primeShare, 60)
+      if (subtotal.prpAchievement > 0) applyAchievementStyle(row.getCell(4), subtotal.prpAchievement)
+      if (subtotal.tgAchievement > 0) applyAchievementStyle(row.getCell(7), subtotal.tgAchievement)
+      if (subtotal.primeShare > 0) applyAchievementStyle(row.getCell(9), subtotal.primeShare, 60)
     }
   }
 
   // 数値フォーマット
+  ws.getColumn(2).numFmt = '0.0'
   ws.getColumn(3).numFmt = '0.0'
-  ws.getColumn(4).numFmt = '0.0'
-  ws.getColumn(5).numFmt = '0.0%'
+  ws.getColumn(4).numFmt = '0.0%'
+  ws.getColumn(5).numFmt = '0.0'
   ws.getColumn(6).numFmt = '0.0'
-  ws.getColumn(7).numFmt = '0.0'
-  ws.getColumn(8).numFmt = '0.0%'
-  ws.getColumn(9).numFmt = '0.0'
-  ws.getColumn(10).numFmt = '0.0%'
+  ws.getColumn(7).numFmt = '0.0%'
+  ws.getColumn(8).numFmt = '0.0'
+  ws.getColumn(9).numFmt = '0.0%'
 
-  // ダウンロード
   const buf = await wb.xlsx.writeBuffer()
   downloadExcel(buf, '局別アクチュアル.xlsx')
 }
 
-/** シート2: 日別PRP推移 Excel出力 */
+/** シート2: 日別PRP推移 Excel出力（横軸=日付、縦軸=エリア・局、累積%なし） */
 export async function exportDailyPrpToExcel(
   regionDailyProgress: RegionDailyPrpProgress[],
   stationDailyProgress: StationDailyPrpProgress[],
@@ -159,112 +151,121 @@ export async function exportDailyPrpToExcel(
   const wb = new ExcelJS.Workbook()
 
   if (isAllRegion) {
-    // エリア別シート
-    const ws = wb.addWorksheet('日別PRP推移')
+    // エリア別サマリーシート
+    addHorizontalDailySheet(wb, '日別PRP推移', regionDailyProgress)
 
-    const headers = ['日付', '関東 日別%', '関東 累積%', '関西 日別%', '関西 累積%', '名古屋 日別%', '名古屋 累積%', '全体 累積%']
-    const headerRow = ws.addRow(headers)
-    headerRow.height = 24
-    headerRow.eachCell((cell) => {
-      cell.fill = HEADER_FILL
-      cell.font = HEADER_FONT
-      cell.alignment = CENTER
-      cell.border = THIN_BORDER
-    })
-
-    ws.getColumn(1).width = 14
-    for (let i = 2; i <= 8; i++) ws.getColumn(i).width = 13
-
-    for (const d of regionDailyProgress) {
-      const row = ws.addRow([
-        d.dateLabel,
-        d.kantoRate > 0 ? d.kantoRate / 100 : null,
-        d.kantoCumRate > 0 ? d.kantoCumRate / 100 : null,
-        d.kansaiRate > 0 ? d.kansaiRate / 100 : null,
-        d.kansaiCumRate > 0 ? d.kansaiCumRate / 100 : null,
-        d.nagoyaRate > 0 ? d.nagoyaRate / 100 : null,
-        d.nagoyaCumRate > 0 ? d.nagoyaCumRate / 100 : null,
-        d.cumulativeRate > 0 ? d.cumulativeRate / 100 : null,
-      ])
-      row.eachCell((cell) => {
-        cell.font = DATA_FONT
-        cell.alignment = CENTER
-        cell.border = THIN_BORDER
-      })
-    }
-
-    for (let i = 2; i <= 8; i++) ws.getColumn(i).numFmt = '0.0%'
-
-    // エリア別の局別シートを追加
+    // エリア別の局別シート
     const regionKeys: Region[] = ['kanto', 'kansai', 'nagoya']
     for (const region of regionKeys) {
       const stations = regionStationDailyProgress[region]
       if (!stations || stations.length === 0) continue
-      addStationDailySheet(wb, `${REGION_LABELS[region]}局別`, stations)
+      addStationHorizontalSheet(wb, `${REGION_LABELS[region]}局別`, stations)
     }
   } else {
-    // 局別シート
-    addStationDailySheet(wb, '日別PRP推移', stationDailyProgress)
+    addStationHorizontalSheet(wb, '日別PRP推移', stationDailyProgress)
   }
 
   const buf = await wb.xlsx.writeBuffer()
   downloadExcel(buf, '日別PRP推移.xlsx')
 }
 
-function addStationDailySheet(wb: ExcelJS.Workbook, sheetName: string, stations: StationDailyPrpProgress[]) {
+/** エリア別日別シート（横軸=日付、縦軸=関東/関西/名古屋） */
+function addHorizontalDailySheet(wb: ExcelJS.Workbook, sheetName: string, data: RegionDailyPrpProgress[]) {
   const ws = wb.addWorksheet(sheetName)
+  if (data.length === 0) return
 
-  // 全日付を収集
-  const allDates = new Set<string>()
-  for (const st of stations) {
-    for (const d of st.dailyData) allDates.add(d.dateLabel)
-  }
-  const sortedDates = Array.from(allDates).sort()
-
-  // ヘッダー: 日付 | 局1 日別% | 局1 累積% | 局2 日別% | ...
-  const headers: string[] = ['日付']
-  for (const st of stations) {
-    headers.push(`${st.stationCode} 日別%`)
-    headers.push(`${st.stationCode} 累積%`)
-  }
-
-  const headerRow = ws.addRow(headers)
+  // 1行目: ヘッダー（A1=空、B1以降=日付）
+  const headerValues: string[] = ['']
+  for (const d of data) headerValues.push(d.dateLabel)
+  const headerRow = ws.addRow(headerValues)
   headerRow.height = 24
-  headerRow.eachCell((cell) => {
-    cell.fill = HEADER_FILL
-    cell.font = HEADER_FONT
+  headerRow.eachCell((cell, colNumber) => {
+    if (colNumber >= 2) {
+      cell.fill = HEADER_FILL
+      cell.font = HEADER_FONT
+    }
     cell.alignment = CENTER
     cell.border = THIN_BORDER
   })
 
-  ws.getColumn(1).width = 14
-  for (let i = 2; i <= headers.length; i++) ws.getColumn(i).width = 12
+  // A列幅
+  ws.getColumn(1).width = 10
+  for (let i = 2; i <= data.length + 1; i++) ws.getColumn(i).width = 11
 
-  // 局別日別マップ
-  const stationMaps = stations.map((st) => {
-    const map = new Map<string, { dailyRate: number; cumulativeRate: number }>()
-    for (const d of st.dailyData) {
-      map.set(d.dateLabel, { dailyRate: d.dailyRate, cumulativeRate: d.cumulativeRate })
-    }
-    return map
-  })
+  // 各エリア行
+  const regionRows: { label: string; key: 'kantoRate' | 'kansaiRate' | 'nagoyaRate' }[] = [
+    { label: '関東', key: 'kantoRate' },
+    { label: '関西', key: 'kansaiRate' },
+    { label: '名古屋', key: 'nagoyaRate' },
+  ]
 
-  for (const date of sortedDates) {
-    const rowData: (string | number | null)[] = [date]
-    for (const map of stationMaps) {
-      const d = map.get(date)
-      rowData.push(d ? d.dailyRate / 100 : null)
-      rowData.push(d ? d.cumulativeRate / 100 : null)
+  for (const r of regionRows) {
+    const rowValues: (string | number | null)[] = [r.label]
+    for (const d of data) {
+      const val = d[r.key]
+      rowValues.push(val > 0 ? val / 100 : null)
     }
-    const row = ws.addRow(rowData)
-    row.eachCell((cell) => {
-      cell.font = DATA_FONT
+    const row = ws.addRow(rowValues)
+    row.eachCell((cell, colNumber) => {
+      cell.font = colNumber === 1 ? SUBTOTAL_FONT : DATA_FONT
       cell.alignment = CENTER
       cell.border = THIN_BORDER
     })
   }
 
-  for (let i = 2; i <= headers.length; i++) ws.getColumn(i).numFmt = '0.0%'
+  // 数値フォーマット
+  for (let i = 2; i <= data.length + 1; i++) ws.getColumn(i).numFmt = '0.0%'
+}
+
+/** 局別日別シート（横軸=日付、縦軸=局） */
+function addStationHorizontalSheet(wb: ExcelJS.Workbook, sheetName: string, stations: StationDailyPrpProgress[]) {
+  const ws = wb.addWorksheet(sheetName)
+  if (stations.length === 0) return
+
+  // 全日付を収集・ソート
+  const allDatesSet = new Set<string>()
+  for (const st of stations) {
+    for (const d of st.dailyData) allDatesSet.add(d.dateLabel)
+  }
+  const allDates = Array.from(allDatesSet).sort()
+
+  // 1行目: ヘッダー（A1=空、B1以降=日付）
+  const headerValues: string[] = ['']
+  for (const date of allDates) headerValues.push(date)
+  const headerRow = ws.addRow(headerValues)
+  headerRow.height = 24
+  headerRow.eachCell((cell, colNumber) => {
+    if (colNumber >= 2) {
+      cell.fill = HEADER_FILL
+      cell.font = HEADER_FONT
+    }
+    cell.alignment = CENTER
+    cell.border = THIN_BORDER
+  })
+
+  ws.getColumn(1).width = 10
+  for (let i = 2; i <= allDates.length + 1; i++) ws.getColumn(i).width = 11
+
+  // 局ごとに1行
+  for (const st of stations) {
+    const dateMap = new Map<string, number>()
+    for (const d of st.dailyData) dateMap.set(d.dateLabel, d.dailyRate)
+
+    const rowValues: (string | number | null)[] = [st.stationCode]
+    for (const date of allDates) {
+      const val = dateMap.get(date)
+      rowValues.push(val && val > 0 ? val / 100 : null)
+    }
+    const row = ws.addRow(rowValues)
+    row.eachCell((cell, colNumber) => {
+      cell.font = colNumber === 1 ? SUBTOTAL_FONT : DATA_FONT
+      cell.alignment = CENTER
+      cell.border = THIN_BORDER
+    })
+  }
+
+  // 数値フォーマット
+  for (let i = 2; i <= allDates.length + 1; i++) ws.getColumn(i).numFmt = '0.0%'
 }
 
 function downloadExcel(buffer: ExcelJS.Buffer, filename: string) {
