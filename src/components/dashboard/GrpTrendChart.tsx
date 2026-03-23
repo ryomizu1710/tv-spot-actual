@@ -1,6 +1,12 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import type { DailyActual } from '../../types'
 
+const DAY_OF_WEEK = ['日', '月', '火', '水', '木', '金', '土']
+function formatDateLabel(dateStr: string): string {
+  const d = new Date(dateStr)
+  return `${d.getMonth() + 1}/${d.getDate()}(${DAY_OF_WEEK[d.getDay()]})`
+}
+
 interface Props {
   dailyActuals: DailyActual[]
 }
@@ -21,7 +27,7 @@ export function GrpTrendChart({ dailyActuals }: Props) {
   const data = Array.from(byDate.values()).sort((a, b) => a.date.localeCompare(b.date))
     .map(d => ({
       ...d,
-      dateLabel: d.date.slice(5), // MM-DD
+      dateLabel: formatDateLabel(d.date),
       householdGrp: Math.round(d.householdGrp * 10) / 10,
       individualGrp: Math.round(d.individualGrp * 10) / 10,
     }))

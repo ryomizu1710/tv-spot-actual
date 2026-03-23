@@ -377,7 +377,7 @@ export function useStationActuals(): StationActualsData | null {
       cumulativeTg += data.tg
       return {
         date,
-        dateLabel: date.slice(5), // MM-DD
+        dateLabel: formatDateLabel(date), // MM-DD
         dailyPrp: round2(data.prp),
         cumulativePrp: round2(cumulativePrp),
         dailyTg: round2(data.tg),
@@ -465,7 +465,7 @@ export function useStationActuals(): StationActualsData | null {
 
         return {
           date,
-          dateLabel: date.slice(5),
+          dateLabel: formatDateLabel(date),
           kantoRate: regionCumDenom.kanto > 0 ? round1(kantoPrp / regionCumDenom.kanto * 100) : 0,
           kansaiRate: regionCumDenom.kansai > 0 ? round1(kansaiPrp / regionCumDenom.kansai * 100) : 0,
           nagoyaRate: regionCumDenom.nagoya > 0 ? round1(nagoyaPrp / regionCumDenom.nagoya * 100) : 0,
@@ -525,7 +525,7 @@ export function useStationActuals(): StationActualsData | null {
           cumPrp += prp
           return {
             date,
-            dateLabel: date.slice(5),
+            dateLabel: formatDateLabel(date),
             dailyPrp: round2(prp),
             dailyRate: cumDenom > 0 ? round1(prp / cumDenom * 100) : 0,
             cumulativePrp: round2(cumPrp),
@@ -592,4 +592,15 @@ function round1(n: number): number {
 
 function round2(n: number): number {
   return Math.round(n * 100) / 100
+}
+
+const DAY_OF_WEEK = ['日', '月', '火', '水', '木', '金', '土']
+
+/** "2026-03-24" → "3/24(月)" */
+function formatDateLabel(dateStr: string): string {
+  const d = new Date(dateStr)
+  const m = d.getMonth() + 1
+  const day = d.getDate()
+  const dow = DAY_OF_WEEK[d.getDay()]
+  return `${m}/${day}(${dow})`
 }
