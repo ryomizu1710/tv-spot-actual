@@ -74,15 +74,11 @@ export const useSpotStore = create<SpotStore>()(
         }))
       },
       deleteSpotsByCampaign: (campaignId) => {
-        set((state) => {
-          const newMap = { ...state.campaignDataMap }
-          delete newMap[campaignId]
-          return {
-            spots: state.spots.filter((s) => s.campaignId !== campaignId),
-            importBatches: state.importBatches.filter((b) => b.campaignId !== campaignId),
-            campaignDataMap: newMap,
-          }
-        })
+        set((state) => ({
+          spots: state.spots.filter((s) => s.campaignId !== campaignId),
+          importBatches: state.importBatches.filter((b) => b.campaignId !== campaignId),
+          // campaignDataMap（SPOTプラン・iClimax等）は保持
+        }))
       },
       addImportBatch: (batch) => {
         set((state) => ({ importBatches: [...state.importBatches, batch] }))
