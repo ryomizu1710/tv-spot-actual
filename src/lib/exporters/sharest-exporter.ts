@@ -100,7 +100,7 @@ export interface SharestExportResult {
 
 /** ヘッダーセルのスタイル */
 const headerStyle: Partial<ExcelJS.Style> = {
-  font: { name: 'MS UI Gothic', size: 11 },
+  font: { name: 'MS UI Gothic', size: 9 },
   fill: {
     type: 'pattern',
     pattern: 'solid',
