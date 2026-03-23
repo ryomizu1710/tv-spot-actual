@@ -129,10 +129,10 @@ export function StationActualTable({ stationActuals, regionSubtotals }: Props) {
             <th className="px-3 py-2 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">エリア</th>
             <th className="px-3 py-2 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">局</th>
             <th className={`${CATEGORY_STYLES.prp.cellBorder} px-2 py-2 text-center text-xs font-semibold text-gray-500`}>発注</th>
-            <th className="px-2 py-2 text-center text-xs font-semibold text-gray-500">実績</th>
+            <th className="px-2 py-2 text-center text-xs font-semibold text-gray-500">予測</th>
             <th className="px-2 py-2 text-center text-xs font-semibold text-gray-500">達成率</th>
             <th className={`${CATEGORY_STYLES.trp.cellBorder} px-2 py-2 text-center text-xs font-semibold text-gray-500`}>発注</th>
-            <th className="px-2 py-2 text-center text-xs font-semibold text-gray-500">実績</th>
+            <th className="px-2 py-2 text-center text-xs font-semibold text-gray-500">予測</th>
             <th className="px-2 py-2 text-center text-xs font-semibold text-gray-500">達成率</th>
             <th className={`${CATEGORY_STYLES.prime.cellBorder} px-2 py-2 text-center text-xs font-semibold text-gray-500`}>PRP</th>
             <th className="px-2 py-2 text-center text-xs font-semibold text-gray-500">Share</th>
