@@ -214,33 +214,33 @@ function RegionBlock({
             )}
             <td className="px-3 py-2 text-center font-semibold text-gray-800">{sa.stationCode}</td>
             {/* PRP */}
-            <td className={`${CATEGORY_STYLES.prp.cellBorder} px-2 py-2 text-center font-mono text-gray-500`}>
+            <td className={`${CATEGORY_STYLES.prp.cellBorder} px-2 py-2 text-center text-gray-500`}>
               {sa.targetPrp > 0 ? sa.targetPrp.toFixed(1) : <span className="text-gray-300">—</span>}
             </td>
-            <td className="px-2 py-2 text-center font-mono font-bold text-gray-800">{sa.actualPrp.toFixed(1)}</td>
+            <td className="px-2 py-2 text-center font-bold text-gray-800">{sa.actualPrp.toFixed(1)}</td>
             <td className="px-2 py-2 text-center">
               <AchievementBadge rate={sa.prpAchievement} />
             </td>
             {/* TRP */}
-            <td className={`${CATEGORY_STYLES.trp.cellBorder} px-2 py-2 text-center font-mono text-gray-500`}>
+            <td className={`${CATEGORY_STYLES.trp.cellBorder} px-2 py-2 text-center text-gray-500`}>
               {sa.targetTrp > 0 ? sa.targetTrp.toFixed(1) : <span className="text-gray-300">—</span>}
             </td>
-            <td className="px-2 py-2 text-center font-mono font-bold text-gray-800">{sa.actualTg.toFixed(1)}</td>
+            <td className="px-2 py-2 text-center font-bold text-gray-800">{sa.actualTg.toFixed(1)}</td>
             <td className="px-2 py-2 text-center">
               <AchievementBadge rate={sa.tgAchievement} />
             </td>
             {/* Prime Time */}
-            <td className={`${CATEGORY_STYLES.prime.cellBorder} px-2 py-2 text-center font-mono font-bold text-gray-800`}>{sa.primePrp.toFixed(1)}</td>
+            <td className={`${CATEGORY_STYLES.prime.cellBorder} px-2 py-2 text-center font-bold text-gray-800`}>{sa.primePrp.toFixed(1)}</td>
             <td className="px-2 py-2 text-center">
               <PrimeShareBadge rate={sa.primeShare} />
             </td>
             {/* 出稿 */}
-            <td className={`${CATEGORY_STYLES.spots.cellBorder} px-2 py-2 text-center font-mono text-gray-700`}>{sa.spotCount}</td>
+            <td className={`${CATEGORY_STYLES.spots.cellBorder} px-2 py-2 text-center text-gray-700`}>{sa.spotCount}</td>
             {/* WPT */}
             {hasWpt && (
               <>
-                <td className={`${CATEGORY_STYLES.wpt.cellBorder} px-2 py-2 text-center font-mono text-gray-700`}>{wpt ? wpt.wptSpots : <span className="text-gray-300">—</span>}</td>
-                <td className="px-2 py-2 text-center font-mono text-gray-700">{wpt ? wpt.tptSpots : <span className="text-gray-300">—</span>}</td>
+                <td className={`${CATEGORY_STYLES.wpt.cellBorder} px-2 py-2 text-center text-gray-700`}>{wpt ? wpt.wptSpots : <span className="text-gray-300">—</span>}</td>
+                <td className="px-2 py-2 text-center text-gray-700">{wpt ? wpt.tptSpots : <span className="text-gray-300">—</span>}</td>
                 <td className="px-2 py-2 text-center">
                   {wpt && wpt.wptTptRate > 0
                     ? <span className="inline-block rounded-full bg-gradient-to-r from-violet-50 to-violet-100 px-2 py-0.5 text-[10px] font-bold text-violet-700 ring-1 ring-violet-200">{wpt.wptTptRate.toFixed(1)}%</span>
@@ -260,31 +260,31 @@ function RegionBlock({
               <span className={`${accent.text}`}>{REGION_LABELS[region]}</span> 小計
             </td>
             {/* PRP */}
-            <td className={`${CATEGORY_STYLES.prp.cellBorder} px-2 py-2.5 text-center font-mono font-bold text-gray-700`}>{subtotal.targetPrp.toFixed(1)}</td>
-            <td className="px-2 py-2.5 text-center font-mono font-bold text-gray-900">{subtotal.actualPrp.toFixed(1)}</td>
+            <td className={`${CATEGORY_STYLES.prp.cellBorder} px-2 py-2.5 text-center font-bold text-gray-700`}>{subtotal.targetPrp.toFixed(1)}</td>
+            <td className="px-2 py-2.5 text-center font-bold text-gray-900">{subtotal.actualPrp.toFixed(1)}</td>
             <td className="px-2 py-2.5 text-center">
               <AchievementBadge rate={subtotal.prpAchievement} />
             </td>
             {/* TRP */}
-            <td className={`${CATEGORY_STYLES.trp.cellBorder} px-2 py-2.5 text-center font-mono font-bold text-gray-700`}>
+            <td className={`${CATEGORY_STYLES.trp.cellBorder} px-2 py-2.5 text-center font-bold text-gray-700`}>
               {subtotal.targetTrp > 0 ? subtotal.targetTrp.toFixed(1) : <span className="text-gray-300">—</span>}
             </td>
-            <td className="px-2 py-2.5 text-center font-mono font-bold text-gray-900">{subtotal.actualTg.toFixed(1)}</td>
+            <td className="px-2 py-2.5 text-center font-bold text-gray-900">{subtotal.actualTg.toFixed(1)}</td>
             <td className="px-2 py-2.5 text-center">
               <AchievementBadge rate={subtotal.tgAchievement} />
             </td>
             {/* Prime Time */}
-            <td className={`${CATEGORY_STYLES.prime.cellBorder} px-2 py-2.5 text-center font-mono font-bold text-gray-900`}>{subtotal.primePrp.toFixed(1)}</td>
+            <td className={`${CATEGORY_STYLES.prime.cellBorder} px-2 py-2.5 text-center font-bold text-gray-900`}>{subtotal.primePrp.toFixed(1)}</td>
             <td className="px-2 py-2.5 text-center">
               <PrimeShareBadge rate={subtotal.primeShare} />
             </td>
             {/* 出稿 */}
-            <td className={`${CATEGORY_STYLES.spots.cellBorder} px-2 py-2.5 text-center font-mono font-bold text-gray-700`}>{subtotal.spotCount}</td>
+            <td className={`${CATEGORY_STYLES.spots.cellBorder} px-2 py-2.5 text-center font-bold text-gray-700`}>{subtotal.spotCount}</td>
             {/* WPT */}
             {hasWpt && (
               <>
-                <td className={`${CATEGORY_STYLES.wpt.cellBorder} px-2 py-2.5 text-center font-mono font-bold text-gray-700`}>{wptR ? wptR.wptSpots : <span className="text-gray-300">—</span>}</td>
-                <td className="px-2 py-2.5 text-center font-mono font-bold text-gray-700">{wptR ? wptR.tptSpots : <span className="text-gray-300">—</span>}</td>
+                <td className={`${CATEGORY_STYLES.wpt.cellBorder} px-2 py-2.5 text-center font-bold text-gray-700`}>{wptR ? wptR.wptSpots : <span className="text-gray-300">—</span>}</td>
+                <td className="px-2 py-2.5 text-center font-bold text-gray-700">{wptR ? wptR.tptSpots : <span className="text-gray-300">—</span>}</td>
                 <td className="px-2 py-2.5 text-center">
                   {wptR && wptR.wptTptRate > 0
                     ? <span className="inline-block rounded-full bg-gradient-to-r from-violet-50 to-violet-100 px-2 py-0.5 text-[10px] font-bold text-violet-700 ring-1 ring-violet-200">{wptR.wptTptRate.toFixed(1)}%</span>
