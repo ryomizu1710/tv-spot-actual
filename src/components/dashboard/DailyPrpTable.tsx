@@ -30,14 +30,20 @@ const CHART_FONT = {
   legend: 12,
 }
 
-/** 棒グラフ上部にラベルを表示するカスタムレンダラー */
+/** 棒グラフ上部にラベルを表示するカスタムレンダラー（白背景付きで折れ線と重なっても読める） */
 function BarLabel({ x, y, width, value, suffix }: { x?: number; y?: number; width?: number; value?: number; suffix?: string; [key: string]: unknown }) {
   if (!value || value === 0) return null
   const label = suffix === '%' ? `${value.toFixed(1)}%` : value.toFixed(1)
+  const cx = (x ?? 0) + (width ?? 0) / 2
+  const cy = (y ?? 0) - 6
+  const textWidth = label.length * 5.5
   return (
-    <text x={(x ?? 0) + (width ?? 0) / 2} y={(y ?? 0) - 4} textAnchor="middle" fontSize={CHART_FONT.barLabel} fill="#374151">
-      {label}
-    </text>
+    <g>
+      <rect x={cx - textWidth / 2 - 2} y={cy - 8} width={textWidth + 4} height={12} rx={2} fill="white" fillOpacity={0.85} />
+      <text x={cx} y={cy} textAnchor="middle" fontSize={CHART_FONT.barLabel} fill="#374151" fontWeight={500}>
+        {label}
+      </text>
+    </g>
   )
 }
 
@@ -84,7 +90,7 @@ function StationDailyCharts({ data }: { data: StationDailyPrpProgress[] }) {
                 <Tooltip contentStyle={{ fontSize: CHART_FONT.tooltip }} formatter={pctFormatter} />
                 <Legend wrapperStyle={{ fontSize: CHART_FONT.legend }} />
                 <Bar yAxisId="left" dataKey="dailyRate" name="日別%" fill={color} radius={[2, 2, 0, 0]} maxBarSize={20} label={(props) => <BarLabel {...(props as Record<string, unknown>)} value={(props as Record<string, unknown>).value as number} suffix="%" />} />
-                <Line yAxisId="right" type="monotone" dataKey="cumulativeRate" name="累積達成率" stroke="#9CA3AF" strokeWidth={2} dot={{ r: 2, fill: '#9CA3AF' }} />
+                <Line yAxisId="right" type="monotone" dataKey="cumulativeRate" name="累積達成率" stroke="#9CA3AF" strokeWidth={2} strokeDasharray="6 3" strokeOpacity={0.7} dot={{ r: 2, fill: '#9CA3AF' }} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
@@ -143,7 +149,7 @@ function RegionDailyCharts({ data, regionStationData }: {
                   <Tooltip contentStyle={{ fontSize: CHART_FONT.tooltip }} formatter={pctFormatter} />
                   <Legend wrapperStyle={{ fontSize: CHART_FONT.legend }} />
                   <Bar yAxisId="left" dataKey="dailyRate" name="日別%" fill={region.color} radius={[2, 2, 0, 0]} maxBarSize={20} label={(props) => <BarLabel {...(props as Record<string, unknown>)} value={(props as Record<string, unknown>).value as number} suffix="%" />} />
-                  <Line yAxisId="right" type="monotone" dataKey="cumulativeRate" name="累積達成率" stroke="#9CA3AF" strokeWidth={2} dot={{ r: 2, fill: '#9CA3AF' }} />
+                  <Line yAxisId="right" type="monotone" dataKey="cumulativeRate" name="累積達成率" stroke="#9CA3AF" strokeWidth={2} strokeDasharray="6 3" strokeOpacity={0.7} dot={{ r: 2, fill: '#9CA3AF' }} />
                 </ComposedChart>
               </ResponsiveContainer>
             </div>
@@ -209,7 +215,7 @@ function StationDailyModal({ region, data, onClose }: {
                       <Tooltip contentStyle={{ fontSize: CHART_FONT.tooltip }} formatter={pctFormatter} />
                       <Legend wrapperStyle={{ fontSize: CHART_FONT.legend }} />
                       <Bar yAxisId="left" dataKey="dailyRate" name="日別%" fill={color} radius={[2, 2, 0, 0]} maxBarSize={20} label={(props) => <BarLabel {...(props as Record<string, unknown>)} value={(props as Record<string, unknown>).value as number} suffix="%" />} />
-                      <Line yAxisId="right" type="monotone" dataKey="cumulativeRate" name="累積達成率" stroke="#9CA3AF" strokeWidth={2} dot={{ r: 2, fill: '#9CA3AF' }} />
+                      <Line yAxisId="right" type="monotone" dataKey="cumulativeRate" name="累積達成率" stroke="#9CA3AF" strokeWidth={2} strokeDasharray="6 3" strokeOpacity={0.7} dot={{ r: 2, fill: '#9CA3AF' }} />
                     </ComposedChart>
                   </ResponsiveContainer>
                 </div>
