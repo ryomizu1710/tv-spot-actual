@@ -8,8 +8,8 @@ const FONT_NAME = 'Yu Gothic'
 const HEADER_FILL: ExcelJS.FillPattern = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF374151' } }
 const HEADER_FONT: Partial<ExcelJS.Font> = { name: FONT_NAME, size: 9, bold: true, color: { argb: 'FFFFFFFF' } }
 const DATA_FONT: Partial<ExcelJS.Font> = { name: FONT_NAME, size: 9 }
-const BOLD_FONT: Partial<ExcelJS.Font> = { name: FONT_NAME, size: 9, bold: true }
-const SUBTOTAL_FILL: ExcelJS.FillPattern = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF9FAFB' } }
+const SUBTOTAL_FILL: ExcelJS.FillPattern = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1D5DB' } }
+const SUBTOTAL_FONT: Partial<ExcelJS.Font> = { name: FONT_NAME, size: 9, bold: true, color: { argb: 'FF1F2937' } }
 
 const GREEN_FILL: ExcelJS.FillPattern = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDCFCE7' } }
 const GREEN_FONT: Partial<ExcelJS.Font> = { name: FONT_NAME, size: 9, bold: true, color: { argb: 'FF15803D' } }
@@ -76,10 +76,15 @@ export async function exportStationActualsToExcel(
   for (const region of regions) {
     const regionStations = stationActuals.filter((s) => s.region === region)
     const subtotal = regionSubtotals.find((s) => s.region === region)
+    if (regionStations.length === 0) continue
 
-    for (const sa of regionStations) {
+    // 中央の局にエリア名を表示
+    const midIndex = Math.floor(regionStations.length / 2)
+
+    for (let i = 0; i < regionStations.length; i++) {
+      const sa = regionStations[i]
       const row = ws.addRow([
-        sa.regionLabel,
+        i === midIndex ? REGION_LABELS[region] : '',
         sa.stationCode,
         sa.targetPrp > 0 ? sa.targetPrp : null,
         sa.actualPrp,
@@ -118,7 +123,7 @@ export async function exportStationActualsToExcel(
         subtotal.spotCount,
       ])
       row.eachCell((cell) => {
-        cell.font = BOLD_FONT
+        cell.font = SUBTOTAL_FONT
         cell.alignment = CENTER
         cell.border = THIN_BORDER
         cell.fill = SUBTOTAL_FILL
