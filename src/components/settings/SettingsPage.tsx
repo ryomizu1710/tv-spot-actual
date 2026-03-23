@@ -37,9 +37,9 @@ export function SettingsPage() {
       try {
         const data = JSON.parse(evt.target?.result as string)
         if (data.campaigns) {
-          const addCampaign = useCampaignStore.getState().addCampaign
+          const restoreCampaign = useCampaignStore.getState().restoreCampaign
           for (const c of data.campaigns) {
-            addCampaign(c)
+            restoreCampaign(c)
           }
         }
         if (data.spots) {
