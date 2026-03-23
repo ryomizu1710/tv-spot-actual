@@ -76,7 +76,7 @@ function StationDailyCharts({ data }: { data: StationDailyPrpProgress[] }) {
               {station.stationCode} 日別PRP推移
             </h4>
             <ResponsiveContainer width="100%" height={220}>
-              <ComposedChart data={station.dailyData}>
+              <ComposedChart data={station.dailyData} margin={{ top: 20, right: 5, left: 5, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                 <XAxis dataKey="dateLabel" tick={{ fontSize: CHART_FONT.axis }} interval="preserveStartEnd" />
                 <YAxis yAxisId="left" tick={{ fontSize: CHART_FONT.axis }} label={{ value: '日別%', angle: -90, position: 'insideLeft', fontSize: CHART_FONT.axisLabel }} />
@@ -135,7 +135,7 @@ function RegionDailyCharts({ data, regionStationData }: {
                 <span className="ml-auto text-[10px] font-normal text-gray-400">ダブルクリックで局別詳細</span>
               </h4>
               <ResponsiveContainer width="100%" height={220}>
-                <ComposedChart data={chartData}>
+                <ComposedChart data={chartData} margin={{ top: 20, right: 5, left: 5, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                   <XAxis dataKey="dateLabel" tick={{ fontSize: CHART_FONT.axis }} interval="preserveStartEnd" />
                   <YAxis yAxisId="left" tick={{ fontSize: CHART_FONT.axis }} label={{ value: '日別%', angle: -90, position: 'insideLeft', fontSize: CHART_FONT.axisLabel }} />
@@ -201,7 +201,7 @@ function StationDailyModal({ region, data, onClose }: {
                     {station.stationCode} 日別PRP%推移
                   </h4>
                   <ResponsiveContainer width="100%" height={200}>
-                    <ComposedChart data={station.dailyData}>
+                    <ComposedChart data={station.dailyData} margin={{ top: 20, right: 5, left: 5, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                       <XAxis dataKey="dateLabel" tick={{ fontSize: CHART_FONT.axis }} interval="preserveStartEnd" />
                       <YAxis yAxisId="left" tick={{ fontSize: CHART_FONT.axis }} label={{ value: '日別%', angle: -90, position: 'insideLeft', fontSize: CHART_FONT.axisLabel }} />
