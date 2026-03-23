@@ -100,7 +100,7 @@ export interface SharestExportResult {
 
 /** ヘッダーセルのスタイル */
 const headerStyle: Partial<ExcelJS.Style> = {
-  font: { name: 'ＭＳ Ｐゴシック', size: 11 },
+  font: { name: 'MS UI Gothic', size: 11 },
   fill: {
     type: 'pattern',
     pattern: 'solid',
@@ -121,7 +121,7 @@ const headerStyle: Partial<ExcelJS.Style> = {
 
 /** データセルのスタイル */
 const dataStyle: Partial<ExcelJS.Style> = {
-  font: { name: 'ＭＳ Ｐゴシック', size: 11 },
+  font: { name: '游ゴシック', size: 11 },
   alignment: {
     vertical: 'middle',
   },
