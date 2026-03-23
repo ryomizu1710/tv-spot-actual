@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import { Upload, CheckCircle, AlertCircle, FileSpreadsheet, Target, BarChart3, Download } from 'lucide-react'
+import { Upload, CheckCircle, AlertCircle, Target, BarChart3, Download } from 'lucide-react'
+import { FileDropZone } from './FileDropZone'
 import { toast } from 'sonner'
 import { useCampaignStore } from '../../stores/campaign-store'
 import { useSpotStore } from '../../stores/spot-store'
@@ -57,7 +58,7 @@ export function ImportPage() {
   const [sharestExporting, setSharestExporting] = useState(false)
 
   // --- Sharest handlers ---
-  const handleSharestFilesSelect = (files: FileList | null) => {
+  const handleSharestFilesSelect = (files: FileList | File[] | null) => {
     if (!files) return
     setSharestFiles(Array.from(files))
     setSharestResults([])
@@ -268,16 +269,12 @@ export function ImportPage() {
           「SPOTプラン」ExcelのH列（発注GRP ※PRP）を局別アクチュアルの分母として使用します
         </p>
 
-        <div className="flex items-end gap-3">
-          <div className="flex-1">
-            <label className="mb-1 block text-xs text-gray-500">ファイル選択</label>
-            <label className="flex cursor-pointer items-center gap-2 rounded border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50">
-              <FileSpreadsheet size={14} className="text-gray-400" />
-              {spotPlanFile ? spotPlanFile.name : 'SPOTプラン.xlsxを選択...'}
-              <input type="file" accept=".xlsx,.xls" className="hidden"
-                onChange={(e) => e.target.files?.[0] && handleSpotPlanSelect(e.target.files[0])} />
-            </label>
-          </div>
+        <FileDropZone
+          displayName={spotPlanFile?.name ?? ''}
+          placeholder="SPOTプラン.xlsxを選択またはドロップ..."
+          onFileSelect={(file) => handleSpotPlanSelect(file)}
+        />
+        <div className="mt-3 flex items-end gap-3">
           {spotPlanSheets.length > 0 && (
             <div className="flex-1">
               <label className="mb-1 block text-xs text-gray-500">シート選択</label>
@@ -336,16 +333,12 @@ export function ImportPage() {
           iClimaxローデータExcelから局別の「発注TRP」と「Prime PRP」を読み込みます。TRP参照列はキャンペーンに合わせて選択してください。
         </p>
 
-        <div className="flex items-end gap-3">
-          <div className="flex-1">
-            <label className="mb-1 block text-xs text-gray-500">ファイル選択</label>
-            <label className="flex cursor-pointer items-center gap-2 rounded border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50">
-              <FileSpreadsheet size={14} className="text-gray-400" />
-              {iclimaxFile ? iclimaxFile.name : 'iClimaxローデータ.xlsxを選択...'}
-              <input type="file" accept=".xlsx,.xls" className="hidden"
-                onChange={(e) => { if (e.target.files?.[0]) handleIclimaxFileSelect(e.target.files[0]) }} />
-            </label>
-          </div>
+        <FileDropZone
+          displayName={iclimaxFile?.name ?? ''}
+          placeholder="iClimaxローデータ.xlsxを選択またはドロップ..."
+          onFileSelect={(file) => handleIclimaxFileSelect(file)}
+        />
+        <div className="mt-3 flex items-end gap-3">
           {iclimaxColumnHeaders.length > 0 && (
             <div className="w-64">
               <label className="mb-1 block text-xs text-gray-500">TRP参照列</label>
@@ -460,35 +453,29 @@ export function ImportPage() {
           関東・関西・名古屋のSharestファイルを選択してください（複数選択可）。地域はシート名・ファイル名から自動判定します。
         </p>
 
-        <div className="flex items-end gap-3">
-          <div className="flex-1">
-            <label className="mb-1 block text-xs text-gray-500">ファイル選択（複数可）</label>
-            <label className="flex cursor-pointer items-center gap-2 rounded border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50">
-              <FileSpreadsheet size={14} className="text-gray-400" />
-              {sharestFiles.length > 0
-                ? `${sharestFiles.length}ファイル選択中`
-                : 'Sharestファイルを選択...'}
-              <input type="file" accept=".xlsx,.xls" multiple className="hidden"
-                onChange={(e) => handleSharestFilesSelect(e.target.files)} />
-            </label>
+        <FileDropZone
+          displayName={sharestFiles.length > 0 ? `${sharestFiles.length}ファイル選択中` : ''}
+          placeholder="Sharestファイルを選択またはドロップ...（複数可）"
+          multiple
+          onFilesSelect={(files) => handleSharestFilesSelect(files)}
+        />
+        {/* 選択ファイル一覧 */}
+        {sharestFiles.length > 0 && !sharestDone && (
+          <div className="mt-2 space-y-1">
+            {sharestFiles.map((f, i) => (
+              <div key={i} className="flex items-center gap-2 text-xs text-gray-600">
+                <Upload size={12} /> {f.name}
+              </div>
+            ))}
           </div>
+        )}
+        <div className="mt-3 flex items-end gap-3">
           <button onClick={handleSharestImport}
             disabled={sharestFiles.length === 0 || sharestImporting}
             className="rounded-lg bg-prime px-4 py-2 text-sm font-medium text-white hover:bg-prime-dark disabled:opacity-40">
             {sharestImporting ? '読込中...' : 'インポート'}
           </button>
         </div>
-
-        {/* 選択ファイル一覧 */}
-        {sharestFiles.length > 0 && !sharestDone && (
-          <div className="mt-2 space-y-1">
-            {sharestFiles.map((f, i) => (
-              <div key={i} className="flex items-center gap-2 text-xs text-gray-600">
-                <FileSpreadsheet size={12} /> {f.name}
-              </div>
-            ))}
-          </div>
-        )}
 
         {/* インポート結果 */}
         {sharestDone && sharestResults.length > 0 && (
