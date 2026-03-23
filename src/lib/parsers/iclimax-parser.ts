@@ -2,15 +2,60 @@ import * as XLSX from 'xlsx'
 import type { Region } from '../../types'
 import { isPrimeTime } from '../../constants'
 
-/** iClimaxの TRP 参照列オプション */
+/** iClimaxの TRP 参照列オプション（後方互換用） */
 export type IclimaxTrpColumn = 'U' | 'V' | 'W' | 'X'
 
+/** 動的に読み取った列ヘッダー情報 */
+export interface IclimaxColumnHeader {
+  /** 列の文字（U, V, W, ... AD） */
+  columnLetter: string
+  /** 0-basedの列インデックス */
+  columnIndex: number
+  /** Excelの1行目に書かれたヘッダー文字列 */
+  label: string
+}
+
+/** 後方互換用の固定TRP列選択肢 */
 export const ICLIMAX_TRP_COLUMNS: { value: IclimaxTrpColumn; label: string }[] = [
   { value: 'U', label: 'U列 — 女 35才以上' },
   { value: 'V', label: 'V列 — 男 35才以上' },
   { value: 'W', label: 'W列 — 女 20～34才' },
   { value: 'X', label: 'X列 — ３５＋' },
 ]
+
+/** 列インデックス(0-based) → 列文字 (A, B, ..., Z, AA, AB, ...) */
+function colIndexToLetter(idx: number): string {
+  let s = ''
+  let n = idx
+  while (n >= 0) {
+    s = String.fromCharCode((n % 26) + 65) + s
+    n = Math.floor(n / 26) - 1
+  }
+  return s
+}
+
+/** iClimaxファイルのU列〜AD列（index 20〜29）の1行目ヘッダーを読み取る */
+export async function readIclimaxColumnHeaders(file: File): Promise<IclimaxColumnHeader[]> {
+  const buffer = await file.arrayBuffer()
+  const wb = XLSX.read(buffer, { type: 'array' })
+  const ws = wb.Sheets[wb.SheetNames[0]]
+  if (!ws) return []
+
+  const headers: IclimaxColumnHeader[] = []
+  // U列(20) 〜 AD列(29)
+  for (let c = 20; c <= 29; c++) {
+    const cell = ws[XLSX.utils.encode_cell({ r: 0, c })]
+    if (!cell) continue
+    const label = String(cell.v).trim()
+    if (!label) continue
+    headers.push({
+      columnLetter: colIndexToLetter(c),
+      columnIndex: c,
+      label,
+    })
+  }
+  return headers
+}
 
 /** 局別のiClimax集計結果 */
 export interface IclimaxStationData {
@@ -159,6 +204,8 @@ function trpColumnIndex(col: IclimaxTrpColumn): number {
 export async function parseIclimaxFile(
   file: File,
   trpColumn: IclimaxTrpColumn,
+  /** 動的列インデックスを指定した場合、trpColumnより優先 */
+  trpColumnIndexOverride?: number,
 ): Promise<IclimaxParseResult> {
   const buffer = await file.arrayBuffer()
   const wb = XLSX.read(buffer, { type: 'array' })
@@ -180,7 +227,7 @@ export async function parseIclimaxFile(
   // 局別スポット数 (WPT用)
   const stationSpotCount = new Map<string, { region: Region; stationCode: string; count: number }>()
 
-  const trpColIdx = trpColumnIndex(trpColumn)
+  const trpColIdx = trpColumnIndexOverride ?? trpColumnIndex(trpColumn)
   const totalRows = range.e.r // exclude header
 
   for (let r = 1; r <= range.e.r; r++) {

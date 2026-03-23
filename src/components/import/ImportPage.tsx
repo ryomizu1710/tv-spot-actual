@@ -8,8 +8,10 @@ import { parseSharestFile, type SharestParseResult } from '../../lib/parsers/sha
 import { getSpotPlanSheets, parseSpotPlanFile, type SpotPlanSheet } from '../../lib/parsers/spot-plan-parser'
 import {
   parseIclimaxFile,
+  readIclimaxColumnHeaders,
   ICLIMAX_TRP_COLUMNS,
   type IclimaxTrpColumn,
+  type IclimaxColumnHeader,
   type IclimaxParseResult,
 } from '../../lib/parsers/iclimax-parser'
 import { REGION_LABELS } from '../../constants'
@@ -44,6 +46,8 @@ export function ImportPage() {
   // iClimax file
   const [iclimaxFile, setIclimaxFile] = useState<File | null>(null)
   const [iclimaxTrpColumn, setIclimaxTrpColumn] = useState<IclimaxTrpColumn>('X')
+  const [iclimaxColumnHeaders, setIclimaxColumnHeaders] = useState<IclimaxColumnHeader[]>([])
+  const [iclimaxSelectedColIdx, setIclimaxSelectedColIdx] = useState<number | null>(null)
   const [iclimaxResult, setIclimaxResult] = useState<IclimaxParseResult | null>(null)
   const [iclimaxImporting, setIclimaxImporting] = useState(false)
   const [iclimaxDone, setIclimaxDone] = useState(false)
@@ -145,11 +149,28 @@ export function ImportPage() {
   }
 
   // --- iClimax handlers ---
+  const handleIclimaxFileSelect = async (file: File) => {
+    setIclimaxFile(file)
+    setIclimaxDone(false)
+    setIclimaxResult(null)
+    setIclimaxColumnHeaders([])
+    setIclimaxSelectedColIdx(null)
+    try {
+      const headers = await readIclimaxColumnHeaders(file)
+      setIclimaxColumnHeaders(headers)
+      if (headers.length > 0) {
+        setIclimaxSelectedColIdx(headers[0].columnIndex)
+      }
+    } catch {
+      toast.error('iClimaxファイルのヘッダー読込に失敗しました')
+    }
+  }
+
   const handleIclimaxImport = async () => {
     if (!iclimaxFile) { toast.error('iClimaxファイルを選択してください'); return }
     setIclimaxImporting(true)
     try {
-      const result = await parseIclimaxFile(iclimaxFile, iclimaxTrpColumn)
+      const result = await parseIclimaxFile(iclimaxFile, iclimaxTrpColumn, iclimaxSelectedColIdx ?? undefined)
       if (result.stationData.length === 0) {
         toast.error('局別データが見つかりませんでした')
         setIclimaxImporting(false)
@@ -158,7 +179,11 @@ export function ImportPage() {
       setIclimaxResult(result)
       setIclimaxData(result.stationData, result.regionData, result.dailyPrpData, result.wptStationData, result.wptRegionData)
       setIclimaxDone(true)
-      toast.success(`${result.stationData.length}局の発注TRP・Prime PRPを読み込みました（${ICLIMAX_TRP_COLUMNS.find(c => c.value === iclimaxTrpColumn)?.label}）`)
+      const selectedHeader = iclimaxColumnHeaders.find(h => h.columnIndex === iclimaxSelectedColIdx)
+      const colLabel = selectedHeader
+        ? `${selectedHeader.columnLetter}列 — ${selectedHeader.label}`
+        : ICLIMAX_TRP_COLUMNS.find(c => c.value === iclimaxTrpColumn)?.label ?? ''
+      toast.success(`${result.stationData.length}局の発注TRP・Prime PRPを読み込みました（${colLabel}）`)
     } catch (err) {
       toast.error(`読込エラー: ${err instanceof Error ? err.message : '不明'}`)
     }
@@ -175,6 +200,8 @@ export function ImportPage() {
     setSpotPlanTargets([])
     setSpotPlanDone(false)
     setIclimaxFile(null)
+    setIclimaxColumnHeaders([])
+    setIclimaxSelectedColIdx(null)
     setIclimaxResult(null)
     setIclimaxDone(false)
   }
@@ -285,18 +312,35 @@ export function ImportPage() {
               <FileSpreadsheet size={14} className="text-gray-400" />
               {iclimaxFile ? iclimaxFile.name : 'iClimaxローデータ.xlsxを選択...'}
               <input type="file" accept=".xlsx,.xls" className="hidden"
-                onChange={(e) => { if (e.target.files?.[0]) { setIclimaxFile(e.target.files[0]); setIclimaxDone(false); setIclimaxResult(null) } }} />
+                onChange={(e) => { if (e.target.files?.[0]) handleIclimaxFileSelect(e.target.files[0]) }} />
             </label>
           </div>
-          <div className="w-56">
-            <label className="mb-1 block text-xs text-gray-500">TRP参照列</label>
-            <select value={iclimaxTrpColumn} onChange={(e) => setIclimaxTrpColumn(e.target.value as IclimaxTrpColumn)}
-              className="w-full rounded border border-gray-300 px-3 py-2 text-sm">
-              {ICLIMAX_TRP_COLUMNS.map((col) => (
-                <option key={col.value} value={col.value}>{col.label}</option>
-              ))}
-            </select>
-          </div>
+          {iclimaxColumnHeaders.length > 0 && (
+            <div className="w-64">
+              <label className="mb-1 block text-xs text-gray-500">TRP参照列</label>
+              <select
+                value={iclimaxSelectedColIdx ?? ''}
+                onChange={(e) => setIclimaxSelectedColIdx(Number(e.target.value))}
+                className="w-full rounded border border-gray-300 px-3 py-2 text-sm">
+                {iclimaxColumnHeaders.map((h) => (
+                  <option key={h.columnIndex} value={h.columnIndex}>
+                    {h.columnLetter}列 — {h.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          {iclimaxFile && iclimaxColumnHeaders.length === 0 && (
+            <div className="w-56">
+              <label className="mb-1 block text-xs text-gray-500">TRP参照列</label>
+              <select value={iclimaxTrpColumn} onChange={(e) => setIclimaxTrpColumn(e.target.value as IclimaxTrpColumn)}
+                className="w-full rounded border border-gray-300 px-3 py-2 text-sm">
+                {ICLIMAX_TRP_COLUMNS.map((col) => (
+                  <option key={col.value} value={col.value}>{col.label}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <button onClick={handleIclimaxImport}
             disabled={!iclimaxFile || iclimaxImporting}
             className="rounded-lg bg-amazon px-4 py-2 text-sm font-medium text-white hover:bg-amazon-light disabled:opacity-40">
