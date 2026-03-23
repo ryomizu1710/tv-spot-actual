@@ -16,7 +16,7 @@ function AchievementBadge({ rate }: { rate: number }) {
     ? 'bg-gradient-to-r from-green-50 to-green-100 text-green-700 ring-1 ring-green-200'
     : 'bg-gradient-to-r from-red-50 to-red-100 text-red-600 ring-1 ring-red-200'
   return (
-    <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-bold ${color}`}>
+    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-bold ${color}`}>
       {rate.toFixed(1)}%
     </span>
   )
@@ -28,7 +28,7 @@ function PrimeShareBadge({ rate }: { rate: number }) {
     ? 'bg-gradient-to-r from-green-50 to-green-100 text-green-700 ring-1 ring-green-200'
     : 'bg-gradient-to-r from-red-50 to-red-100 text-red-600 ring-1 ring-red-200'
   return (
-    <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-bold ${color}`}>
+    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-bold ${color}`}>
       {rate.toFixed(1)}%
     </span>
   )
@@ -127,22 +127,22 @@ export function StationActualTable({ stationActuals, regionSubtotals }: Props) {
             )}
           </tr>
           <tr className="border-b border-gray-200 bg-gray-50/80">
-            <th className="px-3 py-2 text-center text-[10px] font-semibold uppercase tracking-wider text-gray-500">エリア</th>
-            <th className="px-3 py-2 text-center text-[10px] font-semibold uppercase tracking-wider text-gray-500">局</th>
-            <th className={`${CATEGORY_STYLES.prp.cellBorder} px-2 py-2 text-center text-[10px] font-semibold text-gray-500`}>発注</th>
-            <th className="px-2 py-2 text-center text-[10px] font-semibold text-gray-500">実績</th>
-            <th className="px-2 py-2 text-center text-[10px] font-semibold text-gray-500">達成率</th>
-            <th className={`${CATEGORY_STYLES.trp.cellBorder} px-2 py-2 text-center text-[10px] font-semibold text-gray-500`}>発注</th>
-            <th className="px-2 py-2 text-center text-[10px] font-semibold text-gray-500">実績</th>
-            <th className="px-2 py-2 text-center text-[10px] font-semibold text-gray-500">達成率</th>
-            <th className={`${CATEGORY_STYLES.prime.cellBorder} px-2 py-2 text-center text-[10px] font-semibold text-gray-500`}>PRP</th>
-            <th className="px-2 py-2 text-center text-[10px] font-semibold text-gray-500">Share</th>
-            <th className={`${CATEGORY_STYLES.spots.cellBorder} px-2 py-2 text-center text-[10px] font-semibold text-gray-500`}>本数</th>
+            <th className="px-3 py-2 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">エリア</th>
+            <th className="px-3 py-2 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">局</th>
+            <th className={`${CATEGORY_STYLES.prp.cellBorder} px-2 py-2 text-center text-xs font-semibold text-gray-500`}>発注</th>
+            <th className="px-2 py-2 text-center text-xs font-semibold text-gray-500">実績</th>
+            <th className="px-2 py-2 text-center text-xs font-semibold text-gray-500">達成率</th>
+            <th className={`${CATEGORY_STYLES.trp.cellBorder} px-2 py-2 text-center text-xs font-semibold text-gray-500`}>発注</th>
+            <th className="px-2 py-2 text-center text-xs font-semibold text-gray-500">実績</th>
+            <th className="px-2 py-2 text-center text-xs font-semibold text-gray-500">達成率</th>
+            <th className={`${CATEGORY_STYLES.prime.cellBorder} px-2 py-2 text-center text-xs font-semibold text-gray-500`}>PRP</th>
+            <th className="px-2 py-2 text-center text-xs font-semibold text-gray-500">Share</th>
+            <th className={`${CATEGORY_STYLES.spots.cellBorder} px-2 py-2 text-center text-xs font-semibold text-gray-500`}>本数</th>
             {hasWpt && (
               <>
-                <th className={`${CATEGORY_STYLES.wpt.cellBorder} px-2 py-2 text-center text-[10px] font-semibold text-gray-500`}>WPT</th>
-                <th className="px-2 py-2 text-center text-[10px] font-semibold text-gray-500">TPT</th>
-                <th className="px-2 py-2 text-center text-[10px] font-semibold text-gray-500">割合</th>
+                <th className={`${CATEGORY_STYLES.wpt.cellBorder} px-2 py-2 text-center text-xs font-semibold text-gray-500`}>WPT</th>
+                <th className="px-2 py-2 text-center text-xs font-semibold text-gray-500">TPT</th>
+                <th className="px-2 py-2 text-center text-xs font-semibold text-gray-500">割合</th>
               </>
             )}
           </tr>
@@ -243,7 +243,7 @@ function RegionBlock({
                 <td className="px-2 py-2 text-center text-gray-700">{wpt ? wpt.tptSpots : <span className="text-gray-300">—</span>}</td>
                 <td className="px-2 py-2 text-center">
                   {wpt && wpt.wptTptRate > 0
-                    ? <span className="inline-block rounded-full bg-gradient-to-r from-violet-50 to-violet-100 px-2 py-0.5 text-[10px] font-bold text-violet-700 ring-1 ring-violet-200">{wpt.wptTptRate.toFixed(1)}%</span>
+                    ? <span className="inline-block rounded-full bg-gradient-to-r from-violet-50 to-violet-100 px-2 py-0.5 text-xs font-bold text-violet-700 ring-1 ring-violet-200">{wpt.wptTptRate.toFixed(1)}%</span>
                     : <span className="text-gray-300">—</span>}
                 </td>
               </>
@@ -287,7 +287,7 @@ function RegionBlock({
                 <td className="px-2 py-2.5 text-center font-bold text-gray-700">{wptR ? wptR.tptSpots : <span className="text-gray-300">—</span>}</td>
                 <td className="px-2 py-2.5 text-center">
                   {wptR && wptR.wptTptRate > 0
-                    ? <span className="inline-block rounded-full bg-gradient-to-r from-violet-50 to-violet-100 px-2 py-0.5 text-[10px] font-bold text-violet-700 ring-1 ring-violet-200">{wptR.wptTptRate.toFixed(1)}%</span>
+                    ? <span className="inline-block rounded-full bg-gradient-to-r from-violet-50 to-violet-100 px-2 py-0.5 text-xs font-bold text-violet-700 ring-1 ring-violet-200">{wptR.wptTptRate.toFixed(1)}%</span>
                     : <span className="text-gray-300">—</span>}
                 </td>
               </>
