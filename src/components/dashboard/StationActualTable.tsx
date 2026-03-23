@@ -75,8 +75,8 @@ const CATEGORY_STYLES = {
 
 export function StationActualTable({ stationActuals, regionSubtotals }: Props) {
   const campaignId = useUiStore((s) => s.selectedCampaignId)
-  const getCampaignData = useSpotStore((s) => s.getCampaignData)
-  const campaignData = campaignId ? getCampaignData(campaignId) : null
+  const campaignDataMap = useSpotStore((s) => s.campaignDataMap)
+  const campaignData = campaignId ? (campaignDataMap[campaignId] ?? null) : null
   const wptStationData = campaignData?.wptStationData ?? []
   const wptRegionData = campaignData?.wptRegionData ?? []
   const hasWpt = wptStationData.length > 0

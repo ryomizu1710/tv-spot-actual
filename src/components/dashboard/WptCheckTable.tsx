@@ -6,8 +6,8 @@ import type { WptStationData, WptRegionData } from '../../lib/parsers/iclimax-pa
 
 export function WptCheckTable() {
   const campaignId = useUiStore((s) => s.selectedCampaignId)
-  const getCampaignData = useSpotStore((s) => s.getCampaignData)
-  const campaignData = campaignId ? getCampaignData(campaignId) : null
+  const campaignDataMap = useSpotStore((s) => s.campaignDataMap)
+  const campaignData = campaignId ? (campaignDataMap[campaignId] ?? null) : null
   const wptStationData = campaignData?.wptStationData ?? []
   const wptRegionData = campaignData?.wptRegionData ?? []
   const selectedRegion = useUiStore((s) => s.selectedRegion)

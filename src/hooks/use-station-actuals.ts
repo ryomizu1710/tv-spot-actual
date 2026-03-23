@@ -130,10 +130,10 @@ export interface StationActualsData {
 
 export function useStationActuals(): StationActualsData | null {
   const spots = useSpotStore((s) => s.spots)
-  const getCampaignData = useSpotStore((s) => s.getCampaignData)
+  const campaignDataMap = useSpotStore((s) => s.campaignDataMap)
   const campaignId = useUiStore((s) => s.selectedCampaignId)
   const selectedRegion = useUiStore((s) => s.selectedRegion)
-  const campaignData = campaignId ? getCampaignData(campaignId) : null
+  const campaignData = campaignId ? (campaignDataMap[campaignId] ?? null) : null
   const stationTargets = campaignData?.stationTargets ?? []
   const regionTargetTrps = campaignData?.regionTargetTrps ?? []
   const iclimaxStationData = campaignData?.iclimaxStationData ?? []
@@ -543,7 +543,7 @@ export function useStationActuals(): StationActualsData | null {
         return denom > 0 ? round1(totalPrimePrp / denom * 100) : 0
       })(),
     }
-  }, [spots, campaignData, campaignId, selectedRegion])
+  }, [spots, campaignDataMap, campaignId, selectedRegion])
 }
 
 /** prpRating取得（旧データ互換: undefinedの場合individualRatingにフォールバック） */
