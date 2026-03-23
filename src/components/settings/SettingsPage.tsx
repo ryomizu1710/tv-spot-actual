@@ -6,30 +6,18 @@ import { toast } from 'sonner'
 export function SettingsPage() {
   const spots = useSpotStore((s) => s.spots)
   const importBatches = useSpotStore((s) => s.importBatches)
-  const stationTargets = useSpotStore((s) => s.stationTargets)
-  const regionTargetTrps = useSpotStore((s) => s.regionTargetTrps)
-  const iclimaxStationData = useSpotStore((s) => s.iclimaxStationData)
-  const iclimaxRegionData = useSpotStore((s) => s.iclimaxRegionData)
-  const iclimaxDailyData = useSpotStore((s) => s.iclimaxDailyData)
-  const wptStationData = useSpotStore((s) => s.wptStationData)
-  const wptRegionData = useSpotStore((s) => s.wptRegionData)
+  const campaignDataMap = useSpotStore((s) => s.campaignDataMap)
   const campaigns = useCampaignStore((s) => s.campaigns)
   const clearAll = useSpotStore((s) => s.clearAll)
 
   const handleExportBackup = () => {
     const data = {
-      version: 2,
+      version: 3,
       exportedAt: new Date().toISOString(),
       campaigns,
       spots,
       importBatches,
-      stationTargets,
-      regionTargetTrps,
-      iclimaxStationData,
-      iclimaxRegionData,
-      iclimaxDailyData,
-      wptStationData,
-      wptRegionData,
+      campaignDataMap,
     }
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
@@ -62,22 +50,42 @@ export function SettingsPage() {
             useSpotStore.getState().addImportBatch(b)
           }
         }
-        // v2: 全データのリストア
         const store = useSpotStore.getState()
-        if (data.stationTargets) {
-          store.setStationTargets(data.stationTargets)
+        // v3: キャンペーン別データのリストア
+        if (data.version >= 3 && data.campaignDataMap) {
+          for (const [cid, cdata] of Object.entries(data.campaignDataMap)) {
+            const cd = cdata as Record<string, unknown[]>
+            if (cd.stationTargets) store.setStationTargets(cid, cd.stationTargets as never)
+            if (cd.regionTargetTrps) store.setRegionTargetTrps(cid, cd.regionTargetTrps as never)
+            if (cd.iclimaxStationData && cd.iclimaxRegionData) {
+              store.setIclimaxData(
+                cid,
+                cd.iclimaxStationData as never,
+                cd.iclimaxRegionData as never,
+                (cd.iclimaxDailyData ?? []) as never,
+                (cd.wptStationData ?? []) as never,
+                (cd.wptRegionData ?? []) as never,
+              )
+            }
+          }
         }
-        if (data.regionTargetTrps) {
-          store.setRegionTargetTrps(data.regionTargetTrps)
-        }
-        if (data.iclimaxStationData && data.iclimaxRegionData) {
-          store.setIclimaxData(
-            data.iclimaxStationData,
-            data.iclimaxRegionData,
-            data.iclimaxDailyData ?? [],
-            data.wptStationData ?? [],
-            data.wptRegionData ?? [],
-          )
+        // v2互換: 旧グローバルデータ → 最初のキャンペーンに紐付け
+        else if (data.stationTargets || data.iclimaxStationData) {
+          const firstCampaignId = data.campaigns?.[0]?.id || campaigns[0]?.id
+          if (firstCampaignId) {
+            if (data.stationTargets) store.setStationTargets(firstCampaignId, data.stationTargets)
+            if (data.regionTargetTrps) store.setRegionTargetTrps(firstCampaignId, data.regionTargetTrps)
+            if (data.iclimaxStationData && data.iclimaxRegionData) {
+              store.setIclimaxData(
+                firstCampaignId,
+                data.iclimaxStationData,
+                data.iclimaxRegionData,
+                data.iclimaxDailyData ?? [],
+                data.wptStationData ?? [],
+                data.wptRegionData ?? [],
+              )
+            }
+          }
         }
         toast.success('バックアップをリストアしました')
       } catch {

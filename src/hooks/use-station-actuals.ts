@@ -130,13 +130,15 @@ export interface StationActualsData {
 
 export function useStationActuals(): StationActualsData | null {
   const spots = useSpotStore((s) => s.spots)
-  const stationTargets = useSpotStore((s) => s.stationTargets)
-  const regionTargetTrps = useSpotStore((s) => s.regionTargetTrps)
-  const iclimaxStationData = useSpotStore((s) => s.iclimaxStationData)
-  const iclimaxRegionData = useSpotStore((s) => s.iclimaxRegionData)
-  const iclimaxDailyData = useSpotStore((s) => s.iclimaxDailyData)
+  const getCampaignData = useSpotStore((s) => s.getCampaignData)
   const campaignId = useUiStore((s) => s.selectedCampaignId)
   const selectedRegion = useUiStore((s) => s.selectedRegion)
+  const campaignData = campaignId ? getCampaignData(campaignId) : null
+  const stationTargets = campaignData?.stationTargets ?? []
+  const regionTargetTrps = campaignData?.regionTargetTrps ?? []
+  const iclimaxStationData = campaignData?.iclimaxStationData ?? []
+  const iclimaxRegionData = campaignData?.iclimaxRegionData ?? []
+  const iclimaxDailyData = campaignData?.iclimaxDailyData ?? []
 
   return useMemo(() => {
     if (!campaignId) return null
@@ -541,7 +543,7 @@ export function useStationActuals(): StationActualsData | null {
         return denom > 0 ? round1(totalPrimePrp / denom * 100) : 0
       })(),
     }
-  }, [spots, stationTargets, regionTargetTrps, iclimaxStationData, iclimaxRegionData, iclimaxDailyData, campaignId, selectedRegion])
+  }, [spots, campaignData, campaignId, selectedRegion])
 }
 
 /** prpRating取得（旧データ互換: undefinedの場合individualRatingにフォールバック） */

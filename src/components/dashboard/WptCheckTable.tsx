@@ -5,8 +5,11 @@ import type { Region } from '../../types'
 import type { WptStationData, WptRegionData } from '../../lib/parsers/iclimax-parser'
 
 export function WptCheckTable() {
-  const wptStationData = useSpotStore((s) => s.wptStationData)
-  const wptRegionData = useSpotStore((s) => s.wptRegionData)
+  const campaignId = useUiStore((s) => s.selectedCampaignId)
+  const getCampaignData = useSpotStore((s) => s.getCampaignData)
+  const campaignData = campaignId ? getCampaignData(campaignId) : null
+  const wptStationData = campaignData?.wptStationData ?? []
+  const wptRegionData = campaignData?.wptRegionData ?? []
   const selectedRegion = useUiStore((s) => s.selectedRegion)
 
   if (wptStationData.length === 0) return null

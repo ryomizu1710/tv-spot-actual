@@ -4,44 +4,66 @@ import type { SpotRecord, ImportBatch, StationTarget } from '../types'
 import type { RegionTargetTrp } from '../lib/parsers/spot-plan-parser'
 import type { IclimaxStationData, IclimaxRegionData, IclimaxDailyPrp, WptStationData, WptRegionData } from '../lib/parsers/iclimax-parser'
 
+/** キャンペーン固有データ */
+export interface CampaignSpecificData {
+  stationTargets: StationTarget[]
+  regionTargetTrps: RegionTargetTrp[]
+  iclimaxStationData: IclimaxStationData[]
+  iclimaxRegionData: IclimaxRegionData[]
+  iclimaxDailyData: IclimaxDailyPrp[]
+  wptStationData: WptStationData[]
+  wptRegionData: WptRegionData[]
+}
+
+const emptyCampaignData: CampaignSpecificData = {
+  stationTargets: [],
+  regionTargetTrps: [],
+  iclimaxStationData: [],
+  iclimaxRegionData: [],
+  iclimaxDailyData: [],
+  wptStationData: [],
+  wptRegionData: [],
+}
+
 interface SpotStore {
   spots: SpotRecord[]
   importBatches: ImportBatch[]
-  stationTargets: StationTarget[]
-  /** エリア別発注TRP (SPOTプラン L列 Row17/23/29) */
-  regionTargetTrps: RegionTargetTrp[]
-  /** iClimax 局別データ（発注TRP・Prime PRP） */
-  iclimaxStationData: IclimaxStationData[]
-  /** iClimax エリア別データ */
-  iclimaxRegionData: IclimaxRegionData[]
-  /** iClimax 日別PRP */
-  iclimaxDailyData: IclimaxDailyPrp[]
-  /** WPTチェック 局別データ */
-  wptStationData: WptStationData[]
-  /** WPTチェック エリア別データ */
-  wptRegionData: WptRegionData[]
+  /** キャンペーン別データ (campaignId -> data) */
+  campaignDataMap: Record<string, CampaignSpecificData>
+
+  // --- 後方互換: 旧グローバルフィールド（マイグレーション用） ---
+  stationTargets?: StationTarget[]
+  regionTargetTrps?: RegionTargetTrp[]
+  iclimaxStationData?: IclimaxStationData[]
+  iclimaxRegionData?: IclimaxRegionData[]
+  iclimaxDailyData?: IclimaxDailyPrp[]
+  wptStationData?: WptStationData[]
+  wptRegionData?: WptRegionData[]
+
+  /** キャンペーン別データ取得ヘルパー */
+  getCampaignData: (campaignId: string) => CampaignSpecificData
+
   addSpots: (spots: SpotRecord[]) => void
   deleteSpotsByBatch: (batchId: string) => void
   deleteSpotsByCampaign: (campaignId: string) => void
   addImportBatch: (batch: ImportBatch) => void
-  setStationTargets: (targets: StationTarget[]) => void
-  setRegionTargetTrps: (trps: RegionTargetTrp[]) => void
-  setIclimaxData: (stationData: IclimaxStationData[], regionData: IclimaxRegionData[], dailyData: IclimaxDailyPrp[], wptStation: WptStationData[], wptRegion: WptRegionData[]) => void
+  setStationTargets: (campaignId: string, targets: StationTarget[]) => void
+  setRegionTargetTrps: (campaignId: string, trps: RegionTargetTrp[]) => void
+  setIclimaxData: (campaignId: string, stationData: IclimaxStationData[], regionData: IclimaxRegionData[], dailyData: IclimaxDailyPrp[], wptStation: WptStationData[], wptRegion: WptRegionData[]) => void
   clearAll: () => void
 }
 
 export const useSpotStore = create<SpotStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       spots: [],
       importBatches: [],
-      stationTargets: [],
-      regionTargetTrps: [],
-      iclimaxStationData: [],
-      iclimaxRegionData: [],
-      iclimaxDailyData: [],
-      wptStationData: [],
-      wptRegionData: [],
+      campaignDataMap: {},
+
+      getCampaignData: (campaignId) => {
+        return get().campaignDataMap[campaignId] ?? emptyCampaignData
+      },
+
       addSpots: (newSpots) => {
         set((state) => ({ spots: [...state.spots, ...newSpots] }))
       },
@@ -52,25 +74,58 @@ export const useSpotStore = create<SpotStore>()(
         }))
       },
       deleteSpotsByCampaign: (campaignId) => {
-        set((state) => ({
-          spots: state.spots.filter((s) => s.campaignId !== campaignId),
-          importBatches: state.importBatches.filter((b) => b.campaignId !== campaignId),
-        }))
+        set((state) => {
+          const newMap = { ...state.campaignDataMap }
+          delete newMap[campaignId]
+          return {
+            spots: state.spots.filter((s) => s.campaignId !== campaignId),
+            importBatches: state.importBatches.filter((b) => b.campaignId !== campaignId),
+            campaignDataMap: newMap,
+          }
+        })
       },
       addImportBatch: (batch) => {
         set((state) => ({ importBatches: [...state.importBatches, batch] }))
       },
-      setStationTargets: (targets) => {
-        set({ stationTargets: targets })
+      setStationTargets: (campaignId, targets) => {
+        set((state) => ({
+          campaignDataMap: {
+            ...state.campaignDataMap,
+            [campaignId]: {
+              ...(state.campaignDataMap[campaignId] ?? emptyCampaignData),
+              stationTargets: targets,
+            },
+          },
+        }))
       },
-      setRegionTargetTrps: (trps) => {
-        set({ regionTargetTrps: trps })
+      setRegionTargetTrps: (campaignId, trps) => {
+        set((state) => ({
+          campaignDataMap: {
+            ...state.campaignDataMap,
+            [campaignId]: {
+              ...(state.campaignDataMap[campaignId] ?? emptyCampaignData),
+              regionTargetTrps: trps,
+            },
+          },
+        }))
       },
-      setIclimaxData: (stationData, regionData, dailyData, wptStation, wptRegion) => {
-        set({ iclimaxStationData: stationData, iclimaxRegionData: regionData, iclimaxDailyData: dailyData, wptStationData: wptStation, wptRegionData: wptRegion })
+      setIclimaxData: (campaignId, stationData, regionData, dailyData, wptStation, wptRegion) => {
+        set((state) => ({
+          campaignDataMap: {
+            ...state.campaignDataMap,
+            [campaignId]: {
+              ...(state.campaignDataMap[campaignId] ?? emptyCampaignData),
+              iclimaxStationData: stationData,
+              iclimaxRegionData: regionData,
+              iclimaxDailyData: dailyData,
+              wptStationData: wptStation,
+              wptRegionData: wptRegion,
+            },
+          },
+        }))
       },
       clearAll: () => {
-        set({ spots: [], importBatches: [], stationTargets: [], regionTargetTrps: [], iclimaxStationData: [], iclimaxRegionData: [], iclimaxDailyData: [], wptStationData: [], wptRegionData: [] })
+        set({ spots: [], importBatches: [], campaignDataMap: {} })
       },
     }),
     { name: 'tv-spot-data' },

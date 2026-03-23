@@ -1,6 +1,7 @@
 import type { StationActual, RegionSubtotal } from '../../hooks/use-station-actuals'
 import type { WptStationData, WptRegionData } from '../../lib/parsers/iclimax-parser'
 import { useSpotStore } from '../../stores/spot-store'
+import { useUiStore } from '../../stores/ui-store'
 import { REGION_LABELS } from '../../constants'
 import type { Region } from '../../types'
 
@@ -73,8 +74,11 @@ const CATEGORY_STYLES = {
 }
 
 export function StationActualTable({ stationActuals, regionSubtotals }: Props) {
-  const wptStationData = useSpotStore((s) => s.wptStationData)
-  const wptRegionData = useSpotStore((s) => s.wptRegionData)
+  const campaignId = useUiStore((s) => s.selectedCampaignId)
+  const getCampaignData = useSpotStore((s) => s.getCampaignData)
+  const campaignData = campaignId ? getCampaignData(campaignId) : null
+  const wptStationData = campaignData?.wptStationData ?? []
+  const wptRegionData = campaignData?.wptRegionData ?? []
   const hasWpt = wptStationData.length > 0
 
   // WPTマップ化

@@ -26,8 +26,7 @@ export function ImportPage() {
   const setStationTargets = useSpotStore((s) => s.setStationTargets)
   const setRegionTargetTrps = useSpotStore((s) => s.setRegionTargetTrps)
   const setIclimaxData = useSpotStore((s) => s.setIclimaxData)
-  const existingTargets = useSpotStore((s) => s.stationTargets)
-  const existingIclimax = useSpotStore((s) => s.iclimaxStationData)
+  const getCampaignData = useSpotStore((s) => s.getCampaignData)
 
   const [campaignId, setCampaignId] = useState('')
 
@@ -136,6 +135,7 @@ export function ImportPage() {
   }
 
   const handleSpotPlanImport = async () => {
+    if (!campaignId) { toast.error('キャンペーンを選択してください'); return }
     if (!spotPlanFile || !selectedSheet) return
     try {
       const result = await parseSpotPlanFile(spotPlanFile, selectedSheet)
@@ -144,8 +144,8 @@ export function ImportPage() {
         return
       }
       setSpotPlanTargets(result.targets)
-      setStationTargets(result.targets)
-      setRegionTargetTrps(result.regionTargetTrps)
+      setStationTargets(campaignId, result.targets)
+      setRegionTargetTrps(campaignId, result.regionTargetTrps)
       setSpotPlanDone(true)
       toast.success(`${result.targets.length}局の発注PRP目標を読み込みました`)
     } catch (err) {
@@ -197,6 +197,7 @@ export function ImportPage() {
   }
 
   const handleIclimaxImport = async () => {
+    if (!campaignId) { toast.error('キャンペーンを選択してください'); return }
     if (!iclimaxFile) { toast.error('iClimaxファイルを選択してください'); return }
     setIclimaxImporting(true)
     try {
@@ -207,7 +208,7 @@ export function ImportPage() {
         return
       }
       setIclimaxResult(result)
-      setIclimaxData(result.stationData, result.regionData, result.dailyPrpData, result.wptStationData, result.wptRegionData)
+      setIclimaxData(campaignId, result.stationData, result.regionData, result.dailyPrpData, result.wptStationData, result.wptRegionData)
       setIclimaxDone(true)
       const selectedHeader = iclimaxColumnHeaders.find(h => h.columnIndex === iclimaxSelectedColIdx)
       const colLabel = selectedHeader
@@ -257,9 +258,9 @@ export function ImportPage() {
         <div className="mb-4 flex items-center gap-2">
           <Target size={18} className="text-prime" />
           <h2 className="text-sm font-bold text-gray-800">SPOTプラン（発注PRP目標）</h2>
-          {(spotPlanDone || existingTargets.length > 0) && (
+          {(spotPlanDone || (campaignId && getCampaignData(campaignId).stationTargets.length > 0)) && (
             <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
-              {spotPlanDone ? spotPlanTargets.length : existingTargets.length}局 読込済
+              {spotPlanDone ? spotPlanTargets.length : getCampaignData(campaignId).stationTargets.length}局 読込済
             </span>
           )}
         </div>
@@ -325,9 +326,9 @@ export function ImportPage() {
         <div className="mb-4 flex items-center gap-2">
           <BarChart3 size={18} className="text-prime" />
           <h2 className="text-sm font-bold text-gray-800">iClimaxローデータ（発注TRP・Prime PRP）</h2>
-          {(iclimaxDone || existingIclimax.length > 0) && (
+          {(iclimaxDone || (campaignId && getCampaignData(campaignId).iclimaxStationData.length > 0)) && (
             <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
-              {iclimaxDone && iclimaxResult ? iclimaxResult.stationData.length : existingIclimax.length}局 読込済
+              {iclimaxDone && iclimaxResult ? iclimaxResult.stationData.length : (campaignId ? getCampaignData(campaignId).iclimaxStationData.length : 0)}局 読込済
             </span>
           )}
         </div>
