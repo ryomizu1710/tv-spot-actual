@@ -24,16 +24,7 @@ body {
   box-sizing: border-box;
 }
 
-/* Windows環境でフォントサイズを少し拡大（Macは影響なし） */
-@media screen and (-webkit-min-device-pixel-ratio: 1) {
-  @supports (-moz-appearance: none) {
-    /* Firefox on Windows */
-    html { font-size: 18px; }
-  }
-}
-@media screen and (hover: hover) and (pointer: fine) {
-  /* デスクトップ環境でRetina以外（= 主にWindows） */
-  @media (max-resolution: 1.5dppx) {
-    html { font-size: 18px; }
-  }
+/* Windows環境（非Retina）で全体を拡大してMacと同等の見た目にする */
+@media screen and (hover: hover) and (pointer: fine) and (max-resolution: 1.5dppx) {
+  html { zoom: 1.15; }
 }
