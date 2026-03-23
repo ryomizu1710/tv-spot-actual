@@ -105,8 +105,7 @@ export function StationActualTable({ stationActuals, regionSubtotals }: Props) {
         <thead>
           {/* カテゴリーグループヘッダー */}
           <tr>
-            <th colSpan={2} className="rounded-tl-xl bg-gray-800 px-3 py-2.5 text-left text-[11px] font-bold tracking-wide text-white">
-              局別アクチュアル
+            <th colSpan={2} className="rounded-tl-xl bg-gray-100 px-3 py-2.5">
             </th>
             <th colSpan={3} className={`${CATEGORY_STYLES.prp.headerBg} border-l ${CATEGORY_STYLES.prp.headerBorder} px-2 py-2.5 text-center text-[11px] font-bold tracking-wider ${CATEGORY_STYLES.prp.headerText}`}>
               PRP
