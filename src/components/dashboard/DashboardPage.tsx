@@ -1,5 +1,7 @@
+import { Download } from 'lucide-react'
 import { useUiStore } from '../../stores/ui-store'
 import { useStationActuals } from '../../hooks/use-station-actuals'
+import { exportStationActualsToExcel, exportDailyPrpToExcel } from '../../lib/exporters/dashboard-exporter'
 import { PrpSummaryCards } from './PrpSummaryCards'
 import { RegionSummaryTable } from './RegionSummaryTable'
 import { StationActualTable } from './StationActualTable'
@@ -46,9 +48,17 @@ export function DashboardPage() {
 
       {/* 局別アクチュアル */}
       <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-        <h3 className="mb-3 text-sm font-semibold text-gray-700">
-          局別アクチュアル（PRP・TG別）
-        </h3>
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-gray-700">
+            局別アクチュアル（PRP・TG別）
+          </h3>
+          <button
+            onClick={() => exportStationActualsToExcel(actualsData.stationActuals, actualsData.regionSubtotals)}
+            className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50"
+          >
+            <Download size={13} /> Excel出力
+          </button>
+        </div>
         <StationActualTable
           stationActuals={actualsData.stationActuals}
           regionSubtotals={actualsData.regionSubtotals}
@@ -57,9 +67,22 @@ export function DashboardPage() {
 
       {/* 日別PRP推移 */}
       <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-        <h3 className="mb-3 text-sm font-semibold text-gray-700">
-          日別PRP推移（%）
-        </h3>
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-gray-700">
+            日別PRP推移（%）
+          </h3>
+          <button
+            onClick={() => exportDailyPrpToExcel(
+              actualsData.regionDailyPrpProgress,
+              actualsData.stationDailyPrpProgress,
+              actualsData.regionStationDailyPrpProgress,
+              isAllRegion,
+            )}
+            className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50"
+          >
+            <Download size={13} /> Excel出力
+          </button>
+        </div>
         <DailyPrpTrendChart
           dailyProgress={actualsData.dailyPrpProgress}
           regionDailyProgress={actualsData.regionDailyPrpProgress}
