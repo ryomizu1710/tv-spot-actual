@@ -6,16 +6,30 @@ import { toast } from 'sonner'
 export function SettingsPage() {
   const spots = useSpotStore((s) => s.spots)
   const importBatches = useSpotStore((s) => s.importBatches)
+  const stationTargets = useSpotStore((s) => s.stationTargets)
+  const regionTargetTrps = useSpotStore((s) => s.regionTargetTrps)
+  const iclimaxStationData = useSpotStore((s) => s.iclimaxStationData)
+  const iclimaxRegionData = useSpotStore((s) => s.iclimaxRegionData)
+  const iclimaxDailyData = useSpotStore((s) => s.iclimaxDailyData)
+  const wptStationData = useSpotStore((s) => s.wptStationData)
+  const wptRegionData = useSpotStore((s) => s.wptRegionData)
   const campaigns = useCampaignStore((s) => s.campaigns)
   const clearAll = useSpotStore((s) => s.clearAll)
 
   const handleExportBackup = () => {
     const data = {
-      version: 1,
+      version: 2,
       exportedAt: new Date().toISOString(),
       campaigns,
       spots,
       importBatches,
+      stationTargets,
+      regionTargetTrps,
+      iclimaxStationData,
+      iclimaxRegionData,
+      iclimaxDailyData,
+      wptStationData,
+      wptRegionData,
     }
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
@@ -47,6 +61,23 @@ export function SettingsPage() {
           for (const b of data.importBatches) {
             useSpotStore.getState().addImportBatch(b)
           }
+        }
+        // v2: 全データのリストア
+        const store = useSpotStore.getState()
+        if (data.stationTargets) {
+          store.setStationTargets(data.stationTargets)
+        }
+        if (data.regionTargetTrps) {
+          store.setRegionTargetTrps(data.regionTargetTrps)
+        }
+        if (data.iclimaxStationData && data.iclimaxRegionData) {
+          store.setIclimaxData(
+            data.iclimaxStationData,
+            data.iclimaxRegionData,
+            data.iclimaxDailyData ?? [],
+            data.wptStationData ?? [],
+            data.wptRegionData ?? [],
+          )
         }
         toast.success('バックアップをリストアしました')
       } catch {
