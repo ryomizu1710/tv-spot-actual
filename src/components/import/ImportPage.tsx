@@ -414,8 +414,7 @@ export function ImportPage() {
         )}
 
         {/* Sharest用フォーマット作成 */}
-        {iclimaxFile && (
-          <div className="mt-4 border-t border-gray-200 pt-4">
+        <div className="mt-4 border-t border-gray-200 pt-4">
             <div className="mb-3 flex items-center gap-2">
               <Download size={16} className="text-teal-600" />
               <h3 className="text-sm font-bold text-gray-800">Sharest用フォーマット作成</h3>
@@ -436,14 +435,13 @@ export function ImportPage() {
                 </select>
               </div>
               <button onClick={handleSharestExport}
-                disabled={sharestExporting}
+                disabled={!iclimaxFile || sharestExporting}
                 className="flex items-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 disabled:opacity-40">
                 <Download size={14} />
                 {sharestExporting ? '出力中...' : 'フォーマット出力'}
               </button>
             </div>
           </div>
-        )}
       </div>
 
       {/* セクション3: Sharest（実績データ）*/}
