@@ -357,13 +357,18 @@ export function useStationActuals(): StationActualsData | null {
       }
     }
 
-    // 対象エリアの合計発注PRP
+    // 対象エリアの合計発注PRP（iClimaxがない場合のフォールバック）
     const totalRegionTarget = selectedRegion === 'all'
       ? stationTargets.reduce((s, t) => s + t.targetPrp, 0)
       : stationTargets.filter((t) => t.region === selectedRegion).reduce((s, t) => s + t.targetPrp, 0)
 
     // 日付順ソート → 累積計算
     const sortedDays = Array.from(dailyMap.entries()).sort(([a], [b]) => a.localeCompare(b))
+
+    // 累積達成率の分母: iClimaxデータがあればiClimax合計PRP（最終日に100%になるように）
+    const totalDailyPrp = sortedDays.reduce((s, [, d]) => s + d.prp, 0)
+    const dailyCumDenom = useIclimaxForDaily && totalDailyPrp > 0 ? totalDailyPrp : totalRegionTarget
+
     let cumulativePrp = 0
     let cumulativeTg = 0
 
@@ -377,7 +382,7 @@ export function useStationActuals(): StationActualsData | null {
         cumulativePrp: round2(cumulativePrp),
         dailyTg: round2(data.tg),
         cumulativeTg: round2(cumulativeTg),
-        cumulativePrpRate: totalRegionTarget > 0 ? round1(cumulativePrp / totalRegionTarget * 100) : 0,
+        cumulativePrpRate: dailyCumDenom > 0 ? round1(cumulativePrp / dailyCumDenom * 100) : 0,
         cumulativeTgPrpRatio: cumulativePrp > 0 ? round1(cumulativeTg / cumulativePrp * 100) : 0,
       }
     })
@@ -411,13 +416,30 @@ export function useStationActuals(): StationActualsData | null {
         }
       }
 
-      // エリア別の発注PRP合計
+      // エリア別のiClimax合計PRP（累積達成率の分母用：最終日に100%になるように）
+      const regionTotalIclimaxPrp: Record<Region, number> = { kanto: 0, kansai: 0, nagoya: 0 }
+      const hasIclimaxDaily = iclimaxDailyData.length > 0
+      if (hasIclimaxDaily) {
+        for (const m of regionDailyMaps.kanto.values()) regionTotalIclimaxPrp.kanto += m
+        for (const m of regionDailyMaps.kansai.values()) regionTotalIclimaxPrp.kansai += m
+        for (const m of regionDailyMaps.nagoya.values()) regionTotalIclimaxPrp.nagoya += m
+      }
+
+      // エリア別の発注PRP合計（iClimaxがない場合のフォールバック）
       const regionTargetPrpMap: Record<Region, number> = { kanto: 0, kansai: 0, nagoya: 0 }
       for (const t of stationTargets) {
         if (regionTargetPrpMap[t.region] !== undefined) {
           regionTargetPrpMap[t.region] += t.targetPrp
         }
       }
+
+      // 累積達成率の分母: iClimaxデータがあればiClimax合計、なければSPOTプラン発注PRP
+      const regionCumDenom: Record<Region, number> = {
+        kanto: hasIclimaxDaily && regionTotalIclimaxPrp.kanto > 0 ? regionTotalIclimaxPrp.kanto : regionTargetPrpMap.kanto,
+        kansai: hasIclimaxDaily && regionTotalIclimaxPrp.kansai > 0 ? regionTotalIclimaxPrp.kansai : regionTargetPrpMap.kansai,
+        nagoya: hasIclimaxDaily && regionTotalIclimaxPrp.nagoya > 0 ? regionTotalIclimaxPrp.nagoya : regionTargetPrpMap.nagoya,
+      }
+      const totalCumDenom = regionCumDenom.kanto + regionCumDenom.kansai + regionCumDenom.nagoya
 
       // 全日付を集めてソート
       const allDates = new Set<string>()
@@ -444,19 +466,19 @@ export function useStationActuals(): StationActualsData | null {
         return {
           date,
           dateLabel: date.slice(5),
-          kantoRate: regionTargetPrpMap.kanto > 0 ? round1(kantoPrp / regionTargetPrpMap.kanto * 100) : 0,
-          kansaiRate: regionTargetPrpMap.kansai > 0 ? round1(kansaiPrp / regionTargetPrpMap.kansai * 100) : 0,
-          nagoyaRate: regionTargetPrpMap.nagoya > 0 ? round1(nagoyaPrp / regionTargetPrpMap.nagoya * 100) : 0,
+          kantoRate: regionCumDenom.kanto > 0 ? round1(kantoPrp / regionCumDenom.kanto * 100) : 0,
+          kansaiRate: regionCumDenom.kansai > 0 ? round1(kansaiPrp / regionCumDenom.kansai * 100) : 0,
+          nagoyaRate: regionCumDenom.nagoya > 0 ? round1(nagoyaPrp / regionCumDenom.nagoya * 100) : 0,
           kantoPrp: round2(kantoPrp),
           kansaiPrp: round2(kansaiPrp),
           nagoyaPrp: round2(nagoyaPrp),
           kantoCumPrp: round2(kantoCum),
           kansaiCumPrp: round2(kansaiCum),
           nagoyaCumPrp: round2(nagoyaCum),
-          kantoCumRate: regionTargetPrpMap.kanto > 0 ? round1(kantoCum / regionTargetPrpMap.kanto * 100) : 0,
-          kansaiCumRate: regionTargetPrpMap.kansai > 0 ? round1(kansaiCum / regionTargetPrpMap.kansai * 100) : 0,
-          nagoyaCumRate: regionTargetPrpMap.nagoya > 0 ? round1(nagoyaCum / regionTargetPrpMap.nagoya * 100) : 0,
-          cumulativeRate: totalRegionTarget > 0 ? round1(cumPrp / totalRegionTarget * 100) : 0,
+          kantoCumRate: regionCumDenom.kanto > 0 ? round1(kantoCum / regionCumDenom.kanto * 100) : 0,
+          kansaiCumRate: regionCumDenom.kansai > 0 ? round1(kansaiCum / regionCumDenom.kansai * 100) : 0,
+          nagoyaCumRate: regionCumDenom.nagoya > 0 ? round1(nagoyaCum / regionCumDenom.nagoya * 100) : 0,
+          cumulativeRate: totalCumDenom > 0 ? round1(cumPrp / totalCumDenom * 100) : 0,
         }
       })
     })()
@@ -495,6 +517,9 @@ export function useStationActuals(): StationActualsData | null {
         const stationTargetPrp = target?.targetPrp ?? 0
         const dayMap = stationDailyMap.get(stationCode)!
         const sortedDays = Array.from(dayMap.entries()).sort(([a], [b]) => a.localeCompare(b))
+        // 累積達成率の分母: iClimaxデータの合計PRP（最終日に100%になるように）、なければSPOTプラン発注PRP
+        const totalIclimaxPrp = sortedDays.reduce((s, [, prp]) => s + prp, 0)
+        const cumDenom = useIclimax && totalIclimaxPrp > 0 ? totalIclimaxPrp : stationTargetPrp
         let cumPrp = 0
         const dailyData = sortedDays.map(([date, prp]) => {
           cumPrp += prp
@@ -502,9 +527,9 @@ export function useStationActuals(): StationActualsData | null {
             date,
             dateLabel: date.slice(5),
             dailyPrp: round2(prp),
-            dailyRate: stationTargetPrp > 0 ? round1(prp / stationTargetPrp * 100) : 0,
+            dailyRate: cumDenom > 0 ? round1(prp / cumDenom * 100) : 0,
             cumulativePrp: round2(cumPrp),
-            cumulativeRate: stationTargetPrp > 0 ? round1(cumPrp / stationTargetPrp * 100) : 0,
+            cumulativeRate: cumDenom > 0 ? round1(cumPrp / cumDenom * 100) : 0,
           }
         })
         return { stationCode, targetPrp: stationTargetPrp, dailyData }
