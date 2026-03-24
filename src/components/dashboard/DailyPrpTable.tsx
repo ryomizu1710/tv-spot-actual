@@ -30,6 +30,26 @@ const CHART_FONT = {
   legend: 12,
 }
 
+/** 日数に応じたX軸フォントサイズを計算 */
+function xAxisFontSize(count: number): number {
+  if (count <= 15) return 12
+  if (count <= 21) return 10
+  if (count <= 31) return 8
+  return 7
+}
+
+/** 日数に応じたX軸ラベル角度 */
+function xAxisAngle(count: number): number {
+  if (count <= 15) return 0
+  return -45
+}
+
+/** 日数に応じたX軸の下マージン */
+function xAxisBottomMargin(count: number): number {
+  if (count <= 15) return 5
+  return 40
+}
+
 /** 棒グラフ上部にラベルを表示するカスタムレンダラー（白背景付きで折れ線と重なっても読める） */
 function BarLabel({ x, y, width, value, suffix }: { x?: number; y?: number; width?: number; value?: number; suffix?: string; [key: string]: unknown }) {
   if (!value || value === 0) return null
@@ -75,16 +95,20 @@ function StationDailyCharts({ data }: { data: StationDailyPrpProgress[] }) {
       {data.map((station) => {
         if (station.dailyData.length === 0) return null
         const color = STATION_COLORS[station.stationCode] ?? '#6B7280'
+        const count = station.dailyData.length
+        const fontSize = xAxisFontSize(count)
+        const angle = xAxisAngle(count)
+        const bottomMargin = xAxisBottomMargin(count)
         return (
           <div key={station.stationCode}>
             <h4 className="mb-2 flex items-center gap-2 text-xs font-semibold text-gray-700">
               <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: color }} />
               {station.stationCode} 日別PRP推移
             </h4>
-            <ResponsiveContainer width="100%" height={220}>
-              <ComposedChart data={station.dailyData} margin={{ top: 20, right: 5, left: 5, bottom: 5 }}>
+            <ResponsiveContainer width="100%" height={220 + (bottomMargin > 5 ? 30 : 0)}>
+              <ComposedChart data={station.dailyData} margin={{ top: 20, right: 5, left: 5, bottom: bottomMargin }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                <XAxis dataKey="dateLabel" tick={{ fontSize: CHART_FONT.axis }} interval="preserveStartEnd" />
+                <XAxis dataKey="dateLabel" tick={{ fontSize }} interval={0} angle={angle} textAnchor={angle < 0 ? 'end' : 'middle'} />
                 <YAxis yAxisId="left" tick={{ fontSize: CHART_FONT.axis }} label={{ value: '日別%', angle: -90, position: 'insideLeft', fontSize: CHART_FONT.axisLabel }} />
                 <YAxis yAxisId="right" orientation="right" tick={{ fontSize: CHART_FONT.axis }} domain={[0, 100]} label={{ value: '累積達成率%', angle: 90, position: 'insideRight', fontSize: CHART_FONT.axisLabel }} />
                 <Tooltip contentStyle={{ fontSize: CHART_FONT.tooltip }} formatter={pctFormatter} />
@@ -128,6 +152,11 @@ function RegionDailyCharts({ data, regionStationData }: {
 
           if (chartData.length === 0) return null
 
+          const count = chartData.length
+          const fontSize = xAxisFontSize(count)
+          const angle = xAxisAngle(count)
+          const bottomMargin = xAxisBottomMargin(count)
+
           return (
             <div
               key={region.key}
@@ -140,10 +169,10 @@ function RegionDailyCharts({ data, regionStationData }: {
                 {region.label} 日別PRP推移
                 <span className="ml-auto text-[10px] font-normal text-gray-400">ダブルクリックで局別詳細</span>
               </h4>
-              <ResponsiveContainer width="100%" height={220}>
-                <ComposedChart data={chartData} margin={{ top: 20, right: 5, left: 5, bottom: 5 }}>
+              <ResponsiveContainer width="100%" height={220 + (bottomMargin > 5 ? 30 : 0)}>
+                <ComposedChart data={chartData} margin={{ top: 20, right: 5, left: 5, bottom: bottomMargin }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                  <XAxis dataKey="dateLabel" tick={{ fontSize: CHART_FONT.axis }} interval="preserveStartEnd" />
+                  <XAxis dataKey="dateLabel" tick={{ fontSize }} interval={0} angle={angle} textAnchor={angle < 0 ? 'end' : 'middle'} />
                   <YAxis yAxisId="left" tick={{ fontSize: CHART_FONT.axis }} label={{ value: '日別%', angle: -90, position: 'insideLeft', fontSize: CHART_FONT.axisLabel }} />
                   <YAxis yAxisId="right" orientation="right" tick={{ fontSize: CHART_FONT.axis }} domain={[0, 100]} label={{ value: '累積達成率%', angle: 90, position: 'insideRight', fontSize: CHART_FONT.axisLabel }} />
                   <Tooltip contentStyle={{ fontSize: CHART_FONT.tooltip }} formatter={pctFormatter} />
@@ -200,16 +229,20 @@ function StationDailyModal({ region, data, onClose }: {
             {data.map((station) => {
               if (station.dailyData.length === 0) return null
               const color = STATION_COLORS[station.stationCode] ?? '#6B7280'
+              const count = station.dailyData.length
+              const fontSize = xAxisFontSize(count)
+              const angle = xAxisAngle(count)
+              const bottomMargin = xAxisBottomMargin(count)
               return (
                 <div key={station.stationCode}>
                   <h4 className="mb-2 flex items-center gap-2 text-xs font-semibold text-gray-700">
                     <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: color }} />
                     {station.stationCode} 日別PRP%推移
                   </h4>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <ComposedChart data={station.dailyData} margin={{ top: 20, right: 5, left: 5, bottom: 5 }}>
+                  <ResponsiveContainer width="100%" height={200 + (bottomMargin > 5 ? 30 : 0)}>
+                    <ComposedChart data={station.dailyData} margin={{ top: 20, right: 5, left: 5, bottom: bottomMargin }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                      <XAxis dataKey="dateLabel" tick={{ fontSize: CHART_FONT.axis }} interval="preserveStartEnd" />
+                      <XAxis dataKey="dateLabel" tick={{ fontSize }} interval={0} angle={angle} textAnchor={angle < 0 ? 'end' : 'middle'} />
                       <YAxis yAxisId="left" tick={{ fontSize: CHART_FONT.axis }} label={{ value: '日別%', angle: -90, position: 'insideLeft', fontSize: CHART_FONT.axisLabel }} />
                       <YAxis yAxisId="right" orientation="right" tick={{ fontSize: CHART_FONT.axis }} domain={[0, 100]} label={{ value: '累積達成率%', angle: 90, position: 'insideRight', fontSize: CHART_FONT.axisLabel }} />
                       <Tooltip contentStyle={{ fontSize: CHART_FONT.tooltip }} formatter={pctFormatter} />

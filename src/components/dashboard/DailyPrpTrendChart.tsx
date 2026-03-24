@@ -18,6 +18,26 @@ interface Props {
   isAllRegion: boolean
 }
 
+/** 日数に応じたX軸フォントサイズを計算 */
+function xAxisFontSize(count: number): number {
+  if (count <= 15) return 12
+  if (count <= 21) return 10
+  if (count <= 31) return 8
+  return 7
+}
+
+/** 日数に応じたX軸ラベル角度 */
+function xAxisAngle(count: number): number {
+  if (count <= 15) return 0
+  return -45
+}
+
+/** 日数に応じたX軸の下マージン */
+function xAxisBottomMargin(count: number): number {
+  if (count <= 15) return 5
+  return 40
+}
+
 export function DailyPrpTrendChart({ dailyProgress, regionDailyProgress, totalTargetPrp, isAllRegion }: Props) {
   if (isAllRegion) {
     return <RegionDailyChart data={regionDailyProgress} />
@@ -39,11 +59,16 @@ function SingleDailyChart({ dailyProgress, totalTargetPrp }: { dailyProgress: Da
     dailyPrpRate: totalTargetPrp > 0 ? Math.round(d.dailyPrp / totalTargetPrp * 1000) / 10 : 0,
   }))
 
+  const count = data.length
+  const fontSize = xAxisFontSize(count)
+  const angle = xAxisAngle(count)
+  const bottomMargin = xAxisBottomMargin(count)
+
   return (
-    <ResponsiveContainer width="100%" height={320}>
-      <BarChart data={data}>
+    <ResponsiveContainer width="100%" height={320 + (bottomMargin > 5 ? 30 : 0)}>
+      <BarChart data={data} margin={{ top: 5, right: 5, left: 5, bottom: bottomMargin }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-        <XAxis dataKey="dateLabel" tick={{ fontSize: 12 }} interval="preserveStartEnd" />
+        <XAxis dataKey="dateLabel" tick={{ fontSize }} interval={0} angle={angle} textAnchor={angle < 0 ? 'end' : 'middle'} />
         <YAxis
           tick={{ fontSize: 12 }}
           label={{ value: '日別 %', angle: -90, position: 'insideLeft', fontSize: 12 }}
@@ -78,11 +103,16 @@ function RegionDailyChart({ data }: { data: RegionDailyPrpProgress[] }) {
     )
   }
 
+  const count = data.length
+  const fontSize = xAxisFontSize(count)
+  const angle = xAxisAngle(count)
+  const bottomMargin = xAxisBottomMargin(count)
+
   return (
-    <ResponsiveContainer width="100%" height={360}>
-      <BarChart data={data}>
+    <ResponsiveContainer width="100%" height={360 + (bottomMargin > 5 ? 30 : 0)}>
+      <BarChart data={data} margin={{ top: 5, right: 5, left: 5, bottom: bottomMargin }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-        <XAxis dataKey="dateLabel" tick={{ fontSize: 12 }} interval="preserveStartEnd" />
+        <XAxis dataKey="dateLabel" tick={{ fontSize }} interval={0} angle={angle} textAnchor={angle < 0 ? 'end' : 'middle'} />
         <YAxis
           tick={{ fontSize: 12 }}
           label={{ value: '日別 %', angle: -90, position: 'insideLeft', fontSize: 12 }}
