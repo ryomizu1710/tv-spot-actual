@@ -295,11 +295,11 @@ export async function exportKaianToExcel(
   if (iclimaxSpots.length === 0) return
 
   // Sharestスポットをキー(station|date|startTime)でマップ化
-  const sharestMap = new Map<string, number[]>()
+  const sharestMap = new Map<string, { prp: number; trp: number }[]>()
   for (const sp of sharestSpots) {
     const key = `${sp.stationCode}|${sp.broadcastDate}|${normalizeTime(sp.broadcastTime)}`
     const arr = sharestMap.get(key) ?? []
-    arr.push(sp.prpRating)
+    arr.push({ prp: sp.prpRating, trp: sp.tgRating ?? 0 })
     sharestMap.set(key, arr)
   }
 
@@ -316,6 +316,10 @@ export async function exportKaianToExcel(
     sharestPrp: number   // 予測視聴率ALL (Sharest R列)
     diff: number         // 号数差分ALL
     achieveRate: number  // 想定アクチュアルALL達成率
+    iclimaxTrp: number   // 発注号数TRP (iClimax 選択列)
+    sharestTrp: number   // 予測視聴率TRP (Sharest S列)
+    trpDiff: number      // 号数差分TRP
+    trpAchieveRate: number // 想定アクチュアルTRP達成率
   }
 
   const allRows: KaianRow[] = []
@@ -331,9 +335,13 @@ export async function exportKaianToExcel(
     const sharestValues = sharestMap.get(matchKey)
     if (!sharestValues || sharestValues.length === 0) continue
 
-    const sharestPrp = sharestValues[0]
+    const sharestPrp = sharestValues[0].prp
+    const sharestTrp = sharestValues[0].trp
     const diff = sharestPrp - ic.prp
     if (diff > -0.5) continue
+
+    const iclimaxTrp = ic.trp ?? 0
+    const trpDiff = sharestTrp - iclimaxTrp
 
     allRows.push({
       region: ic.region,
@@ -347,6 +355,10 @@ export async function exportKaianToExcel(
       sharestPrp,
       diff,
       achieveRate: ic.prp > 0 ? sharestPrp / ic.prp : 0,
+      iclimaxTrp,
+      sharestTrp,
+      trpDiff,
+      trpAchieveRate: iclimaxTrp > 0 ? sharestTrp / iclimaxTrp : 0,
     })
   }
 
@@ -379,7 +391,7 @@ export async function exportKaianToExcel(
     const ws = wb.addWorksheet(`改案枠（${stCode}）`)
 
     // ヘッダー行
-    const headers = ['No.', '地区', '放送局', '放送日', '曜日', '開始時間', '終了時間', '秒数', '発注号数\nALL', '予測視聴率\nALL', '号数差分\nALL', '想定アクチュアル\nALL達成率']
+    const headers = ['No.', '地区', '放送局', '放送日', '曜日', '開始時間', '終了時間', '秒数', '発注号数\nALL', '予測視聴率\nALL', '号数差分\nALL', '想定アクチュアル\nALL達成率', '発注号数\nTRP', '予測視聴率\nTRP', '号数差分\nTRP', '想定アクチュアル\nTRP達成率']
     const headerRow = ws.addRow(headers)
     headerRow.height = 28
     headerRow.eachCell((cell) => {
@@ -390,7 +402,7 @@ export async function exportKaianToExcel(
     })
 
     // 列幅
-    const colWidths = [5, 6, 7, 12, 5, 9, 9, 5, 11, 11, 11, 14]
+    const colWidths = [5, 6, 7, 12, 5, 9, 9, 5, 11, 11, 11, 14, 11, 11, 11, 14]
     colWidths.forEach((w, i) => { ws.getColumn(i + 1).width = w })
 
     // データ行
@@ -409,18 +421,22 @@ export async function exportKaianToExcel(
         row.sharestPrp,
         row.diff,
         row.achieveRate,
+        row.iclimaxTrp,
+        row.sharestTrp,
+        row.trpDiff,
+        row.trpAchieveRate,
       ])
       dataRow.eachCell((cell, colNumber) => {
         cell.font = DATA_FONT
         cell.alignment = CENTER
         cell.border = THIN_BORDER
-        // 号数差分列（K=11列目）を赤色ハイライト
-        if (colNumber === 11 && typeof cell.value === 'number' && cell.value <= -0.5) {
+        // 号数差分列（11=ALL, 15=TRP）を赤色ハイライト
+        if ((colNumber === 11 || colNumber === 15) && typeof cell.value === 'number' && cell.value <= -0.5) {
           cell.fill = RED_FILL
           cell.font = RED_FONT
         }
-        // 達成率列（L=12列目）
-        if (colNumber === 12 && typeof cell.value === 'number') {
+        // 達成率列（12=ALL, 16=TRP）
+        if ((colNumber === 12 || colNumber === 16) && typeof cell.value === 'number') {
           cell.numFmt = '0.0%'
           if (cell.value < 1) {
             cell.fill = RED_FILL
@@ -437,6 +453,9 @@ export async function exportKaianToExcel(
     ws.getColumn(9).numFmt = '0.0'
     ws.getColumn(10).numFmt = '0.0'
     ws.getColumn(11).numFmt = '0.0'
+    ws.getColumn(13).numFmt = '0.0'
+    ws.getColumn(14).numFmt = '0.0'
+    ws.getColumn(15).numFmt = '0.0'
   }
 
   const buffer = await wb.xlsx.writeBuffer()

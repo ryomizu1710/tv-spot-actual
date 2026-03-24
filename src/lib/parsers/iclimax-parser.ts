@@ -145,6 +145,7 @@ export interface IclimaxSpotRow {
   endTime: string     // e.g. "21:54" or ""
   seconds: number     // 秒数
   prp: number         // T列 見積ALL
+  trp: number         // 選択TRP列
 }
 
 export interface IclimaxParseResult {
@@ -335,6 +336,7 @@ export async function parseIclimaxFile(
       endTime: endTimeValue,
       seconds: isNaN(seconds) ? 0 : seconds,
       prp: prpValue,
+      trp: trpValue,
     })
 
     // 日別PRP収集 (T列)
