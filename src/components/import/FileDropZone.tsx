@@ -30,61 +30,33 @@ export function FileDropZone({
     }
   }, [multiple, onFileSelect, onFilesSelect])
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragOver(true)
-  }, [])
-
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragOver(false)
-  }, [])
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragOver(false)
-    handleFiles(e.dataTransfer.files)
-  }, [handleFiles])
-
-  const handleClick = () => {
-    inputRef.current?.click()
-  }
+  const handleDragOver = useCallback((e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); setIsDragOver(true) }, [])
+  const handleDragLeave = useCallback((e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); setIsDragOver(false) }, [])
+  const handleDrop = useCallback((e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); setIsDragOver(false); handleFiles(e.dataTransfer.files) }, [handleFiles])
 
   return (
     <div
-      onClick={handleClick}
+      onClick={() => inputRef.current?.click()}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed px-4 py-3.5 text-[13px] transition-all duration-200 ${
         isDragOver
-          ? 'border-[#007AFF] bg-[#007AFF]/5 text-[#007AFF]'
+          ? 'border-[#0a84ff] bg-[#0a84ff]/10 text-[#0a84ff]'
           : displayName
-            ? 'border-[#34C759]/40 bg-[#34C759]/5 text-[#1d1d1f]'
-            : 'border-gray-200 bg-[#f5f5f7]/50 text-[#86868b] hover:border-gray-300 hover:bg-[#f5f5f7]'
+            ? 'border-[#30d158]/30 bg-[#30d158]/[0.06] text-[#f5f5f7]'
+            : 'border-white/[0.1] bg-white/[0.03] text-[#636366] hover:border-white/[0.15] hover:bg-white/[0.05]'
       }`}
     >
       {isDragOver ? (
-        <Upload size={16} className="text-[#007AFF]" />
+        <Upload size={16} className="text-[#0a84ff]" />
       ) : (
-        <FileSpreadsheet size={16} className={displayName ? 'text-[#34C759]' : 'text-[#86868b]'} />
+        <FileSpreadsheet size={16} className={displayName ? 'text-[#30d158]' : 'text-[#636366]'} />
       )}
       <span className={isDragOver ? 'font-medium' : ''}>
-        {isDragOver
-          ? 'ここにドロップ'
-          : displayName || placeholder}
+        {isDragOver ? 'ここにドロップ' : displayName || placeholder}
       </span>
-      <input
-        ref={inputRef}
-        type="file"
-        accept={accept}
-        multiple={multiple}
-        className="hidden"
-        onChange={(e) => handleFiles(e.target.files)}
-      />
+      <input ref={inputRef} type="file" accept={accept} multiple={multiple} className="hidden" onChange={(e) => handleFiles(e.target.files)} />
     </div>
   )
 }
