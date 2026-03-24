@@ -240,7 +240,7 @@ function RegionBlock({
             {hasWpt && (
               <>
                 <td className={`${CATEGORY_STYLES.wpt.cellBorder} px-2 py-2 text-center text-gray-700`}>{wpt ? wpt.wptSpots : <span className="text-gray-300">—</span>}</td>
-                <td className="px-2 py-2 text-center text-gray-700">{wpt ? wpt.wsbSpots : <span className="text-gray-300">—</span>}</td>
+                <td className="px-2 py-2 text-center text-gray-700">{wpt ? (wpt.wsbSpots ?? 0) : <span className="text-gray-300">—</span>}</td>
                 <td className="px-2 py-2 text-center text-gray-700">{wpt ? wpt.tptSpots : <span className="text-gray-300">—</span>}</td>
                 <td className="px-2 py-2 text-center">
                   {wpt && wpt.wptTptRate > 0
@@ -285,7 +285,7 @@ function RegionBlock({
             {hasWpt && (
               <>
                 <td className={`${CATEGORY_STYLES.wpt.cellBorder} px-2 py-2.5 text-center font-bold text-gray-700`}>{wptR ? wptR.wptSpots : <span className="text-gray-300">—</span>}</td>
-                <td className="px-2 py-2.5 text-center font-bold text-gray-700">{wptR ? wptR.wsbSpots : <span className="text-gray-300">—</span>}</td>
+                <td className="px-2 py-2.5 text-center font-bold text-gray-700">{wptR ? (wptR.wsbSpots ?? 0) : <span className="text-gray-300">—</span>}</td>
                 <td className="px-2 py-2.5 text-center font-bold text-gray-700">{wptR ? wptR.tptSpots : <span className="text-gray-300">—</span>}</td>
                 <td className="px-2 py-2.5 text-center">
                   {wptR && wptR.wptTptRate > 0

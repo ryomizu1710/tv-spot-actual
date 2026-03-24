@@ -33,10 +33,10 @@ export function WptCheckTable() {
   const grandTotal = {
     totalSpots: filteredRegions.reduce((s, r) => s + r.totalSpots, 0),
     wptSpots: filteredRegions.reduce((s, r) => s + r.wptSpots, 0),
-    wsbSpots: filteredRegions.reduce((s, r) => s + r.wsbSpots, 0),
+    wsbSpots: filteredRegions.reduce((s, r) => s + (r.wsbSpots ?? 0), 0),
     tptSpots: filteredRegions.reduce((s, r) => s + r.tptSpots, 0),
     wptFrames: filteredRegions.reduce((s, r) => s + r.wptFrames, 0),
-    wsbFrames: filteredRegions.reduce((s, r) => s + r.wsbFrames, 0),
+    wsbFrames: filteredRegions.reduce((s, r) => s + (r.wsbFrames ?? 0), 0),
     tptFrames: filteredRegions.reduce((s, r) => s + r.tptFrames, 0),
   }
   const grandWptTptRate = grandTotal.totalSpots > 0
@@ -116,8 +116,8 @@ function RegionBlock({ region, stations, subtotal, showRegion }: {
           <td className="px-2 py-1.5 text-right">{st.totalSpots}</td>
           <td className="px-2 py-1.5 text-right">{st.wptFrames}</td>
           <td className="px-2 py-1.5 text-right">{st.wptSpots}</td>
-          <td className="px-2 py-1.5 text-right">{st.wsbFrames}</td>
-          <td className="px-2 py-1.5 text-right">{st.wsbSpots}</td>
+          <td className="px-2 py-1.5 text-right">{st.wsbFrames ?? 0}</td>
+          <td className="px-2 py-1.5 text-right">{st.wsbSpots ?? 0}</td>
           <td className="px-2 py-1.5 text-right">{st.tptFrames}</td>
           <td className="px-2 py-1.5 text-right">{st.tptSpots}</td>
           <td className="px-2 py-1.5 text-right">{fmtRate(st.wptTptRate)}</td>
@@ -130,8 +130,8 @@ function RegionBlock({ region, stations, subtotal, showRegion }: {
           <td className="px-2 py-1.5 text-right">{subtotal.totalSpots}</td>
           <td className="px-2 py-1.5 text-right">{subtotal.wptFrames}</td>
           <td className="px-2 py-1.5 text-right">{subtotal.wptSpots}</td>
-          <td className="px-2 py-1.5 text-right">{subtotal.wsbFrames}</td>
-          <td className="px-2 py-1.5 text-right">{subtotal.wsbSpots}</td>
+          <td className="px-2 py-1.5 text-right">{subtotal.wsbFrames ?? 0}</td>
+          <td className="px-2 py-1.5 text-right">{subtotal.wsbSpots ?? 0}</td>
           <td className="px-2 py-1.5 text-right">{subtotal.tptFrames}</td>
           <td className="px-2 py-1.5 text-right">{subtotal.tptSpots}</td>
           <td className="px-2 py-1.5 text-right">{fmtRate(subtotal.wptTptRate)}</td>
