@@ -1,7 +1,8 @@
 import { Download } from 'lucide-react'
 import { useUiStore } from '../../stores/ui-store'
+import { useSpotStore } from '../../stores/spot-store'
 import { useStationActuals } from '../../hooks/use-station-actuals'
-import { exportStationActualsToExcel, exportDailyPrpToExcel } from '../../lib/exporters/dashboard-exporter'
+import { exportStationActualsToExcel, exportDailyPrpToExcel, exportKaianToExcel } from '../../lib/exporters/dashboard-exporter'
 import { PrpSummaryCards } from './PrpSummaryCards'
 import { RegionSummaryTable } from './RegionSummaryTable'
 import { StationActualTable } from './StationActualTable'
@@ -13,6 +14,11 @@ export function DashboardPage() {
   const selectedRegion = useUiStore((s) => s.selectedRegion)
   const actualsData = useStationActuals()
   const isAllRegion = selectedRegion === 'all'
+  const campaignDataMap = useSpotStore((s) => s.campaignDataMap)
+  const spots = useSpotStore((s) => s.spots)
+  const campaignData = campaignId ? campaignDataMap[campaignId] : null
+  const iclimaxSpots = campaignData?.iclimaxSpots ?? []
+  const sharestSpots = campaignId ? spots.filter((s) => s.campaignId === campaignId) : []
 
   if (!campaignId) {
     return (
@@ -52,12 +58,22 @@ export function DashboardPage() {
           <h3 className="text-sm font-semibold text-gray-700">
             局別アクチュアル（PRP・TG別）
           </h3>
-          <button
-            onClick={() => exportStationActualsToExcel(actualsData.stationActuals, actualsData.regionSubtotals)}
-            className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50"
-          >
-            <Download size={13} /> Excel出力
-          </button>
+          <div className="flex items-center gap-2">
+            {iclimaxSpots.length > 0 && sharestSpots.length > 0 && (
+              <button
+                onClick={() => exportKaianToExcel(iclimaxSpots, sharestSpots)}
+                className="flex items-center gap-1.5 rounded-lg border border-violet-300 bg-violet-50 px-3 py-1.5 text-xs text-violet-700 hover:bg-violet-100"
+              >
+                <Download size={13} /> 改案枠出力
+              </button>
+            )}
+            <button
+              onClick={() => exportStationActualsToExcel(actualsData.stationActuals, actualsData.regionSubtotals)}
+              className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50"
+            >
+              <Download size={13} /> Excel出力
+            </button>
+          </div>
         </div>
         <StationActualTable
           stationActuals={actualsData.stationActuals}

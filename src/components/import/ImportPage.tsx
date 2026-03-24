@@ -209,7 +209,7 @@ export function ImportPage() {
         return
       }
       setIclimaxResult(result)
-      setIclimaxData(campaignId, result.stationData, result.regionData, result.dailyPrpData, result.wptStationData, result.wptRegionData)
+      setIclimaxData(campaignId, result.stationData, result.regionData, result.dailyPrpData, result.spotRows, result.wptStationData, result.wptRegionData)
       setIclimaxDone(true)
       const selectedHeader = iclimaxColumnHeaders.find(h => h.columnIndex === iclimaxSelectedColIdx)
       const colLabel = selectedHeader

@@ -135,6 +135,18 @@ export interface IclimaxDailyPrp {
   prp: number
 }
 
+/** iClimax 個別スポット行（改案枠出力用） */
+export interface IclimaxSpotRow {
+  region: Region
+  stationCode: string
+  date: string        // YYYY-MM-DD
+  dayOfWeek: string   // 曜日
+  startTime: string   // e.g. "21:00"
+  endTime: string     // e.g. "21:54" or ""
+  seconds: number     // 秒数
+  prp: number         // T列 見積ALL
+}
+
 export interface IclimaxParseResult {
   stationData: IclimaxStationData[]
   regionData: IclimaxRegionData[]
@@ -142,6 +154,8 @@ export interface IclimaxParseResult {
   wptRegionData: WptRegionData[]
   /** 日別PRP（局別） */
   dailyPrpData: IclimaxDailyPrp[]
+  /** 個別スポット行（改案枠出力用） */
+  spotRows: IclimaxSpotRow[]
   totalRows: number
   errorCount: number
   errors: string[]
@@ -234,6 +248,8 @@ export async function parseIclimaxFile(
 
   // 日別PRP収集用
   const dailyPrpList: IclimaxDailyPrp[] = []
+  // 個別スポット行（改案枠出力用）
+  const spotRows: IclimaxSpotRow[] = []
 
   // 局別集計マップ: key = "region|stationCode"
   const stationMap = new Map<string, { trpSum: number; totalPrpSum: number; primePrpSum: number; count: number; region: Region; stationCode: string }>()
@@ -304,6 +320,22 @@ export async function parseIclimaxFile(
       errorCount++
       continue
     }
+
+    // 個別スポット行を収集（改案枠出力用）
+    const fCell = ws[XLSX.utils.encode_cell({ r, c: 5 })]
+    const dayOfWeek = fCell ? String(fCell.v).trim() : ''
+    const iCell = ws[XLSX.utils.encode_cell({ r, c: 8 })]
+    const seconds = iCell ? Number(iCell.v) : 0
+    spotRows.push({
+      region,
+      stationCode,
+      date: dateStr ?? '',
+      dayOfWeek,
+      startTime: timeStr,
+      endTime: endTimeValue,
+      seconds: isNaN(seconds) ? 0 : seconds,
+      prp: prpValue,
+    })
 
     // 日別PRP収集 (T列)
     if (dateStr) {
@@ -420,5 +452,5 @@ export async function parseIclimaxFile(
     wptTptRate: v.totalSpots > 0 ? Math.round((v.wptSpots + v.wsbSpots + v.tptSpots) / v.totalSpots * 1000) / 10 : 0,
   }))
 
-  return { stationData, regionData, wptStationData, wptRegionData, dailyPrpData: dailyPrpList, totalRows, errorCount, errors }
+  return { stationData, regionData, wptStationData, wptRegionData, dailyPrpData: dailyPrpList, spotRows, totalRows, errorCount, errors }
 }

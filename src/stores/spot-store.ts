@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { SpotRecord, ImportBatch, StationTarget } from '../types'
 import type { RegionTargetTrp } from '../lib/parsers/spot-plan-parser'
-import type { IclimaxStationData, IclimaxRegionData, IclimaxDailyPrp, WptStationData, WptRegionData } from '../lib/parsers/iclimax-parser'
+import type { IclimaxStationData, IclimaxRegionData, IclimaxDailyPrp, IclimaxSpotRow, WptStationData, WptRegionData } from '../lib/parsers/iclimax-parser'
 
 /** キャンペーン固有データ */
 export interface CampaignSpecificData {
@@ -11,6 +11,7 @@ export interface CampaignSpecificData {
   iclimaxStationData: IclimaxStationData[]
   iclimaxRegionData: IclimaxRegionData[]
   iclimaxDailyData: IclimaxDailyPrp[]
+  iclimaxSpots: IclimaxSpotRow[]
   wptStationData: WptStationData[]
   wptRegionData: WptRegionData[]
 }
@@ -21,6 +22,7 @@ const emptyCampaignData: CampaignSpecificData = {
   iclimaxStationData: [],
   iclimaxRegionData: [],
   iclimaxDailyData: [],
+  iclimaxSpots: [],
   wptStationData: [],
   wptRegionData: [],
 }
@@ -49,7 +51,7 @@ interface SpotStore {
   addImportBatch: (batch: ImportBatch) => void
   setStationTargets: (campaignId: string, targets: StationTarget[]) => void
   setRegionTargetTrps: (campaignId: string, trps: RegionTargetTrp[]) => void
-  setIclimaxData: (campaignId: string, stationData: IclimaxStationData[], regionData: IclimaxRegionData[], dailyData: IclimaxDailyPrp[], wptStation: WptStationData[], wptRegion: WptRegionData[]) => void
+  setIclimaxData: (campaignId: string, stationData: IclimaxStationData[], regionData: IclimaxRegionData[], dailyData: IclimaxDailyPrp[], spotRows: IclimaxSpotRow[], wptStation: WptStationData[], wptRegion: WptRegionData[]) => void
   clearAll: () => void
 }
 
@@ -105,7 +107,7 @@ export const useSpotStore = create<SpotStore>()(
           },
         }))
       },
-      setIclimaxData: (campaignId, stationData, regionData, dailyData, wptStation, wptRegion) => {
+      setIclimaxData: (campaignId, stationData, regionData, dailyData, spotRows, wptStation, wptRegion) => {
         set((state) => ({
           campaignDataMap: {
             ...state.campaignDataMap,
@@ -114,6 +116,7 @@ export const useSpotStore = create<SpotStore>()(
               iclimaxStationData: stationData,
               iclimaxRegionData: regionData,
               iclimaxDailyData: dailyData,
+              iclimaxSpots: spotRows,
               wptStationData: wptStation,
               wptRegionData: wptRegion,
             },

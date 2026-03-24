@@ -1,6 +1,8 @@
 import ExcelJS from 'exceljs'
 import type { StationActual, RegionSubtotal, StationDailyPrpProgress, RegionDailyPrpProgress } from '../../hooks/use-station-actuals'
 import type { Region } from '../../types'
+import type { SpotRecord } from '../../types/spot'
+import type { IclimaxSpotRow } from '../parsers/iclimax-parser'
 import { REGION_LABELS } from '../../constants'
 
 /** 共通スタイル */
@@ -276,4 +278,167 @@ function downloadExcel(buffer: ExcelJS.Buffer, filename: string) {
   a.download = filename
   a.click()
   URL.revokeObjectURL(url)
+}
+
+/** 時間文字列を正規化 (e.g. "5:00" → "05:00") */
+function normalizeTime(t: string): string {
+  const m = t.match(/^(\d{1,2}):(\d{2})/)
+  if (!m) return t.trim()
+  return `${m[1].padStart(2, '0')}:${m[2]}`
+}
+
+/** 改案枠出力: iClimax vs Sharest 差分が-0.5以下の枠を局別シートで出力 */
+export async function exportKaianToExcel(
+  iclimaxSpots: IclimaxSpotRow[],
+  sharestSpots: SpotRecord[],
+) {
+  if (iclimaxSpots.length === 0) return
+
+  // Sharestスポットをキー(station|date|startTime)でマップ化
+  const sharestMap = new Map<string, number[]>()
+  for (const sp of sharestSpots) {
+    const key = `${sp.stationCode}|${sp.broadcastDate}|${normalizeTime(sp.broadcastTime)}`
+    const arr = sharestMap.get(key) ?? []
+    arr.push(sp.prpRating)
+    sharestMap.set(key, arr)
+  }
+
+  // iClimaxの各スポットにSharest値をマッチングし、差分を計算
+  interface KaianRow {
+    region: Region
+    stationCode: string
+    date: string
+    dayOfWeek: string
+    startTime: string
+    endTime: string
+    seconds: number
+    iclimaxPrp: number   // 発注号数ALL (iClimax T列)
+    sharestPrp: number   // 予測視聴率ALL (Sharest R列)
+    diff: number         // 号数差分ALL
+    achieveRate: number  // 想定アクチュアルALL達成率
+  }
+
+  const allRows: KaianRow[] = []
+  // 重複防止: 同一枠(station|date|startTime|endTime)を1回だけ処理
+  const processedFrames = new Set<string>()
+
+  for (const ic of iclimaxSpots) {
+    const frameKey = `${ic.stationCode}|${ic.date}|${normalizeTime(ic.startTime)}|${ic.endTime}`
+    if (processedFrames.has(frameKey)) continue
+    processedFrames.add(frameKey)
+
+    const matchKey = `${ic.stationCode}|${ic.date}|${normalizeTime(ic.startTime)}`
+    const sharestValues = sharestMap.get(matchKey)
+    if (!sharestValues || sharestValues.length === 0) continue
+
+    const sharestPrp = sharestValues[0]
+    const diff = sharestPrp - ic.prp
+    if (diff > -0.5) continue
+
+    allRows.push({
+      region: ic.region,
+      stationCode: ic.stationCode,
+      date: ic.date,
+      dayOfWeek: ic.dayOfWeek,
+      startTime: ic.startTime,
+      endTime: ic.endTime,
+      seconds: ic.seconds,
+      iclimaxPrp: ic.prp,
+      sharestPrp,
+      diff,
+      achieveRate: ic.prp > 0 ? sharestPrp / ic.prp : 0,
+    })
+  }
+
+  if (allRows.length === 0) return
+
+  // 局別にグループ化
+  const stationGroups = new Map<string, KaianRow[]>()
+  for (const row of allRows) {
+    const arr = stationGroups.get(row.stationCode) ?? []
+    arr.push(row)
+    stationGroups.set(row.stationCode, arr)
+  }
+
+  // 局コードの表示順
+  const stationOrder = ['NTV', 'TBS', 'CX', 'EX', 'TX', 'YTV', 'MBS', 'KTV', 'ABC', 'TVO', 'CTV', 'CBC', 'THK', 'NBN', 'TVA']
+  const sortedStations = Array.from(stationGroups.keys()).sort(
+    (a, b) => (stationOrder.indexOf(a) === -1 ? 99 : stationOrder.indexOf(a)) - (stationOrder.indexOf(b) === -1 ? 99 : stationOrder.indexOf(b)),
+  )
+
+  const wb = new ExcelJS.Workbook()
+
+  const KAIAN_HEADER_FILL: ExcelJS.FillPattern = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1F2937' } }
+  const KAIAN_HEADER_FONT: Partial<ExcelJS.Font> = { name: FONT_NAME, size: 9, bold: true, color: { argb: 'FFFFFFFF' } }
+
+  for (const stCode of sortedStations) {
+    const rows = stationGroups.get(stCode)!
+    // 日付→開始時間でソート
+    rows.sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime))
+
+    const ws = wb.addWorksheet(`改案枠（${stCode}）`)
+
+    // ヘッダー行
+    const headers = ['No.', '地区', '放送局', '放送日', '曜日', '開始時間', '終了時間', '秒数', '発注号数\nALL', '予測視聴率\nALL', '号数差分\nALL', '想定アクチュアル\nALL達成率']
+    const headerRow = ws.addRow(headers)
+    headerRow.height = 28
+    headerRow.eachCell((cell) => {
+      cell.fill = KAIAN_HEADER_FILL
+      cell.font = KAIAN_HEADER_FONT
+      cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }
+      cell.border = THIN_BORDER
+    })
+
+    // 列幅
+    const colWidths = [5, 6, 7, 12, 5, 9, 9, 5, 11, 11, 11, 14]
+    colWidths.forEach((w, i) => { ws.getColumn(i + 1).width = w })
+
+    // データ行
+    rows.forEach((row, idx) => {
+      const regionLabel = REGION_LABELS[row.region] ?? row.region
+      const dataRow = ws.addRow([
+        idx + 1,
+        regionLabel,
+        row.stationCode,
+        row.date,
+        row.dayOfWeek,
+        row.startTime,
+        row.endTime,
+        row.seconds || '',
+        row.iclimaxPrp,
+        row.sharestPrp,
+        row.diff,
+        row.achieveRate,
+      ])
+      dataRow.eachCell((cell, colNumber) => {
+        cell.font = DATA_FONT
+        cell.alignment = CENTER
+        cell.border = THIN_BORDER
+        // 号数差分列（K=11列目）を赤色ハイライト
+        if (colNumber === 11 && typeof cell.value === 'number' && cell.value <= -0.5) {
+          cell.fill = RED_FILL
+          cell.font = RED_FONT
+        }
+        // 達成率列（L=12列目）
+        if (colNumber === 12 && typeof cell.value === 'number') {
+          cell.numFmt = '0.0%'
+          if (cell.value < 1) {
+            cell.fill = RED_FILL
+            cell.font = RED_FONT
+          } else {
+            cell.fill = GREEN_FILL
+            cell.font = GREEN_FONT
+          }
+        }
+      })
+    })
+
+    // 数値フォーマット
+    ws.getColumn(9).numFmt = '0.0'
+    ws.getColumn(10).numFmt = '0.0'
+    ws.getColumn(11).numFmt = '0.0'
+  }
+
+  const buffer = await wb.xlsx.writeBuffer()
+  downloadExcel(buffer, '改案枠出力.xlsx')
 }
