@@ -509,6 +509,15 @@ export function useStationActuals(): StationActualsData | null {
         }
       }
 
+      // 全局を通じた全日付を収集（枠が0本の日も表示するため）
+      const allDatesSet = new Set<string>()
+      for (const dayMap of stationDailyMap.values()) {
+        for (const date of dayMap.keys()) {
+          allDatesSet.add(date)
+        }
+      }
+      const allDates = Array.from(allDatesSet).sort()
+
       const stationCodes = Array.from(stationDailyMap.keys()).sort(
         (a, b) => getStationSortOrder(a) - getStationSortOrder(b)
       )
@@ -516,7 +525,8 @@ export function useStationActuals(): StationActualsData | null {
         const target = targetMap.get(`${region}|${stationCode}`)
         const stationTargetPrp = target?.targetPrp ?? 0
         const dayMap = stationDailyMap.get(stationCode)!
-        const sortedDays = Array.from(dayMap.entries()).sort(([a], [b]) => a.localeCompare(b))
+        // 全日付を使用し、データがない日は0として扱う
+        const sortedDays: [string, number][] = allDates.map((date) => [date, dayMap.get(date) ?? 0])
         // 累積達成率の分母: iClimaxデータの合計PRP（最終日に100%になるように）、なければSPOTプラン発注PRP
         const totalIclimaxPrp = sortedDays.reduce((s, [, prp]) => s + prp, 0)
         const cumDenom = useIclimax && totalIclimaxPrp > 0 ? totalIclimaxPrp : stationTargetPrp
