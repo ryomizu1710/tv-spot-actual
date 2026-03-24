@@ -8,6 +8,12 @@ interface Props {
 
 const REGION_ORDER: Region[] = ['kanto', 'kansai', 'nagoya']
 
+const P4P_VALUES: Record<Region, number> = {
+  kanto: 50.7,
+  kansai: 57.1,
+  nagoya: 47.4,
+}
+
 function RateValue({ rate, threshold }: { rate: number; threshold: number }) {
   if (rate === 0) return <span className="text-2xl font-bold text-gray-300">—</span>
   const isGood = rate >= threshold
@@ -49,9 +55,14 @@ export function RegionSummaryTable({ regionSubtotals }: Props) {
               <span className="text-sm text-gray-500">TRP %</span>
               <RateValue rate={rs.tgAchievement} threshold={100} />
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">Prime Time Share</span>
-              <RateValue rate={rs.primeShare} threshold={60} />
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-500">Prime Time Share</span>
+                <RateValue rate={rs.primeShare} threshold={60} />
+              </div>
+              <div className="mt-0.5 text-right">
+                <span className="text-xs text-gray-300">P4P：{P4P_VALUES[rs.region]}％</span>
+              </div>
             </div>
           </div>
         </div>
