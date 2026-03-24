@@ -33,12 +33,14 @@ export function WptCheckTable() {
   const grandTotal = {
     totalSpots: filteredRegions.reduce((s, r) => s + r.totalSpots, 0),
     wptSpots: filteredRegions.reduce((s, r) => s + r.wptSpots, 0),
+    wsbSpots: filteredRegions.reduce((s, r) => s + r.wsbSpots, 0),
     tptSpots: filteredRegions.reduce((s, r) => s + r.tptSpots, 0),
     wptFrames: filteredRegions.reduce((s, r) => s + r.wptFrames, 0),
+    wsbFrames: filteredRegions.reduce((s, r) => s + r.wsbFrames, 0),
     tptFrames: filteredRegions.reduce((s, r) => s + r.tptFrames, 0),
   }
   const grandWptTptRate = grandTotal.totalSpots > 0
-    ? Math.round((grandTotal.wptSpots + grandTotal.tptSpots) / grandTotal.totalSpots * 1000) / 10
+    ? Math.round((grandTotal.wptSpots + grandTotal.wsbSpots + grandTotal.tptSpots) / grandTotal.totalSpots * 1000) / 10
     : 0
 
   return (
@@ -53,9 +55,11 @@ export function WptCheckTable() {
               <th className="px-2 py-1.5 text-right font-semibold text-gray-600">全本数</th>
               <th className="px-2 py-1.5 text-right font-semibold text-gray-600">WPT枠数</th>
               <th className="px-2 py-1.5 text-right font-semibold text-gray-600">WPT本数</th>
+              <th className="px-2 py-1.5 text-right font-semibold text-gray-600">WSB枠数</th>
+              <th className="px-2 py-1.5 text-right font-semibold text-gray-600">WSB本数</th>
               <th className="px-2 py-1.5 text-right font-semibold text-gray-600">TPT枠数</th>
               <th className="px-2 py-1.5 text-right font-semibold text-gray-600">TPT本数</th>
-              <th className="px-2 py-1.5 text-right font-semibold text-gray-600">WPT+TPT割合</th>
+              <th className="px-2 py-1.5 text-right font-semibold text-gray-600">割合</th>
             </tr>
           </thead>
           <tbody>
@@ -80,6 +84,8 @@ export function WptCheckTable() {
               <td className="px-2 py-1.5 text-right">{grandTotal.totalSpots}</td>
               <td className="px-2 py-1.5 text-right">{grandTotal.wptFrames}</td>
               <td className="px-2 py-1.5 text-right">{grandTotal.wptSpots}</td>
+              <td className="px-2 py-1.5 text-right">{grandTotal.wsbFrames}</td>
+              <td className="px-2 py-1.5 text-right">{grandTotal.wsbSpots}</td>
               <td className="px-2 py-1.5 text-right">{grandTotal.tptFrames}</td>
               <td className="px-2 py-1.5 text-right">{grandTotal.tptSpots}</td>
               <td className="px-2 py-1.5 text-right">{fmtRate(grandWptTptRate)}</td>
@@ -110,6 +116,8 @@ function RegionBlock({ region, stations, subtotal, showRegion }: {
           <td className="px-2 py-1.5 text-right">{st.totalSpots}</td>
           <td className="px-2 py-1.5 text-right">{st.wptFrames}</td>
           <td className="px-2 py-1.5 text-right">{st.wptSpots}</td>
+          <td className="px-2 py-1.5 text-right">{st.wsbFrames}</td>
+          <td className="px-2 py-1.5 text-right">{st.wsbSpots}</td>
           <td className="px-2 py-1.5 text-right">{st.tptFrames}</td>
           <td className="px-2 py-1.5 text-right">{st.tptSpots}</td>
           <td className="px-2 py-1.5 text-right">{fmtRate(st.wptTptRate)}</td>
@@ -122,6 +130,8 @@ function RegionBlock({ region, stations, subtotal, showRegion }: {
           <td className="px-2 py-1.5 text-right">{subtotal.totalSpots}</td>
           <td className="px-2 py-1.5 text-right">{subtotal.wptFrames}</td>
           <td className="px-2 py-1.5 text-right">{subtotal.wptSpots}</td>
+          <td className="px-2 py-1.5 text-right">{subtotal.wsbFrames}</td>
+          <td className="px-2 py-1.5 text-right">{subtotal.wsbSpots}</td>
           <td className="px-2 py-1.5 text-right">{subtotal.tptFrames}</td>
           <td className="px-2 py-1.5 text-right">{subtotal.tptSpots}</td>
           <td className="px-2 py-1.5 text-right">{fmtRate(subtotal.wptTptRate)}</td>

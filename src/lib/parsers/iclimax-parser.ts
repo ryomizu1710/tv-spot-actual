@@ -96,15 +96,19 @@ export interface WptStationData {
   stationCode: string
   /** 全スポット数 */
   totalSpots: number
-  /** WPT本数 (2本同枠のスポット数) */
+  /** WPT本数 (2本同枠・終了時間あり) */
   wptSpots: number
-  /** TPT本数 (3本同枠のスポット数) */
+  /** WSB本数 (2本同枠・終了時間なし) */
+  wsbSpots: number
+  /** TPT本数 (3本以上同枠) */
   tptSpots: number
   /** WPT枠数 */
   wptFrames: number
+  /** WSB枠数 */
+  wsbFrames: number
   /** TPT枠数 */
   tptFrames: number
-  /** WPT+TPT和割合 % ((wptSpots + tptSpots) / totalSpots * 100) */
+  /** WPT+WSB+TPT割合 % */
   wptTptRate: number
 }
 
@@ -113,8 +117,10 @@ export interface WptRegionData {
   region: Region
   totalSpots: number
   wptSpots: number
+  wsbSpots: number
   tptSpots: number
   wptFrames: number
+  wsbFrames: number
   tptFrames: number
   wptTptRate: number
 }
@@ -233,7 +239,8 @@ export async function parseIclimaxFile(
   const stationMap = new Map<string, { trpSum: number; totalPrpSum: number; primePrpSum: number; count: number; region: Region; stationCode: string }>()
 
   // WPTチェック用: 枠マップ key = "region|stationCode|D~I列結合"
-  const frameMap = new Map<string, number>()
+  // value: { count, hasEndTime } — H列(index 7)が空欄かどうかを記録
+  const frameMap = new Map<string, { count: number; hasEndTime: boolean }>()
   // 局別スポット数 (WPT用)
   const stationSpotCount = new Map<string, { region: Region; stationCode: string; count: number }>()
 
@@ -263,7 +270,13 @@ export async function parseIclimaxFile(
       frameParts.push(cell ? String(cell.v).trim() : '')
     }
     const frameKey = `${region}|${stationCode}|${frameParts.join('|')}`
-    frameMap.set(frameKey, (frameMap.get(frameKey) ?? 0) + 1)
+    // H列(index 7) = 終了時間: 空欄かどうかを判定
+    const hCell = ws[XLSX.utils.encode_cell({ r, c: 7 })]
+    const endTimeValue = hCell ? String(hCell.v).trim() : ''
+    const existing2 = frameMap.get(frameKey) ?? { count: 0, hasEndTime: endTimeValue !== '' }
+    existing2.count += 1
+    if (endTimeValue !== '') existing2.hasEndTime = true
+    frameMap.set(frameKey, existing2)
 
     // 局別スポット数
     const stKey = `${region}|${stationCode}`
@@ -340,58 +353,71 @@ export async function parseIclimaxFile(
   }))
 
   // --- WPTチェック集計 ---
-  // 枠を局別にWPT/TPT集計
-  const wptStationMap = new Map<string, { wptFrames: number; tptFrames: number; wptSpots: number; tptSpots: number }>()
-  for (const [frameKey, count] of frameMap) {
+  // 枠を局別にWPT/WSB/TPT集計
+  const wptStationMap = new Map<string, { wptFrames: number; wsbFrames: number; tptFrames: number; wptSpots: number; wsbSpots: number; tptSpots: number }>()
+  for (const [frameKey, frameInfo] of frameMap) {
     // frameKey: "region|stationCode|D|E|F|G|H|I"
     const parts = frameKey.split('|')
     const stKey = `${parts[0]}|${parts[1]}`
-    const entry = wptStationMap.get(stKey) ?? { wptFrames: 0, tptFrames: 0, wptSpots: 0, tptSpots: 0 }
-    if (count === 2) {
-      entry.wptFrames += 1
-      entry.wptSpots += 2
-    } else if (count >= 3) {
+    const entry = wptStationMap.get(stKey) ?? { wptFrames: 0, wsbFrames: 0, tptFrames: 0, wptSpots: 0, wsbSpots: 0, tptSpots: 0 }
+    if (frameInfo.count === 2) {
+      if (frameInfo.hasEndTime) {
+        // WPT: 2本同枠で終了時間あり
+        entry.wptFrames += 1
+        entry.wptSpots += 2
+      } else {
+        // WSB: 2本同枠で終了時間が空欄
+        entry.wsbFrames += 1
+        entry.wsbSpots += 2
+      }
+    } else if (frameInfo.count >= 3) {
       entry.tptFrames += 1
-      entry.tptSpots += count
+      entry.tptSpots += frameInfo.count
     }
     wptStationMap.set(stKey, entry)
   }
 
   const wptStationData: WptStationData[] = Array.from(stationSpotCount.entries()).map(([stKey, info]) => {
-    const wpt = wptStationMap.get(stKey) ?? { wptFrames: 0, tptFrames: 0, wptSpots: 0, tptSpots: 0 }
+    const wpt = wptStationMap.get(stKey) ?? { wptFrames: 0, wsbFrames: 0, tptFrames: 0, wptSpots: 0, wsbSpots: 0, tptSpots: 0 }
     const total = info.count
     return {
       region: info.region,
       stationCode: info.stationCode,
       totalSpots: total,
       wptSpots: wpt.wptSpots,
+      wsbSpots: wpt.wsbSpots,
       tptSpots: wpt.tptSpots,
       wptFrames: wpt.wptFrames,
+      wsbFrames: wpt.wsbFrames,
       tptFrames: wpt.tptFrames,
-      wptTptRate: total > 0 ? Math.round((wpt.wptSpots + wpt.tptSpots) / total * 1000) / 10 : 0,
+      wptTptRate: total > 0 ? Math.round((wpt.wptSpots + wpt.wsbSpots + wpt.tptSpots) / total * 1000) / 10 : 0,
     }
   })
 
   // エリア別WPT集計
-  const wptRegionMap = new Map<Region, { totalSpots: number; wptSpots: number; tptSpots: number; wptFrames: number; tptFrames: number }>()
-  for (const ws of wptStationData) {
-    const entry = wptRegionMap.get(ws.region) ?? { totalSpots: 0, wptSpots: 0, tptSpots: 0, wptFrames: 0, tptFrames: 0 }
-    entry.totalSpots += ws.totalSpots
-    entry.wptSpots += ws.wptSpots
-    entry.tptSpots += ws.tptSpots
-    entry.wptFrames += ws.wptFrames
-    entry.tptFrames += ws.tptFrames
-    wptRegionMap.set(ws.region, entry)
+  const wptRegionMap = new Map<Region, { totalSpots: number; wptSpots: number; wsbSpots: number; tptSpots: number; wptFrames: number; wsbFrames: number; tptFrames: number }>()
+  for (const ws2 of wptStationData) {
+    const entry = wptRegionMap.get(ws2.region) ?? { totalSpots: 0, wptSpots: 0, wsbSpots: 0, tptSpots: 0, wptFrames: 0, wsbFrames: 0, tptFrames: 0 }
+    entry.totalSpots += ws2.totalSpots
+    entry.wptSpots += ws2.wptSpots
+    entry.wsbSpots += ws2.wsbSpots
+    entry.tptSpots += ws2.tptSpots
+    entry.wptFrames += ws2.wptFrames
+    entry.wsbFrames += ws2.wsbFrames
+    entry.tptFrames += ws2.tptFrames
+    wptRegionMap.set(ws2.region, entry)
   }
 
   const wptRegionData: WptRegionData[] = Array.from(wptRegionMap.entries()).map(([region, v]) => ({
     region,
     totalSpots: v.totalSpots,
     wptSpots: v.wptSpots,
+    wsbSpots: v.wsbSpots,
     tptSpots: v.tptSpots,
     wptFrames: v.wptFrames,
+    wsbFrames: v.wsbFrames,
     tptFrames: v.tptFrames,
-    wptTptRate: v.totalSpots > 0 ? Math.round((v.wptSpots + v.tptSpots) / v.totalSpots * 1000) / 10 : 0,
+    wptTptRate: v.totalSpots > 0 ? Math.round((v.wptSpots + v.wsbSpots + v.tptSpots) / v.totalSpots * 1000) / 10 : 0,
   }))
 
   return { stationData, regionData, wptStationData, wptRegionData, dailyPrpData: dailyPrpList, totalRows, errorCount, errors }

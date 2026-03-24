@@ -120,7 +120,7 @@ export function StationActualTable({ stationActuals, regionSubtotals }: Props) {
               出稿
             </th>
             {hasWpt && (
-              <th colSpan={3} className={`${CATEGORY_STYLES.wpt.headerBg} border-l ${CATEGORY_STYLES.wpt.headerBorder} rounded-tr-xl px-2 py-2.5 text-center text-[11px] font-bold tracking-wider ${CATEGORY_STYLES.wpt.headerText}`}>
+              <th colSpan={4} className={`${CATEGORY_STYLES.wpt.headerBg} border-l ${CATEGORY_STYLES.wpt.headerBorder} rounded-tr-xl px-2 py-2.5 text-center text-[11px] font-bold tracking-wider ${CATEGORY_STYLES.wpt.headerText}`}>
                 WPT チェック
               </th>
             )}
@@ -140,6 +140,7 @@ export function StationActualTable({ stationActuals, regionSubtotals }: Props) {
             {hasWpt && (
               <>
                 <th className={`${CATEGORY_STYLES.wpt.cellBorder} px-2 py-2 text-center text-xs font-semibold text-gray-500`}>WPT</th>
+                <th className="px-2 py-2 text-center text-xs font-semibold text-gray-500">WSB</th>
                 <th className="px-2 py-2 text-center text-xs font-semibold text-gray-500">TPT</th>
                 <th className="px-2 py-2 text-center text-xs font-semibold text-gray-500">割合</th>
               </>
@@ -239,6 +240,7 @@ function RegionBlock({
             {hasWpt && (
               <>
                 <td className={`${CATEGORY_STYLES.wpt.cellBorder} px-2 py-2 text-center text-gray-700`}>{wpt ? wpt.wptSpots : <span className="text-gray-300">—</span>}</td>
+                <td className="px-2 py-2 text-center text-gray-700">{wpt ? wpt.wsbSpots : <span className="text-gray-300">—</span>}</td>
                 <td className="px-2 py-2 text-center text-gray-700">{wpt ? wpt.tptSpots : <span className="text-gray-300">—</span>}</td>
                 <td className="px-2 py-2 text-center">
                   {wpt && wpt.wptTptRate > 0
@@ -283,6 +285,7 @@ function RegionBlock({
             {hasWpt && (
               <>
                 <td className={`${CATEGORY_STYLES.wpt.cellBorder} px-2 py-2.5 text-center font-bold text-gray-700`}>{wptR ? wptR.wptSpots : <span className="text-gray-300">—</span>}</td>
+                <td className="px-2 py-2.5 text-center font-bold text-gray-700">{wptR ? wptR.wsbSpots : <span className="text-gray-300">—</span>}</td>
                 <td className="px-2 py-2.5 text-center font-bold text-gray-700">{wptR ? wptR.tptSpots : <span className="text-gray-300">—</span>}</td>
                 <td className="px-2 py-2.5 text-center">
                   {wptR && wptR.wptTptRate > 0
