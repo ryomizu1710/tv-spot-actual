@@ -18,6 +18,7 @@ export function DashboardPage() {
   const spots = useSpotStore((s) => s.spots)
   const campaignData = campaignId ? campaignDataMap[campaignId] : null
   const iclimaxSpots = campaignData?.iclimaxSpots ?? []
+  const hasIclimaxData = (campaignData?.iclimaxStationData ?? []).length > 0
   const sharestSpots = campaignId ? spots.filter((s) => s.campaignId === campaignId) : []
 
   if (!campaignId) {
@@ -59,9 +60,15 @@ export function DashboardPage() {
             局別アクチュアル（PRP・TG別）
           </h3>
           <div className="flex items-center gap-2">
-            {iclimaxSpots.length > 0 && sharestSpots.length > 0 && (
+            {hasIclimaxData && sharestSpots.length > 0 && (
               <button
-                onClick={() => exportKaianToExcel(iclimaxSpots, sharestSpots)}
+                onClick={() => {
+                  if (iclimaxSpots.length === 0) {
+                    alert('iClimaxのスポット行データがありません。\n「データ取込」からiClimaxファイルを再度読み込んでください。')
+                    return
+                  }
+                  exportKaianToExcel(iclimaxSpots, sharestSpots)
+                }}
                 className="flex items-center gap-1.5 rounded-lg border border-violet-300 bg-violet-50 px-3 py-1.5 text-xs text-violet-700 hover:bg-violet-100"
               >
                 <Download size={13} /> 改案枠出力
