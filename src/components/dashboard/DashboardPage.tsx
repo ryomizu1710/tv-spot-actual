@@ -22,40 +22,38 @@ export function DashboardPage() {
 
   if (!campaignId) {
     return (
-      <div className="flex h-full flex-col items-center justify-center text-gray-400">
-        <p className="text-lg">キャンペーンを選択してください</p>
-        <p className="mt-1 text-sm">ヘッダーのドロップダウンからキャンペーンを選択するか、新規作成してください</p>
+      <div className="flex h-full flex-col items-center justify-center">
+        <p className="text-[21px] font-semibold text-[#1d1d1f]">キャンペーンを選択</p>
+        <p className="mt-2 text-[15px] text-[#86868b]">ヘッダーのドロップダウンからキャンペーンを選択するか、新規作成してください</p>
       </div>
     )
   }
 
   if (!actualsData || (actualsData.stationActuals.length === 0 && actualsData.dailyPrpProgress.length === 0)) {
     return (
-      <div className="flex h-full flex-col items-center justify-center text-gray-400">
-        <p className="text-lg">データがありません</p>
-        <p className="mt-1 text-sm">データ取込ページからSharestファイルとSPOTプランをインポートしてください</p>
+      <div className="flex h-full flex-col items-center justify-center">
+        <p className="text-[21px] font-semibold text-[#1d1d1f]">データがありません</p>
+        <p className="mt-2 text-[15px] text-[#86868b]">データ取込ページからSharestファイルとSPOTプランをインポートしてください</p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      {/* サマリー: 全体の場合はエリア別テーブル、個別エリアの場合はカード */}
+    <div className="mx-auto max-w-[1400px] space-y-6">
+      {/* サマリー */}
       {isAllRegion ? (
-        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-          <h3 className="mb-3 text-sm font-semibold text-gray-700">エリア別サマリー</h3>
-          <RegionSummaryTable
-            regionSubtotals={actualsData.regionSubtotals}
-          />
-        </div>
+        <section>
+          <h3 className="mb-3 text-[13px] font-semibold text-[#86868b] uppercase tracking-wider">エリア別サマリー</h3>
+          <RegionSummaryTable regionSubtotals={actualsData.regionSubtotals} />
+        </section>
       ) : (
         <PrpSummaryCards data={actualsData} />
       )}
 
       {/* 局別アクチュアル */}
-      <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-        <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-gray-700">
+      <section className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-[15px] font-semibold text-[#1d1d1f]">
             局別アクチュアル（PRP・TG別）
           </h3>
           <div className="flex items-center gap-2">
@@ -71,13 +69,13 @@ export function DashboardPage() {
                 }
                 exportKaianToExcel(iclimaxSpots, sharestSpots)
               }}
-              className="flex items-center gap-1.5 rounded-lg border border-violet-300 bg-violet-50 px-3 py-1.5 text-xs text-violet-700 hover:bg-violet-100"
+              className="flex items-center gap-1.5 rounded-full bg-[#AF52DE]/10 px-3.5 py-1.5 text-[12px] font-medium text-[#AF52DE] transition-all hover:bg-[#AF52DE]/20"
             >
               <Download size={13} /> 改案枠出力
             </button>
             <button
               onClick={() => exportStationActualsToExcel(actualsData.stationActuals, actualsData.regionSubtotals)}
-              className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50"
+              className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3.5 py-1.5 text-[12px] font-medium text-[#1d1d1f] transition-all hover:bg-gray-200/80"
             >
               <Download size={13} /> Excel出力
             </button>
@@ -87,12 +85,12 @@ export function DashboardPage() {
           stationActuals={actualsData.stationActuals}
           regionSubtotals={actualsData.regionSubtotals}
         />
-      </div>
+      </section>
 
       {/* 日別PRP推移 */}
-      <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-        <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-gray-700">
+      <section className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-[15px] font-semibold text-[#1d1d1f]">
             日別PRP推移（%）
           </h3>
           <button
@@ -102,7 +100,7 @@ export function DashboardPage() {
               actualsData.regionStationDailyPrpProgress,
               isAllRegion,
             )}
-            className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50"
+            className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3.5 py-1.5 text-[12px] font-medium text-[#1d1d1f] transition-all hover:bg-gray-200/80"
           >
             <Download size={13} /> Excel出力
           </button>
@@ -113,7 +111,7 @@ export function DashboardPage() {
           totalTargetPrp={actualsData.totalTargetPrp}
           isAllRegion={isAllRegion}
         />
-        <div className="mt-4 border-t border-gray-200 pt-4">
+        <div className="mt-5 border-t border-gray-100 pt-5">
           <DailyPrpTable
             regionDailyProgress={actualsData.regionDailyPrpProgress}
             stationDailyProgress={actualsData.stationDailyPrpProgress}
@@ -121,7 +119,7 @@ export function DashboardPage() {
             isAllRegion={isAllRegion}
           />
         </div>
-      </div>
+      </section>
     </div>
   )
 }

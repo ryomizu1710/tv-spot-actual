@@ -1,5 +1,5 @@
 import type { RegionSubtotal } from '../../hooks/use-station-actuals'
-import { REGION_LABELS, REGION_COLORS } from '../../constants'
+import { REGION_LABELS } from '../../constants'
 import type { Region } from '../../types'
 
 interface Props {
@@ -14,11 +14,17 @@ const P4P_VALUES: Record<Region, number> = {
   nagoya: 47.4,
 }
 
+const REGION_GRADIENT: Record<Region, string> = {
+  kanto: 'from-[#007AFF] to-[#0055D4]',
+  kansai: 'from-[#FF9500] to-[#E08600]',
+  nagoya: 'from-[#AF52DE] to-[#9340C0]',
+}
+
 function RateValue({ rate, threshold }: { rate: number; threshold: number }) {
-  if (rate === 0) return <span className="text-2xl font-bold text-gray-300">—</span>
+  if (rate === 0) return <span className="text-[28px] font-bold text-gray-300">—</span>
   const isGood = rate >= threshold
   return (
-    <span className={`text-2xl font-bold ${isGood ? 'text-green-600' : 'text-red-500'}`}>
+    <span className={`text-[28px] font-bold tracking-tight ${isGood ? 'text-[#34C759]' : 'text-[#FF3B30]'}`}>
       {rate.toFixed(1)}%
     </span>
   )
@@ -34,34 +40,38 @@ export function RegionSummaryTable({ regionSubtotals }: Props) {
       {sorted.map((rs) => (
         <div
           key={rs.region}
-          className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm"
-          style={{ borderTopColor: REGION_COLORS[rs.region], borderTopWidth: 3 }}
+          className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl"
         >
           {/* エリア名 */}
           <div className="mb-4 flex items-center justify-between">
-            <span className="text-base font-bold text-gray-800">
-              {REGION_LABELS[rs.region]}
-            </span>
-            <span className="text-xs text-gray-400">{rs.spotCount.toLocaleString()}本</span>
+            <div className="flex items-center gap-2.5">
+              <span className={`inline-flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-b ${REGION_GRADIENT[rs.region]} text-[10px] font-bold text-white`}>
+                {REGION_LABELS[rs.region].charAt(0)}
+              </span>
+              <span className="text-[15px] font-semibold text-[#1d1d1f]">
+                {REGION_LABELS[rs.region]}
+              </span>
+            </div>
+            <span className="text-[12px] text-[#86868b]">{rs.spotCount.toLocaleString()}本</span>
           </div>
 
           {/* 指標一覧 */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">PRP %</span>
+              <span className="text-[13px] text-[#86868b]">PRP %</span>
               <RateValue rate={rs.prpAchievement} threshold={100} />
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">TRP %</span>
+              <span className="text-[13px] text-[#86868b]">TRP %</span>
               <RateValue rate={rs.tgAchievement} threshold={100} />
             </div>
             <div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500">Prime Time Share</span>
+                <span className="text-[13px] text-[#86868b]">Prime Time Share</span>
                 <RateValue rate={rs.primeShare} threshold={60} />
               </div>
               <div className="mt-0.5 text-right">
-                <span className="text-xs text-gray-400">P4P：{P4P_VALUES[rs.region]}％</span>
+                <span className="text-[11px] text-[#86868b]">P4P：{P4P_VALUES[rs.region]}%</span>
               </div>
             </div>
           </div>

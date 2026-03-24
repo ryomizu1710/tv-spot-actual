@@ -59,22 +59,22 @@ export function PrpSummaryCards({ data }: Props) {
       {cards.map((card) => (
         <div
           key={card.label}
-          className={`rounded-lg border p-4 shadow-sm ${
+          className={`rounded-2xl p-4 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl ${
             card.isHighlight
-              ? 'border-prime/30 bg-gradient-to-br from-prime/5 to-prime/10'
-              : 'border-gray-200 bg-white'
+              ? 'bg-gradient-to-br from-[#007AFF]/5 to-[#007AFF]/10'
+              : 'bg-white/80'
           }`}
         >
-          <p className="text-xs font-medium text-gray-500">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">
             {card.label}
           </p>
-          <p className="mt-1 text-2xl font-bold text-gray-900">{card.value}</p>
+          <p className="mt-1.5 text-[24px] font-bold tracking-tight text-[#1d1d1f]">{card.value}</p>
           {card.sub && (
-            <p className="mt-0.5 text-xs text-gray-400">{card.sub}</p>
+            <p className="mt-0.5 text-[11px] text-[#86868b]">{card.sub}</p>
           )}
           {card.rate !== null && (
-            <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-              card.rate >= 100 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+            <span className={`mt-1.5 inline-block rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
+              card.rate >= 100 ? 'bg-[#34C759]/10 text-[#34C759]' : 'bg-[#FF3B30]/10 text-[#FF3B30]'
             }`}>
               達成率 {card.rate}%
             </span>

@@ -2,17 +2,11 @@ import { useState, useCallback, useRef } from 'react'
 import { FileSpreadsheet, Upload } from 'lucide-react'
 
 interface FileDropZoneProps {
-  /** 選択済みファイル名の表示 */
   displayName: string
-  /** プレースホルダー */
   placeholder: string
-  /** 受け付ける拡張子 */
   accept?: string
-  /** 複数ファイル */
   multiple?: boolean
-  /** ファイル選択時コールバック（単一） */
   onFileSelect?: (file: File) => void
-  /** ファイル選択時コールバック（複数） */
   onFilesSelect?: (files: File[]) => void
 }
 
@@ -65,18 +59,18 @@ export function FileDropZone({
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className={`flex cursor-pointer items-center gap-3 rounded-lg border-2 border-dashed px-4 py-3 text-sm transition-colors ${
+      className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed px-4 py-3.5 text-[13px] transition-all duration-200 ${
         isDragOver
-          ? 'border-blue-400 bg-blue-50 text-blue-600'
+          ? 'border-[#007AFF] bg-[#007AFF]/5 text-[#007AFF]'
           : displayName
-            ? 'border-green-300 bg-green-50/50 text-gray-700'
-            : 'border-gray-300 bg-gray-50/50 text-gray-500 hover:border-gray-400 hover:bg-gray-50'
+            ? 'border-[#34C759]/40 bg-[#34C759]/5 text-[#1d1d1f]'
+            : 'border-gray-200 bg-[#f5f5f7]/50 text-[#86868b] hover:border-gray-300 hover:bg-[#f5f5f7]'
       }`}
     >
       {isDragOver ? (
-        <Upload size={16} className="text-blue-400" />
+        <Upload size={16} className="text-[#007AFF]" />
       ) : (
-        <FileSpreadsheet size={16} className={displayName ? 'text-green-500' : 'text-gray-400'} />
+        <FileSpreadsheet size={16} className={displayName ? 'text-[#34C759]' : 'text-[#86868b]'} />
       )}
       <span className={isDragOver ? 'font-medium' : ''}>
         {isDragOver

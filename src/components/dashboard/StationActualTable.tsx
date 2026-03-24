@@ -11,24 +11,24 @@ interface Props {
 }
 
 function AchievementBadge({ rate }: { rate: number }) {
-  if (rate === 0) return <span className="text-gray-300">—</span>
+  if (rate === 0) return <span className="text-[#d2d2d7]">—</span>
   const color = rate >= 100
-    ? 'bg-gradient-to-r from-green-50 to-green-100 text-green-700 ring-1 ring-green-200'
-    : 'bg-gradient-to-r from-red-50 to-red-100 text-red-600 ring-1 ring-red-200'
+    ? 'bg-[#34C759]/10 text-[#34C759]'
+    : 'bg-[#FF3B30]/10 text-[#FF3B30]'
   return (
-    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-bold ${color}`}>
+    <span className={`inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold ${color}`}>
       {rate.toFixed(1)}%
     </span>
   )
 }
 
 function PrimeShareBadge({ rate }: { rate: number }) {
-  if (rate === 0) return <span className="text-gray-300">—</span>
+  if (rate === 0) return <span className="text-[#d2d2d7]">—</span>
   const color = rate >= 60
-    ? 'bg-gradient-to-r from-green-50 to-green-100 text-green-700 ring-1 ring-green-200'
-    : 'bg-gradient-to-r from-red-50 to-red-100 text-red-600 ring-1 ring-red-200'
+    ? 'bg-[#34C759]/10 text-[#34C759]'
+    : 'bg-[#FF3B30]/10 text-[#FF3B30]'
   return (
-    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-bold ${color}`}>
+    <span className={`inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold ${color}`}>
       {rate.toFixed(1)}%
     </span>
   )
@@ -100,7 +100,7 @@ export function StationActualTable({ stationActuals, regionSubtotals }: Props) {
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+    <div className="overflow-x-auto rounded-xl ring-1 ring-black/[0.06]">
       <table className="w-full text-xs">
         <thead>
           {/* カテゴリーグループヘッダー */}

@@ -315,10 +315,10 @@ export function ImportPage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <h1 className="text-xl font-bold text-gray-900">データ取込</h1>
+      <h1 className="text-[21px] font-semibold tracking-tight text-[#1d1d1f]">データ取込</h1>
 
       {/* キャンペーン選択 */}
-      <div className="rounded-lg border border-gray-200 bg-white p-4">
+      <div className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
         <label className="mb-1 block text-xs font-medium text-gray-600">キャンペーン *</label>
         <select value={campaignId} onChange={(e) => setCampaignId(e.target.value)}
           className="w-full max-w-md rounded border border-gray-300 px-3 py-2 text-sm">
@@ -330,10 +330,10 @@ export function ImportPage() {
       </div>
 
       {/* セクション1: SPOTプラン（目標値）*/}
-      <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
         <div className="mb-4 flex items-center gap-2">
           <Target size={18} className="text-prime" />
-          <h2 className="text-sm font-bold text-gray-800">SPOTプラン（発注PRP目標）</h2>
+          <h2 className="text-[14px] font-semibold text-[#1d1d1f]">SPOTプラン（発注PRP目標）</h2>
           {(spotPlanDone || (campaignId && getCampaignData(campaignId).stationTargets.length > 0)) && (
             <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
               {spotPlanDone ? spotPlanTargets.length : getCampaignData(campaignId).stationTargets.length}局 読込済
@@ -363,7 +363,7 @@ export function ImportPage() {
           )}
           <button onClick={handleSpotPlanImport}
             disabled={!spotPlanFile || !selectedSheet}
-            className="rounded-lg bg-amazon px-4 py-2 text-sm font-medium text-white hover:bg-amazon-light disabled:opacity-40">
+            className="rounded-full bg-[#007AFF] px-5 py-2 text-[13px] font-medium text-white transition-all hover:bg-[#0062cc] disabled:opacity-40">
             読込
           </button>
         </div>
@@ -394,10 +394,10 @@ export function ImportPage() {
       </div>
 
       {/* セクション2: iClimaxローデータ（発注TRP・Prime PRP）*/}
-      <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
         <div className="mb-4 flex items-center gap-2">
           <BarChart3 size={18} className="text-prime" />
-          <h2 className="text-sm font-bold text-gray-800">iClimaxローデータ（発注TRP・Prime PRP）</h2>
+          <h2 className="text-[14px] font-semibold text-[#1d1d1f]">iClimaxローデータ（発注TRP・Prime PRP）</h2>
           {(iclimaxDone || (campaignId && getCampaignData(campaignId).iclimaxStationData.length > 0)) && (
             <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
               {iclimaxDone && iclimaxResult ? iclimaxResult.stationData.length : (campaignId ? getCampaignData(campaignId).iclimaxStationData.length : 0)}局 読込済
@@ -442,7 +442,7 @@ export function ImportPage() {
           )}
           <button onClick={handleIclimaxImport}
             disabled={!iclimaxFile || iclimaxImporting}
-            className="rounded-lg bg-amazon px-4 py-2 text-sm font-medium text-white hover:bg-amazon-light disabled:opacity-40">
+            className="rounded-full bg-[#007AFF] px-5 py-2 text-[13px] font-medium text-white transition-all hover:bg-[#0062cc] disabled:opacity-40">
             {iclimaxImporting ? '読込中...' : '読込'}
           </button>
         </div>
@@ -486,7 +486,7 @@ export function ImportPage() {
         <div className="mt-4 border-t border-gray-200 pt-4">
             <div className="mb-3 flex items-center gap-2">
               <Download size={16} className="text-teal-600" />
-              <h3 className="text-sm font-bold text-gray-800">Sharest用フォーマット作成</h3>
+              <h3 className="text-[14px] font-semibold text-[#1d1d1f]">Sharest用フォーマット作成</h3>
             </div>
             <p className="mb-3 text-xs text-gray-500">
               上記iClimaxファイルからSharest用のExcelを関東・関西・名古屋ごとに出力します。Q・R・S列は空欄で出力されます。
@@ -505,7 +505,7 @@ export function ImportPage() {
               </div>
               <button onClick={handleSharestExport}
                 disabled={!iclimaxFile || sharestExporting}
-                className="flex items-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 disabled:opacity-40">
+                className="flex items-center gap-2 rounded-full bg-[#34C759] px-5 py-2 text-[13px] font-medium text-white transition-all hover:bg-[#2DB84E] disabled:opacity-40">
                 <Download size={14} />
                 {sharestExporting ? '出力中...' : 'フォーマット出力'}
               </button>
@@ -514,10 +514,10 @@ export function ImportPage() {
       </div>
 
       {/* セクション3: Sharest 本案（実績データ）*/}
-      <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
         <div className="mb-4 flex items-center gap-2">
           <Upload size={18} className="text-prime" />
-          <h2 className="text-sm font-bold text-gray-800">Sharest — 本案（実績データ）</h2>
+          <h2 className="text-[14px] font-semibold text-[#1d1d1f]">Sharest — 本案（実績データ）</h2>
           {sharestDone && (
             <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
               インポート済
@@ -547,7 +547,7 @@ export function ImportPage() {
         <div className="mt-3 flex items-end gap-3">
           <button onClick={handleSharestImport}
             disabled={sharestFiles.length === 0 || sharestImporting}
-            className="rounded-lg bg-prime px-4 py-2 text-sm font-medium text-white hover:bg-prime-dark disabled:opacity-40">
+            className="rounded-full bg-[#007AFF] px-5 py-2 text-[13px] font-medium text-white transition-all hover:bg-[#0062cc] disabled:opacity-40">
             {sharestImporting ? '読込中...' : 'インポート'}
           </button>
         </div>
@@ -576,10 +576,10 @@ export function ImportPage() {
       </div>
 
       {/* セクション4: Sharest サービス（実績データ）*/}
-      <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
         <div className="mb-4 flex items-center gap-2">
           <Upload size={18} className="text-teal-600" />
-          <h2 className="text-sm font-bold text-gray-800">Sharest — サービス（実績データ）</h2>
+          <h2 className="text-[14px] font-semibold text-[#1d1d1f]">Sharest — サービス（実績データ）</h2>
           {serviceDone && (
             <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
               インポート済
@@ -609,7 +609,7 @@ export function ImportPage() {
         <div className="mt-3 flex items-end gap-3">
           <button onClick={handleServiceImport}
             disabled={serviceFiles.length === 0 || serviceImporting}
-            className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 disabled:opacity-40">
+            className="rounded-full bg-[#34C759] px-5 py-2 text-[13px] font-medium text-white transition-all hover:bg-[#2DB84E] disabled:opacity-40">
             {serviceImporting ? '読込中...' : 'インポート'}
           </button>
         </div>
@@ -641,7 +641,7 @@ export function ImportPage() {
       {(sharestDone || serviceDone || spotPlanDone || iclimaxDone) && (
         <div className="text-center">
           <button onClick={reset}
-            className="text-sm text-prime hover:underline">
+            className="text-[13px] font-medium text-[#007AFF] hover:underline">
             別のファイルを取り込む
           </button>
         </div>
