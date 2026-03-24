@@ -11,10 +11,10 @@ const navItems = [
 
 export function Sidebar() {
   return (
-    <aside className="flex w-[220px] flex-col border-r border-white/[0.08] bg-[#1c1c1e]/90 backdrop-blur-xl">
+    <aside className="flex w-[220px] flex-col border-r border-black/[0.06] bg-[#f0f0f5]/90 backdrop-blur-xl">
       <div className="flex h-14 items-center gap-2.5 px-5">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-b from-[#0a84ff] to-[#0064d2] text-[11px] font-bold text-white shadow-sm">TV</div>
-        <span className="text-[13px] font-semibold text-white tracking-tight">スポット実績管理</span>
+        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-b from-[#007AFF] to-[#0055D4] text-[11px] font-bold text-white shadow-sm">TV</div>
+        <span className="text-[13px] font-semibold text-[#1d1d1f] tracking-tight">スポット実績管理</span>
       </div>
       <nav className="mt-1 flex-1 space-y-0.5 px-3">
         {navItems.map((item) => (
@@ -24,8 +24,8 @@ export function Sidebar() {
             className={({ isActive }) =>
               `flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-200 ${
                 isActive
-                  ? 'bg-[#0a84ff]/20 text-[#0a84ff]'
-                  : 'text-[#98989d] hover:bg-white/[0.06] hover:text-white'
+                  ? 'bg-[#007AFF]/10 text-[#007AFF]'
+                  : 'text-[#6e6e73] hover:bg-black/[0.04] hover:text-[#1d1d1f]'
               }`
             }
           >
@@ -34,7 +34,7 @@ export function Sidebar() {
           </NavLink>
         ))}
       </nav>
-      <div className="border-t border-white/[0.06] px-5 py-4 text-[11px] text-[#636366]">
+      <div className="border-t border-black/[0.06] px-5 py-4 text-[11px] text-[#86868b]">
         Prime Video Campaign
       </div>
     </aside>

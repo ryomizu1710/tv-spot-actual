@@ -34,41 +34,41 @@ function PrimeShareBadge({ rate }: { rate: number }) {
   )
 }
 
-/** カテゴリーヘッダーのスタイル定義 (Dark) */
+/** カテゴリーヘッダーのスタイル定義 (Light) */
 const CATEGORY_STYLES = {
   prp: {
-    headerBg: 'bg-[#0a84ff]/10',
-    headerText: 'text-[#0a84ff]',
-    headerBorder: 'border-[#0a84ff]/20',
-    cellBorder: 'border-l-2 border-[#0a84ff]/15',
+    headerBg: 'bg-[#007AFF]/[0.06]',
+    headerText: 'text-[#007AFF]',
+    headerBorder: 'border-[#007AFF]/15',
+    cellBorder: 'border-l-2 border-[#007AFF]/10',
     colBg: '',
   },
   trp: {
-    headerBg: 'bg-[#64d2ff]/10',
-    headerText: 'text-[#64d2ff]',
-    headerBorder: 'border-[#64d2ff]/20',
-    cellBorder: 'border-l-2 border-[#64d2ff]/15',
+    headerBg: 'bg-[#5AC8FA]/[0.08]',
+    headerText: 'text-[#32ADE6]',
+    headerBorder: 'border-[#5AC8FA]/15',
+    cellBorder: 'border-l-2 border-[#5AC8FA]/10',
     colBg: '',
   },
   prime: {
-    headerBg: 'bg-[#ff9f0a]/10',
-    headerText: 'text-[#ff9f0a]',
-    headerBorder: 'border-[#ff9f0a]/20',
-    cellBorder: 'border-l-2 border-[#ff9f0a]/15',
+    headerBg: 'bg-[#FF9500]/[0.06]',
+    headerText: 'text-[#FF9500]',
+    headerBorder: 'border-[#FF9500]/15',
+    cellBorder: 'border-l-2 border-[#FF9500]/10',
     colBg: '',
   },
   spots: {
-    headerBg: 'bg-white/[0.04]',
-    headerText: 'text-[#98989d]',
-    headerBorder: 'border-white/[0.08]',
-    cellBorder: 'border-l-2 border-white/[0.06]',
+    headerBg: 'bg-black/[0.02]',
+    headerText: 'text-[#86868b]',
+    headerBorder: 'border-black/[0.06]',
+    cellBorder: 'border-l-2 border-black/[0.04]',
     colBg: '',
   },
   wpt: {
-    headerBg: 'bg-[#bf5af2]/10',
-    headerText: 'text-[#bf5af2]',
-    headerBorder: 'border-[#bf5af2]/20',
-    cellBorder: 'border-l-2 border-[#bf5af2]/15',
+    headerBg: 'bg-[#AF52DE]/[0.06]',
+    headerText: 'text-[#AF52DE]',
+    headerBorder: 'border-[#AF52DE]/15',
+    cellBorder: 'border-l-2 border-[#AF52DE]/10',
     colBg: '',
   },
 }
@@ -100,12 +100,12 @@ export function StationActualTable({ stationActuals, regionSubtotals }: Props) {
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl ring-1 ring-white/[0.08]">
+    <div className="overflow-x-auto rounded-xl ring-1 ring-black/[0.06]">
       <table className="w-full text-xs">
         <thead>
           {/* カテゴリーグループヘッダー */}
           <tr>
-            <th colSpan={2} className="rounded-tl-xl bg-[#2c2c2e] px-3 py-2.5">
+            <th colSpan={2} className="rounded-tl-xl bg-[#f5f5f7] px-3 py-2.5">
             </th>
             <th colSpan={4} className={`${CATEGORY_STYLES.prp.headerBg} border-l ${CATEGORY_STYLES.prp.headerBorder} px-2 py-2.5 text-center text-[11px] font-bold tracking-wider ${CATEGORY_STYLES.prp.headerText}`}>
               PRP
@@ -125,26 +125,26 @@ export function StationActualTable({ stationActuals, regionSubtotals }: Props) {
               </th>
             )}
           </tr>
-          <tr className="border-b border-white/[0.06] bg-[#2c2c2e]/60">
-            <th className="px-3 py-2 text-center text-xs font-semibold uppercase tracking-wider text-[#98989d]">エリア</th>
-            <th className="px-3 py-2 text-center text-xs font-semibold uppercase tracking-wider text-[#98989d]">局</th>
-            <th className={`${CATEGORY_STYLES.prp.cellBorder} px-2 py-2 text-center text-xs font-semibold text-[#98989d]`}>発注</th>
-            <th className="px-2 py-2 text-center text-xs font-semibold text-[#98989d]">本案予測</th>
-            <th className="px-2 py-2 text-center text-xs font-semibold text-[#98989d]">サービス予測</th>
-            <th className="px-2 py-2 text-center text-xs font-semibold text-[#98989d]">達成率</th>
-            <th className={`${CATEGORY_STYLES.trp.cellBorder} px-2 py-2 text-center text-xs font-semibold text-[#98989d]`}>発注</th>
-            <th className="px-2 py-2 text-center text-xs font-semibold text-[#98989d]">本案予測</th>
-            <th className="px-2 py-2 text-center text-xs font-semibold text-[#98989d]">サービス予測</th>
-            <th className="px-2 py-2 text-center text-xs font-semibold text-[#98989d]">達成率</th>
-            <th className={`${CATEGORY_STYLES.prime.cellBorder} px-2 py-2 text-center text-xs font-semibold text-[#98989d]`}>PRP</th>
-            <th className="px-2 py-2 text-center text-xs font-semibold text-[#98989d]">Share</th>
-            <th className={`${CATEGORY_STYLES.spots.cellBorder} px-2 py-2 text-center text-xs font-semibold text-[#98989d]`}>本数</th>
+          <tr className="border-b border-black/[0.06] bg-[#f5f5f7]/60">
+            <th className="px-3 py-2 text-center text-xs font-semibold uppercase tracking-wider text-[#86868b]">エリア</th>
+            <th className="px-3 py-2 text-center text-xs font-semibold uppercase tracking-wider text-[#86868b]">局</th>
+            <th className={`${CATEGORY_STYLES.prp.cellBorder} px-2 py-2 text-center text-xs font-semibold text-[#86868b]`}>発注</th>
+            <th className="px-2 py-2 text-center text-xs font-semibold text-[#86868b]">本案予測</th>
+            <th className="px-2 py-2 text-center text-xs font-semibold text-[#86868b]">サービス予測</th>
+            <th className="px-2 py-2 text-center text-xs font-semibold text-[#86868b]">達成率</th>
+            <th className={`${CATEGORY_STYLES.trp.cellBorder} px-2 py-2 text-center text-xs font-semibold text-[#86868b]`}>発注</th>
+            <th className="px-2 py-2 text-center text-xs font-semibold text-[#86868b]">本案予測</th>
+            <th className="px-2 py-2 text-center text-xs font-semibold text-[#86868b]">サービス予測</th>
+            <th className="px-2 py-2 text-center text-xs font-semibold text-[#86868b]">達成率</th>
+            <th className={`${CATEGORY_STYLES.prime.cellBorder} px-2 py-2 text-center text-xs font-semibold text-[#86868b]`}>PRP</th>
+            <th className="px-2 py-2 text-center text-xs font-semibold text-[#86868b]">Share</th>
+            <th className={`${CATEGORY_STYLES.spots.cellBorder} px-2 py-2 text-center text-xs font-semibold text-[#86868b]`}>本数</th>
             {hasWpt && (
               <>
-                <th className={`${CATEGORY_STYLES.wpt.cellBorder} px-2 py-2 text-center text-xs font-semibold text-[#98989d]`}>WPT</th>
-                <th className="px-2 py-2 text-center text-xs font-semibold text-[#98989d]">WSB</th>
-                <th className="px-2 py-2 text-center text-xs font-semibold text-[#98989d]">TPT</th>
-                <th className="px-2 py-2 text-center text-xs font-semibold text-[#98989d]">割合</th>
+                <th className={`${CATEGORY_STYLES.wpt.cellBorder} px-2 py-2 text-center text-xs font-semibold text-[#86868b]`}>WPT</th>
+                <th className="px-2 py-2 text-center text-xs font-semibold text-[#86868b]">WSB</th>
+                <th className="px-2 py-2 text-center text-xs font-semibold text-[#86868b]">TPT</th>
+                <th className="px-2 py-2 text-center text-xs font-semibold text-[#86868b]">割合</th>
               </>
             )}
           </tr>
@@ -172,9 +172,9 @@ export function StationActualTable({ stationActuals, regionSubtotals }: Props) {
 
 /** エリアごとのアクセントカラー */
 const REGION_ACCENT: Record<Region, { bg: string; border: string; text: string; subtotalBg: string }> = {
-  kanto: { bg: '', border: 'border-l-[#0a84ff]', text: 'text-[#0a84ff]', subtotalBg: 'bg-[#0a84ff]/[0.06]' },
-  kansai: { bg: '', border: 'border-l-[#ff9f0a]', text: 'text-[#ff9f0a]', subtotalBg: 'bg-[#ff9f0a]/[0.06]' },
-  nagoya: { bg: '', border: 'border-l-[#bf5af2]', text: 'text-[#bf5af2]', subtotalBg: 'bg-[#bf5af2]/[0.06]' },
+  kanto: { bg: '', border: 'border-l-[#007AFF]', text: 'text-[#007AFF]', subtotalBg: 'bg-[#007AFF]/[0.04]' },
+  kansai: { bg: '', border: 'border-l-[#FF9500]', text: 'text-[#FF9500]', subtotalBg: 'bg-[#FF9500]/[0.04]' },
+  nagoya: { bg: '', border: 'border-l-[#AF52DE]', text: 'text-[#AF52DE]', subtotalBg: 'bg-[#AF52DE]/[0.04]' },
 }
 
 function RegionBlock({
@@ -202,58 +202,58 @@ function RegionBlock({
         return (
           <tr
             key={sa.stationCode}
-            className={`border-l-4 ${accent.border} ${i % 2 === 0 ? 'bg-transparent' : 'bg-white/[0.02]'} ${isLast ? '' : 'border-b border-white/[0.04]'} transition-colors hover:bg-white/[0.04]`}
+            className={`border-l-4 ${accent.border} ${i % 2 === 0 ? 'bg-transparent' : 'bg-black/[0.015]'} ${isLast ? '' : 'border-b border-black/[0.04]'} transition-colors hover:bg-black/[0.03]`}
           >
             {i === 0 && (
               <td className={`px-3 py-2 text-center font-bold ${accent.text}`} rowSpan={stations.length}>
                 <div className="flex items-center justify-center gap-1.5">
                   <span className="inline-block h-2 w-2 rounded-full" style={{
-                    backgroundColor: region === 'kanto' ? '#3B82F6' : region === 'kansai' ? '#F97316' : '#8B5CF6'
+                    backgroundColor: region === 'kanto' ? '#007AFF' : region === 'kansai' ? '#FF9500' : '#AF52DE'
                   }} />
                   {REGION_LABELS[region]}
                 </div>
               </td>
             )}
-            <td className="px-3 py-2 text-center font-semibold text-[#f5f5f7]">{sa.stationCode}</td>
+            <td className="px-3 py-2 text-center font-semibold text-[#1d1d1f]">{sa.stationCode}</td>
             {/* PRP */}
-            <td className={`${CATEGORY_STYLES.prp.cellBorder} px-2 py-2 text-center text-[#636366]`}>
-              {sa.targetPrp > 0 ? sa.targetPrp.toFixed(1) : <span className="text-[#48484a]">—</span>}
+            <td className={`${CATEGORY_STYLES.prp.cellBorder} px-2 py-2 text-center text-[#86868b]`}>
+              {sa.targetPrp > 0 ? sa.targetPrp.toFixed(1) : <span className="text-[#d2d2d7]">—</span>}
             </td>
-            <td className="px-2 py-2 text-center font-bold text-[#f5f5f7]">{sa.actualPrp.toFixed(1)}</td>
+            <td className="px-2 py-2 text-center font-bold text-[#1d1d1f]">{sa.actualPrp.toFixed(1)}</td>
             <td className="px-2 py-2 text-center text-teal-600">
-              {sa.servicePrp > 0 ? sa.servicePrp.toFixed(1) : <span className="text-[#48484a]">—</span>}
+              {sa.servicePrp > 0 ? sa.servicePrp.toFixed(1) : <span className="text-[#d2d2d7]">—</span>}
             </td>
             <td className="px-2 py-2 text-center">
               <AchievementBadge rate={sa.prpAchievement} />
             </td>
             {/* TRP */}
-            <td className={`${CATEGORY_STYLES.trp.cellBorder} px-2 py-2 text-center text-[#636366]`}>
-              {sa.targetTrp > 0 ? sa.targetTrp.toFixed(1) : <span className="text-[#48484a]">—</span>}
+            <td className={`${CATEGORY_STYLES.trp.cellBorder} px-2 py-2 text-center text-[#86868b]`}>
+              {sa.targetTrp > 0 ? sa.targetTrp.toFixed(1) : <span className="text-[#d2d2d7]">—</span>}
             </td>
-            <td className="px-2 py-2 text-center font-bold text-[#f5f5f7]">{sa.actualTg.toFixed(1)}</td>
+            <td className="px-2 py-2 text-center font-bold text-[#1d1d1f]">{sa.actualTg.toFixed(1)}</td>
             <td className="px-2 py-2 text-center text-teal-600">
-              {sa.serviceTg > 0 ? sa.serviceTg.toFixed(1) : <span className="text-[#48484a]">—</span>}
+              {sa.serviceTg > 0 ? sa.serviceTg.toFixed(1) : <span className="text-[#d2d2d7]">—</span>}
             </td>
             <td className="px-2 py-2 text-center">
               <AchievementBadge rate={sa.tgAchievement} />
             </td>
             {/* Prime Time */}
-            <td className={`${CATEGORY_STYLES.prime.cellBorder} px-2 py-2 text-center font-bold text-[#f5f5f7]`}>{sa.primePrp.toFixed(1)}</td>
+            <td className={`${CATEGORY_STYLES.prime.cellBorder} px-2 py-2 text-center font-bold text-[#1d1d1f]`}>{sa.primePrp.toFixed(1)}</td>
             <td className="px-2 py-2 text-center">
               <PrimeShareBadge rate={sa.primeShare} />
             </td>
             {/* 出稿 */}
-            <td className={`${CATEGORY_STYLES.spots.cellBorder} px-2 py-2 text-center text-[#98989d]`}>{sa.spotCount}</td>
+            <td className={`${CATEGORY_STYLES.spots.cellBorder} px-2 py-2 text-center text-[#86868b]`}>{sa.spotCount}</td>
             {/* WPT */}
             {hasWpt && (
               <>
-                <td className={`${CATEGORY_STYLES.wpt.cellBorder} px-2 py-2 text-center text-[#98989d]`}>{wpt ? wpt.wptSpots : <span className="text-[#48484a]">—</span>}</td>
-                <td className="px-2 py-2 text-center text-[#98989d]">{wpt ? (wpt.wsbSpots ?? 0) : <span className="text-[#48484a]">—</span>}</td>
-                <td className="px-2 py-2 text-center text-[#98989d]">{wpt ? wpt.tptSpots : <span className="text-[#48484a]">—</span>}</td>
+                <td className={`${CATEGORY_STYLES.wpt.cellBorder} px-2 py-2 text-center text-[#86868b]`}>{wpt ? wpt.wptSpots : <span className="text-[#d2d2d7]">—</span>}</td>
+                <td className="px-2 py-2 text-center text-[#86868b]">{wpt ? (wpt.wsbSpots ?? 0) : <span className="text-[#d2d2d7]">—</span>}</td>
+                <td className="px-2 py-2 text-center text-[#86868b]">{wpt ? wpt.tptSpots : <span className="text-[#d2d2d7]">—</span>}</td>
                 <td className="px-2 py-2 text-center">
                   {wpt && wpt.wptTptRate > 0
-                    ? <span className="inline-block rounded-full bg-[#bf5af2]/15 px-2 py-0.5 text-xs font-semibold text-[#bf5af2]">{wpt.wptTptRate.toFixed(1)}%</span>
-                    : <span className="text-[#48484a]">—</span>}
+                    ? <span className="inline-block rounded-full bg-[#AF52DE]/10 px-2 py-0.5 text-xs font-semibold text-[#AF52DE]">{wpt.wptTptRate.toFixed(1)}%</span>
+                    : <span className="text-[#d2d2d7]">—</span>}
                 </td>
               </>
             )}
@@ -264,47 +264,47 @@ function RegionBlock({
       {subtotal && (() => {
         const wptR = wptRegionMap.get(region)
         return (
-          <tr className={`border-b-2 border-white/[0.08] ${accent.subtotalBg}`}>
-            <td className="px-3 py-2.5 text-center font-bold text-[#d1d1d6]" colSpan={2}>
+          <tr className={`border-b-2 border-black/[0.06] ${accent.subtotalBg}`}>
+            <td className="px-3 py-2.5 text-center font-bold text-[#6e6e73]" colSpan={2}>
               <span className={`${accent.text}`}>{REGION_LABELS[region]}</span> 小計
             </td>
             {/* PRP */}
-            <td className={`${CATEGORY_STYLES.prp.cellBorder} px-2 py-2.5 text-center font-bold text-[#d1d1d6]`}>{subtotal.targetPrp.toFixed(1)}</td>
-            <td className="px-2 py-2.5 text-center font-bold text-[#f5f5f7]">{subtotal.actualPrp.toFixed(1)}</td>
+            <td className={`${CATEGORY_STYLES.prp.cellBorder} px-2 py-2.5 text-center font-bold text-[#6e6e73]`}>{subtotal.targetPrp.toFixed(1)}</td>
+            <td className="px-2 py-2.5 text-center font-bold text-[#1d1d1f]">{subtotal.actualPrp.toFixed(1)}</td>
             <td className="px-2 py-2.5 text-center font-bold text-teal-600">
-              {subtotal.servicePrp > 0 ? subtotal.servicePrp.toFixed(1) : <span className="text-[#48484a]">—</span>}
+              {subtotal.servicePrp > 0 ? subtotal.servicePrp.toFixed(1) : <span className="text-[#d2d2d7]">—</span>}
             </td>
             <td className="px-2 py-2.5 text-center">
               <AchievementBadge rate={subtotal.prpAchievement} />
             </td>
             {/* TRP */}
-            <td className={`${CATEGORY_STYLES.trp.cellBorder} px-2 py-2.5 text-center font-bold text-[#d1d1d6]`}>
-              {subtotal.targetTrp > 0 ? subtotal.targetTrp.toFixed(1) : <span className="text-[#48484a]">—</span>}
+            <td className={`${CATEGORY_STYLES.trp.cellBorder} px-2 py-2.5 text-center font-bold text-[#6e6e73]`}>
+              {subtotal.targetTrp > 0 ? subtotal.targetTrp.toFixed(1) : <span className="text-[#d2d2d7]">—</span>}
             </td>
-            <td className="px-2 py-2.5 text-center font-bold text-[#f5f5f7]">{subtotal.actualTg.toFixed(1)}</td>
+            <td className="px-2 py-2.5 text-center font-bold text-[#1d1d1f]">{subtotal.actualTg.toFixed(1)}</td>
             <td className="px-2 py-2.5 text-center font-bold text-teal-600">
-              {subtotal.serviceTg > 0 ? subtotal.serviceTg.toFixed(1) : <span className="text-[#48484a]">—</span>}
+              {subtotal.serviceTg > 0 ? subtotal.serviceTg.toFixed(1) : <span className="text-[#d2d2d7]">—</span>}
             </td>
             <td className="px-2 py-2.5 text-center">
               <AchievementBadge rate={subtotal.tgAchievement} />
             </td>
             {/* Prime Time */}
-            <td className={`${CATEGORY_STYLES.prime.cellBorder} px-2 py-2.5 text-center font-bold text-[#f5f5f7]`}>{subtotal.primePrp.toFixed(1)}</td>
+            <td className={`${CATEGORY_STYLES.prime.cellBorder} px-2 py-2.5 text-center font-bold text-[#1d1d1f]`}>{subtotal.primePrp.toFixed(1)}</td>
             <td className="px-2 py-2.5 text-center">
               <PrimeShareBadge rate={subtotal.primeShare} />
             </td>
             {/* 出稿 */}
-            <td className={`${CATEGORY_STYLES.spots.cellBorder} px-2 py-2.5 text-center font-bold text-[#d1d1d6]`}>{subtotal.spotCount}</td>
+            <td className={`${CATEGORY_STYLES.spots.cellBorder} px-2 py-2.5 text-center font-bold text-[#6e6e73]`}>{subtotal.spotCount}</td>
             {/* WPT */}
             {hasWpt && (
               <>
-                <td className={`${CATEGORY_STYLES.wpt.cellBorder} px-2 py-2.5 text-center font-bold text-[#d1d1d6]`}>{wptR ? wptR.wptSpots : <span className="text-[#48484a]">—</span>}</td>
-                <td className="px-2 py-2.5 text-center font-bold text-[#d1d1d6]">{wptR ? (wptR.wsbSpots ?? 0) : <span className="text-[#48484a]">—</span>}</td>
-                <td className="px-2 py-2.5 text-center font-bold text-[#d1d1d6]">{wptR ? wptR.tptSpots : <span className="text-[#48484a]">—</span>}</td>
+                <td className={`${CATEGORY_STYLES.wpt.cellBorder} px-2 py-2.5 text-center font-bold text-[#6e6e73]`}>{wptR ? wptR.wptSpots : <span className="text-[#d2d2d7]">—</span>}</td>
+                <td className="px-2 py-2.5 text-center font-bold text-[#6e6e73]">{wptR ? (wptR.wsbSpots ?? 0) : <span className="text-[#d2d2d7]">—</span>}</td>
+                <td className="px-2 py-2.5 text-center font-bold text-[#6e6e73]">{wptR ? wptR.tptSpots : <span className="text-[#d2d2d7]">—</span>}</td>
                 <td className="px-2 py-2.5 text-center">
                   {wptR && wptR.wptTptRate > 0
-                    ? <span className="inline-block rounded-full bg-[#bf5af2]/15 px-2 py-0.5 text-xs font-semibold text-[#bf5af2]">{wptR.wptTptRate.toFixed(1)}%</span>
-                    : <span className="text-[#48484a]">—</span>}
+                    ? <span className="inline-block rounded-full bg-[#AF52DE]/10 px-2 py-0.5 text-xs font-semibold text-[#AF52DE]">{wptR.wptTptRate.toFixed(1)}%</span>
+                    : <span className="text-[#d2d2d7]">—</span>}
                 </td>
               </>
             )}

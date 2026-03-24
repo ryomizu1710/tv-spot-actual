@@ -42,16 +42,16 @@ export function FileDropZone({
       onDrop={handleDrop}
       className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed px-4 py-3.5 text-[13px] transition-all duration-200 ${
         isDragOver
-          ? 'border-[#0a84ff] bg-[#0a84ff]/10 text-[#0a84ff]'
+          ? 'border-[#007AFF] bg-[#007AFF]/[0.06] text-[#007AFF]'
           : displayName
-            ? 'border-[#30d158]/30 bg-[#30d158]/[0.06] text-[#f5f5f7]'
-            : 'border-white/[0.1] bg-white/[0.03] text-[#636366] hover:border-white/[0.15] hover:bg-white/[0.05]'
+            ? 'border-[#34C759]/30 bg-[#34C759]/[0.04] text-[#1d1d1f]'
+            : 'border-black/[0.1] bg-black/[0.02] text-[#86868b] hover:border-black/[0.15] hover:bg-black/[0.04]'
       }`}
     >
       {isDragOver ? (
-        <Upload size={16} className="text-[#0a84ff]" />
+        <Upload size={16} className="text-[#007AFF]" />
       ) : (
-        <FileSpreadsheet size={16} className={displayName ? 'text-[#30d158]' : 'text-[#636366]'} />
+        <FileSpreadsheet size={16} className={displayName ? 'text-[#34C759]' : 'text-[#86868b]'} />
       )}
       <span className={isDragOver ? 'font-medium' : ''}>
         {isDragOver ? 'ここにドロップ' : displayName || placeholder}

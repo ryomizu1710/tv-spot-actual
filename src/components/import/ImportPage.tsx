@@ -315,13 +315,13 @@ export function ImportPage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <h1 className="text-[21px] font-semibold tracking-tight text-[#f5f5f7]">データ取込</h1>
+      <h1 className="text-[21px] font-semibold tracking-tight text-[#1d1d1f]">データ取込</h1>
 
       {/* キャンペーン選択 */}
-      <div className="rounded-2xl bg-[#1c1c1e]/80 p-4 shadow-sm ring-1 ring-white/[0.06] backdrop-blur-xl">
-        <label className="mb-1 block text-xs font-medium text-gray-600">キャンペーン *</label>
+      <div className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
+        <label className="mb-1 block text-xs font-medium text-[#86868b]">キャンペーン *</label>
         <select value={campaignId} onChange={(e) => setCampaignId(e.target.value)}
-          className="w-full max-w-md rounded-lg border border-white/[0.1] bg-[#2c2c2e] px-3 py-2 text-sm text-[#f5f5f7]">
+          className="w-full max-w-md rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-sm text-[#1d1d1f]">
           <option value="">選択してください</option>
           {campaigns.map((c) => (
             <option key={c.id} value={c.id}>{c.name}</option>
@@ -330,17 +330,17 @@ export function ImportPage() {
       </div>
 
       {/* セクション1: SPOTプラン（目標値）*/}
-      <div className="rounded-2xl bg-[#1c1c1e]/80 p-5 shadow-sm ring-1 ring-white/[0.06] backdrop-blur-xl">
+      <div className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
         <div className="mb-4 flex items-center gap-2">
-          <Target size={18} className="text-prime" />
-          <h2 className="text-[14px] font-semibold text-[#f5f5f7]">SPOTプラン（発注PRP目標）</h2>
+          <Target size={18} className="text-[#007AFF]" />
+          <h2 className="text-[14px] font-semibold text-[#1d1d1f]">SPOTプラン（発注PRP目標）</h2>
           {(spotPlanDone || (campaignId && getCampaignData(campaignId).stationTargets.length > 0)) && (
-            <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+            <span className="rounded-full bg-[#34C759]/10 px-2 py-0.5 text-xs font-medium text-[#34C759]">
               {spotPlanDone ? spotPlanTargets.length : getCampaignData(campaignId).stationTargets.length}局 読込済
             </span>
           )}
         </div>
-        <p className="mb-3 text-xs text-gray-500">
+        <p className="mb-3 text-xs text-[#86868b]">
           「SPOTプラン」ExcelのH列（発注GRP ※PRP）を局別アクチュアルの分母として使用します
         </p>
 
@@ -352,9 +352,9 @@ export function ImportPage() {
         <div className="mt-3 flex items-end gap-3">
           {spotPlanSheets.length > 0 && (
             <div className="flex-1">
-              <label className="mb-1 block text-xs text-gray-500">シート選択</label>
+              <label className="mb-1 block text-xs text-[#86868b]">シート選択</label>
               <select value={selectedSheet} onChange={(e) => setSelectedSheet(e.target.value)}
-                className="w-full rounded-lg border border-white/[0.1] bg-[#2c2c2e] px-3 py-2 text-sm text-[#f5f5f7]">
+                className="w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-sm text-[#1d1d1f]">
                 {spotPlanSheets.map((s) => (
                   <option key={s.name} value={s.name}>{s.name}</option>
                 ))}
@@ -363,7 +363,7 @@ export function ImportPage() {
           )}
           <button onClick={handleSpotPlanImport}
             disabled={!spotPlanFile || !selectedSheet}
-            className="rounded-full bg-[#0a84ff] px-5 py-2 text-[13px] font-medium text-white transition-all hover:bg-[#0a84ff]/80 disabled:opacity-40">
+            className="rounded-full bg-[#007AFF] px-5 py-2 text-[13px] font-medium text-white transition-all hover:bg-[#007AFF]/80 disabled:opacity-40">
             読込
           </button>
         </div>
@@ -373,18 +373,18 @@ export function ImportPage() {
           <div className="mt-3 overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-gray-200 bg-gray-50">
-                  <th className="px-2 py-1 text-left">地域</th>
-                  <th className="px-2 py-1 text-left">局</th>
-                  <th className="px-2 py-1 text-right">発注PRP</th>
+                <tr className="border-b border-black/[0.06] bg-[#f5f5f7]">
+                  <th className="px-2 py-1 text-left text-[#86868b]">地域</th>
+                  <th className="px-2 py-1 text-left text-[#86868b]">局</th>
+                  <th className="px-2 py-1 text-right text-[#86868b]">発注PRP</th>
                 </tr>
               </thead>
               <tbody>
                 {spotPlanTargets.map((t, i) => (
-                  <tr key={i} className="border-b border-gray-100">
-                    <td className="px-2 py-1">{REGION_LABELS[t.region]}</td>
-                    <td className="px-2 py-1">{t.stationCode}</td>
-                    <td className="px-2 py-1 text-right font-mono">{t.targetPrp.toFixed(1)}</td>
+                  <tr key={i} className="border-b border-black/[0.04]">
+                    <td className="px-2 py-1 text-[#1d1d1f]">{REGION_LABELS[t.region]}</td>
+                    <td className="px-2 py-1 text-[#1d1d1f]">{t.stationCode}</td>
+                    <td className="px-2 py-1 text-right font-mono text-[#1d1d1f]">{t.targetPrp.toFixed(1)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -394,17 +394,17 @@ export function ImportPage() {
       </div>
 
       {/* セクション2: iClimaxローデータ（発注TRP・Prime PRP）*/}
-      <div className="rounded-2xl bg-[#1c1c1e]/80 p-5 shadow-sm ring-1 ring-white/[0.06] backdrop-blur-xl">
+      <div className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
         <div className="mb-4 flex items-center gap-2">
-          <BarChart3 size={18} className="text-prime" />
-          <h2 className="text-[14px] font-semibold text-[#f5f5f7]">iClimaxローデータ（発注TRP・Prime PRP）</h2>
+          <BarChart3 size={18} className="text-[#007AFF]" />
+          <h2 className="text-[14px] font-semibold text-[#1d1d1f]">iClimaxローデータ（発注TRP・Prime PRP）</h2>
           {(iclimaxDone || (campaignId && getCampaignData(campaignId).iclimaxStationData.length > 0)) && (
-            <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+            <span className="rounded-full bg-[#34C759]/10 px-2 py-0.5 text-xs font-medium text-[#34C759]">
               {iclimaxDone && iclimaxResult ? iclimaxResult.stationData.length : (campaignId ? getCampaignData(campaignId).iclimaxStationData.length : 0)}局 読込済
             </span>
           )}
         </div>
-        <p className="mb-3 text-xs text-gray-500">
+        <p className="mb-3 text-xs text-[#86868b]">
           iClimaxローデータExcelから局別の「発注TRP」と「Prime PRP」を読み込みます。TRP参照列はキャンペーンに合わせて選択してください。
         </p>
 
@@ -416,11 +416,11 @@ export function ImportPage() {
         <div className="mt-3 flex items-end gap-3">
           {iclimaxColumnHeaders.length > 0 && (
             <div className="w-64">
-              <label className="mb-1 block text-xs text-gray-500">TRP参照列</label>
+              <label className="mb-1 block text-xs text-[#86868b]">TRP参照列</label>
               <select
                 value={iclimaxSelectedColIdx ?? ''}
                 onChange={(e) => setIclimaxSelectedColIdx(Number(e.target.value))}
-                className="w-full rounded-lg border border-white/[0.1] bg-[#2c2c2e] px-3 py-2 text-sm text-[#f5f5f7]">
+                className="w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-sm text-[#1d1d1f]">
                 {iclimaxColumnHeaders.map((h) => (
                   <option key={h.columnIndex} value={h.columnIndex}>
                     {h.columnLetter}列 — {h.label}
@@ -431,9 +431,9 @@ export function ImportPage() {
           )}
           {iclimaxFile && iclimaxColumnHeaders.length === 0 && (
             <div className="w-56">
-              <label className="mb-1 block text-xs text-gray-500">TRP参照列</label>
+              <label className="mb-1 block text-xs text-[#86868b]">TRP参照列</label>
               <select value={iclimaxTrpColumn} onChange={(e) => setIclimaxTrpColumn(e.target.value as IclimaxTrpColumn)}
-                className="w-full rounded-lg border border-white/[0.1] bg-[#2c2c2e] px-3 py-2 text-sm text-[#f5f5f7]">
+                className="w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-sm text-[#1d1d1f]">
                 {ICLIMAX_TRP_COLUMNS.map((col) => (
                   <option key={col.value} value={col.value}>{col.label}</option>
                 ))}
@@ -442,7 +442,7 @@ export function ImportPage() {
           )}
           <button onClick={handleIclimaxImport}
             disabled={!iclimaxFile || iclimaxImporting}
-            className="rounded-full bg-[#0a84ff] px-5 py-2 text-[13px] font-medium text-white transition-all hover:bg-[#0a84ff]/80 disabled:opacity-40">
+            className="rounded-full bg-[#007AFF] px-5 py-2 text-[13px] font-medium text-white transition-all hover:bg-[#007AFF]/80 disabled:opacity-40">
             {iclimaxImporting ? '読込中...' : '読込'}
           </button>
         </div>
@@ -450,31 +450,31 @@ export function ImportPage() {
         {/* 読込結果 */}
         {iclimaxDone && iclimaxResult && (
           <div className="mt-3 overflow-x-auto">
-            <div className="mb-2 flex items-center gap-2 text-sm">
-              <CheckCircle size={16} className="text-green-500" />
+            <div className="mb-2 flex items-center gap-2 text-sm text-[#1d1d1f]">
+              <CheckCircle size={16} className="text-[#34C759]" />
               <span>{iclimaxResult.totalRows}行中 {iclimaxResult.stationData.length}局を集計</span>
               {iclimaxResult.errorCount > 0 && (
-                <span className="text-yellow-600">（{iclimaxResult.errorCount}件エラー）</span>
+                <span className="text-[#FF9500]">（{iclimaxResult.errorCount}件エラー）</span>
               )}
             </div>
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-gray-200 bg-gray-50">
-                  <th className="px-2 py-1 text-left">地域</th>
-                  <th className="px-2 py-1 text-left">局</th>
-                  <th className="px-2 py-1 text-right">発注TRP</th>
-                  <th className="px-2 py-1 text-right">Prime PRP</th>
-                  <th className="px-2 py-1 text-right">本数</th>
+                <tr className="border-b border-black/[0.06] bg-[#f5f5f7]">
+                  <th className="px-2 py-1 text-left text-[#86868b]">地域</th>
+                  <th className="px-2 py-1 text-left text-[#86868b]">局</th>
+                  <th className="px-2 py-1 text-right text-[#86868b]">発注TRP</th>
+                  <th className="px-2 py-1 text-right text-[#86868b]">Prime PRP</th>
+                  <th className="px-2 py-1 text-right text-[#86868b]">本数</th>
                 </tr>
               </thead>
               <tbody>
                 {iclimaxResult.stationData.map((sd, i) => (
-                  <tr key={i} className="border-b border-gray-100">
-                    <td className="px-2 py-1">{REGION_LABELS[sd.region]}</td>
-                    <td className="px-2 py-1">{sd.stationCode}</td>
-                    <td className="px-2 py-1 text-right font-mono">{sd.targetTrp.toFixed(1)}</td>
-                    <td className="px-2 py-1 text-right font-mono">{sd.primePrp.toFixed(1)}</td>
-                    <td className="px-2 py-1 text-right font-mono">{sd.spotCount}</td>
+                  <tr key={i} className="border-b border-black/[0.04]">
+                    <td className="px-2 py-1 text-[#1d1d1f]">{REGION_LABELS[sd.region]}</td>
+                    <td className="px-2 py-1 text-[#1d1d1f]">{sd.stationCode}</td>
+                    <td className="px-2 py-1 text-right font-mono text-[#1d1d1f]">{sd.targetTrp.toFixed(1)}</td>
+                    <td className="px-2 py-1 text-right font-mono text-[#1d1d1f]">{sd.primePrp.toFixed(1)}</td>
+                    <td className="px-2 py-1 text-right font-mono text-[#1d1d1f]">{sd.spotCount}</td>
                   </tr>
                 ))}
               </tbody>
@@ -483,21 +483,21 @@ export function ImportPage() {
         )}
 
         {/* Sharest用フォーマット作成 */}
-        <div className="mt-4 border-t border-gray-200 pt-4">
+        <div className="mt-4 border-t border-black/[0.06] pt-4">
             <div className="mb-3 flex items-center gap-2">
               <Download size={16} className="text-teal-600" />
-              <h3 className="text-[14px] font-semibold text-[#f5f5f7]">Sharest用フォーマット作成</h3>
+              <h3 className="text-[14px] font-semibold text-[#1d1d1f]">Sharest用フォーマット作成</h3>
             </div>
-            <p className="mb-3 text-xs text-gray-500">
+            <p className="mb-3 text-xs text-[#86868b]">
               上記iClimaxファイルからSharest用のExcelを関東・関西・名古屋ごとに出力します。Q・R・S列は空欄で出力されます。
             </p>
             <div className="flex items-end gap-3">
               <div className="w-64">
-                <label className="mb-1 block text-xs text-gray-500">TG（S列ヘッダー）</label>
+                <label className="mb-1 block text-xs text-[#86868b]">TG（S列ヘッダー）</label>
                 <select
                   value={sharestTg}
                   onChange={(e) => setSharestTg(e.target.value)}
-                  className="w-full rounded-lg border border-white/[0.1] bg-[#2c2c2e] px-3 py-2 text-sm text-[#f5f5f7]">
+                  className="w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-sm text-[#1d1d1f]">
                   {SHAREST_TG_OPTIONS.map((tg) => (
                     <option key={tg} value={tg}>{tg}</option>
                   ))}
@@ -505,7 +505,7 @@ export function ImportPage() {
               </div>
               <button onClick={handleSharestExport}
                 disabled={!iclimaxFile || sharestExporting}
-                className="flex items-center gap-2 rounded-full bg-[#30d158] px-5 py-2 text-[13px] font-medium text-white transition-all hover:bg-[#30d158]/80 disabled:opacity-40">
+                className="flex items-center gap-2 rounded-full bg-[#34C759] px-5 py-2 text-[13px] font-medium text-white transition-all hover:bg-[#34C759]/80 disabled:opacity-40">
                 <Download size={14} />
                 {sharestExporting ? '出力中...' : 'フォーマット出力'}
               </button>
@@ -514,17 +514,17 @@ export function ImportPage() {
       </div>
 
       {/* セクション3: Sharest 本案（実績データ）*/}
-      <div className="rounded-2xl bg-[#1c1c1e]/80 p-5 shadow-sm ring-1 ring-white/[0.06] backdrop-blur-xl">
+      <div className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
         <div className="mb-4 flex items-center gap-2">
-          <Upload size={18} className="text-prime" />
-          <h2 className="text-[14px] font-semibold text-[#f5f5f7]">Sharest — 本案（実績データ）</h2>
+          <Upload size={18} className="text-[#007AFF]" />
+          <h2 className="text-[14px] font-semibold text-[#1d1d1f]">Sharest — 本案（実績データ）</h2>
           {sharestDone && (
-            <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+            <span className="rounded-full bg-[#34C759]/10 px-2 py-0.5 text-xs font-medium text-[#34C759]">
               インポート済
             </span>
           )}
         </div>
-        <p className="mb-3 text-xs text-gray-500">
+        <p className="mb-3 text-xs text-[#86868b]">
           関東・関西・名古屋のSharestファイル（本案）を選択してください（複数選択可）。地域はシート名・ファイル名から自動判定します。
         </p>
 
@@ -538,7 +538,7 @@ export function ImportPage() {
         {sharestFiles.length > 0 && !sharestDone && (
           <div className="mt-2 space-y-1">
             {sharestFiles.map((f, i) => (
-              <div key={i} className="flex items-center gap-2 text-xs text-gray-600">
+              <div key={i} className="flex items-center gap-2 text-xs text-[#86868b]">
                 <Upload size={12} /> {f.name}
               </div>
             ))}
@@ -547,7 +547,7 @@ export function ImportPage() {
         <div className="mt-3 flex items-end gap-3">
           <button onClick={handleSharestImport}
             disabled={sharestFiles.length === 0 || sharestImporting}
-            className="rounded-full bg-[#0a84ff] px-5 py-2 text-[13px] font-medium text-white transition-all hover:bg-[#0a84ff]/80 disabled:opacity-40">
+            className="rounded-full bg-[#007AFF] px-5 py-2 text-[13px] font-medium text-white transition-all hover:bg-[#007AFF]/80 disabled:opacity-40">
             {sharestImporting ? '読込中...' : 'インポート'}
           </button>
         </div>
@@ -557,14 +557,14 @@ export function ImportPage() {
           <div className="mt-4 space-y-2">
             {sharestResults.map((r, i) => (
               <div key={i} className={`flex items-center gap-3 rounded-lg p-3 text-sm ${
-                r.errorCount === 0 ? 'bg-green-50' : 'bg-yellow-50'
+                r.errorCount === 0 ? 'bg-[#34C759]/[0.06]' : 'bg-[#FF9500]/[0.06]'
               }`}>
                 {r.errorCount === 0
-                  ? <CheckCircle size={16} className="text-green-500" />
-                  : <AlertCircle size={16} className="text-yellow-500" />}
+                  ? <CheckCircle size={16} className="text-[#34C759]" />
+                  : <AlertCircle size={16} className="text-[#FF9500]" />}
                 <div>
-                  <span className="font-medium">{REGION_LABELS[r.region]}</span>
-                  <span className="ml-2 text-gray-500">
+                  <span className="font-medium text-[#1d1d1f]">{REGION_LABELS[r.region]}</span>
+                  <span className="ml-2 text-[#86868b]">
                     {r.spots.length}件成功
                     {r.errorCount > 0 && ` / ${r.errorCount}件エラー`}
                   </span>
@@ -576,17 +576,17 @@ export function ImportPage() {
       </div>
 
       {/* セクション4: Sharest サービス（実績データ）*/}
-      <div className="rounded-2xl bg-[#1c1c1e]/80 p-5 shadow-sm ring-1 ring-white/[0.06] backdrop-blur-xl">
+      <div className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
         <div className="mb-4 flex items-center gap-2">
           <Upload size={18} className="text-teal-600" />
-          <h2 className="text-[14px] font-semibold text-[#f5f5f7]">Sharest — サービス（実績データ）</h2>
+          <h2 className="text-[14px] font-semibold text-[#1d1d1f]">Sharest — サービス（実績データ）</h2>
           {serviceDone && (
-            <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+            <span className="rounded-full bg-[#34C759]/10 px-2 py-0.5 text-xs font-medium text-[#34C759]">
               インポート済
             </span>
           )}
         </div>
-        <p className="mb-3 text-xs text-gray-500">
+        <p className="mb-3 text-xs text-[#86868b]">
           放送局からのサービス枠のSharestファイルを選択してください（複数選択可）。サービスPRP/TRPは局別アクチュアル表に別列で表示されます。
         </p>
 
@@ -600,7 +600,7 @@ export function ImportPage() {
         {serviceFiles.length > 0 && !serviceDone && (
           <div className="mt-2 space-y-1">
             {serviceFiles.map((f, i) => (
-              <div key={i} className="flex items-center gap-2 text-xs text-gray-600">
+              <div key={i} className="flex items-center gap-2 text-xs text-[#86868b]">
                 <Upload size={12} /> {f.name}
               </div>
             ))}
@@ -609,7 +609,7 @@ export function ImportPage() {
         <div className="mt-3 flex items-end gap-3">
           <button onClick={handleServiceImport}
             disabled={serviceFiles.length === 0 || serviceImporting}
-            className="rounded-full bg-[#30d158] px-5 py-2 text-[13px] font-medium text-white transition-all hover:bg-[#30d158]/80 disabled:opacity-40">
+            className="rounded-full bg-[#34C759] px-5 py-2 text-[13px] font-medium text-white transition-all hover:bg-[#34C759]/80 disabled:opacity-40">
             {serviceImporting ? '読込中...' : 'インポート'}
           </button>
         </div>
@@ -619,14 +619,14 @@ export function ImportPage() {
           <div className="mt-4 space-y-2">
             {serviceResults.map((r, i) => (
               <div key={i} className={`flex items-center gap-3 rounded-lg p-3 text-sm ${
-                r.errorCount === 0 ? 'bg-green-50' : 'bg-yellow-50'
+                r.errorCount === 0 ? 'bg-[#34C759]/[0.06]' : 'bg-[#FF9500]/[0.06]'
               }`}>
                 {r.errorCount === 0
-                  ? <CheckCircle size={16} className="text-green-500" />
-                  : <AlertCircle size={16} className="text-yellow-500" />}
+                  ? <CheckCircle size={16} className="text-[#34C759]" />
+                  : <AlertCircle size={16} className="text-[#FF9500]" />}
                 <div>
-                  <span className="font-medium">{REGION_LABELS[r.region]}</span>
-                  <span className="ml-2 text-gray-500">
+                  <span className="font-medium text-[#1d1d1f]">{REGION_LABELS[r.region]}</span>
+                  <span className="ml-2 text-[#86868b]">
                     {r.spots.length}件成功
                     {r.errorCount > 0 && ` / ${r.errorCount}件エラー`}
                   </span>
@@ -641,7 +641,7 @@ export function ImportPage() {
       {(sharestDone || serviceDone || spotPlanDone || iclimaxDone) && (
         <div className="text-center">
           <button onClick={reset}
-            className="text-[13px] font-medium text-[#0a84ff] hover:underline">
+            className="text-[13px] font-medium text-[#007AFF] hover:underline">
             別のファイルを取り込む
           </button>
         </div>

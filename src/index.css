@@ -3,21 +3,21 @@
 @theme {
   --color-amazon: #1d1d1f;
   --color-amazon-light: #2d2d2f;
-  --color-prime: #0a84ff;
-  --color-prime-dark: #0071e3;
-  --color-kanto: #0a84ff;
-  --color-kansai: #ff9f0a;
-  --color-nagoya: #bf5af2;
-  --color-achieve-green: #30d158;
-  --color-achieve-yellow: #ffd60a;
-  --color-achieve-red: #ff453a;
+  --color-prime: #0071e3;
+  --color-prime-dark: #0062cc;
+  --color-kanto: #007AFF;
+  --color-kansai: #FF9500;
+  --color-nagoya: #AF52DE;
+  --color-achieve-green: #34C759;
+  --color-achieve-yellow: #FFD60A;
+  --color-achieve-red: #FF3B30;
 }
 
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Noto Sans JP", "Hiragino Sans", sans-serif;
-  background-color: #000000;
-  color: #f5f5f7;
+  background-color: #e8e8ed;
+  color: #1d1d1f;
   font-feature-settings: "tnum", "cv01";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -33,7 +33,7 @@ td, th, .tabular-nums {
   font-variant-numeric: tabular-nums;
 }
 
-/* スクロールバー - Apple Dark */
+/* スクロールバー - Apple風 */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -42,17 +42,17 @@ td, th, .tabular-nums {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.15);
   border-radius: 100px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.25);
 }
 
-/* セレクトボックス - Apple Dark */
+/* セレクトボックス - Apple風 */
 select {
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2398989d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: right 8px center;
   background-size: 16px;

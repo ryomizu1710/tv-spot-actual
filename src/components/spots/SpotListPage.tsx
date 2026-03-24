@@ -19,7 +19,7 @@ export function SpotListPage() {
 
   if (!campaignId) {
     return (
-      <div className="flex h-full items-center justify-center text-gray-400">
+      <div className="flex h-full items-center justify-center text-[#86868b]">
         キャンペーンを選択してください
       </div>
     )
@@ -37,18 +37,18 @@ export function SpotListPage() {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-900">スポット一覧</h1>
+        <h1 className="text-[21px] font-semibold tracking-tight text-[#1d1d1f]">スポット一覧</h1>
         <div className="flex items-center gap-3">
           <input
             value={stationFilter}
             onChange={(e) => { setStationFilter(e.target.value); setPage(0) }}
             placeholder="局名で検索..."
-            className="rounded border border-gray-300 px-3 py-1.5 text-sm"
+            className="rounded-lg border border-black/[0.08] bg-white px-3 py-1.5 text-sm text-[#1d1d1f] focus:border-[#007AFF] focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20"
           />
           {metrics && (
             <button
               onClick={() => exportDailyActualsToCSV(metrics.dailyActuals, campaign?.name ?? 'export')}
-              className="flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
+              className="flex items-center gap-1 rounded-full bg-black/[0.04] px-3.5 py-1.5 text-sm text-[#1d1d1f] transition-all hover:bg-black/[0.08]"
             >
               <Download size={14} /> CSV出力
             </button>
@@ -56,34 +56,34 @@ export function SpotListPage() {
         </div>
       </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+      <div className="rounded-2xl bg-white/80 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="px-3 py-2 text-left font-medium text-gray-500">日付</th>
-                <th className="px-3 py-2 text-left font-medium text-gray-500">時刻</th>
-                <th className="px-3 py-2 text-left font-medium text-gray-500">地域</th>
-                <th className="px-3 py-2 text-left font-medium text-gray-500">局</th>
-                <th className="px-3 py-2 text-left font-medium text-gray-500">番組</th>
-                <th className="px-3 py-2 text-left font-medium text-gray-500">素材</th>
-                <th className="px-3 py-2 text-right font-medium text-gray-500">尺</th>
-                <th className="px-3 py-2 text-right font-medium text-gray-500">世帯</th>
-                <th className="px-3 py-2 text-right font-medium text-gray-500">個人</th>
+              <tr className="border-b border-black/[0.06] bg-[#f5f5f7]/60">
+                <th className="px-3 py-2 text-left font-medium text-[#86868b]">日付</th>
+                <th className="px-3 py-2 text-left font-medium text-[#86868b]">時刻</th>
+                <th className="px-3 py-2 text-left font-medium text-[#86868b]">地域</th>
+                <th className="px-3 py-2 text-left font-medium text-[#86868b]">局</th>
+                <th className="px-3 py-2 text-left font-medium text-[#86868b]">番組</th>
+                <th className="px-3 py-2 text-left font-medium text-[#86868b]">素材</th>
+                <th className="px-3 py-2 text-right font-medium text-[#86868b]">尺</th>
+                <th className="px-3 py-2 text-right font-medium text-[#86868b]">世帯</th>
+                <th className="px-3 py-2 text-right font-medium text-[#86868b]">個人</th>
               </tr>
             </thead>
             <tbody>
               {paged.map((s) => (
-                <tr key={s.id} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="px-3 py-1.5">{s.broadcastDate}</td>
-                  <td className="px-3 py-1.5">{s.broadcastTime}</td>
-                  <td className="px-3 py-1.5">{REGION_LABELS[s.region]}</td>
-                  <td className="px-3 py-1.5">{s.stationName}</td>
-                  <td className="px-3 py-1.5 max-w-32 truncate">{s.programName}</td>
-                  <td className="px-3 py-1.5 max-w-32 truncate">{s.creativeName}</td>
-                  <td className="px-3 py-1.5 text-right">{s.creativeLength}秒</td>
-                  <td className="px-3 py-1.5 text-right">{s.householdRating.toFixed(1)}</td>
-                  <td className="px-3 py-1.5 text-right">{s.individualRating.toFixed(1)}</td>
+                <tr key={s.id} className="border-b border-black/[0.04] transition-colors hover:bg-black/[0.02]">
+                  <td className="px-3 py-1.5 text-[#1d1d1f]">{s.broadcastDate}</td>
+                  <td className="px-3 py-1.5 text-[#1d1d1f]">{s.broadcastTime}</td>
+                  <td className="px-3 py-1.5 text-[#1d1d1f]">{REGION_LABELS[s.region]}</td>
+                  <td className="px-3 py-1.5 text-[#1d1d1f]">{s.stationName}</td>
+                  <td className="px-3 py-1.5 max-w-32 truncate text-[#1d1d1f]">{s.programName}</td>
+                  <td className="px-3 py-1.5 max-w-32 truncate text-[#1d1d1f]">{s.creativeName}</td>
+                  <td className="px-3 py-1.5 text-right text-[#1d1d1f]">{s.creativeLength}秒</td>
+                  <td className="px-3 py-1.5 text-right text-[#1d1d1f]">{s.householdRating.toFixed(1)}</td>
+                  <td className="px-3 py-1.5 text-right text-[#1d1d1f]">{s.individualRating.toFixed(1)}</td>
                 </tr>
               ))}
             </tbody>
@@ -91,13 +91,13 @@ export function SpotListPage() {
         </div>
 
         {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-gray-200 px-4 py-2">
-            <span className="text-xs text-gray-500">{filtered.length}件中 {page * pageSize + 1}-{Math.min((page + 1) * pageSize, filtered.length)}件</span>
+          <div className="flex items-center justify-between border-t border-black/[0.06] px-4 py-2">
+            <span className="text-xs text-[#86868b]">{filtered.length}件中 {page * pageSize + 1}-{Math.min((page + 1) * pageSize, filtered.length)}件</span>
             <div className="flex gap-1">
               <button disabled={page === 0} onClick={() => setPage(page - 1)}
-                className="rounded px-2 py-1 text-xs hover:bg-gray-100 disabled:opacity-30">前へ</button>
+                className="rounded px-2 py-1 text-xs text-[#1d1d1f] hover:bg-black/[0.04] disabled:opacity-30">前へ</button>
               <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)}
-                className="rounded px-2 py-1 text-xs hover:bg-gray-100 disabled:opacity-30">次へ</button>
+                className="rounded px-2 py-1 text-xs text-[#1d1d1f] hover:bg-black/[0.04] disabled:opacity-30">次へ</button>
             </div>
           </div>
         )}
