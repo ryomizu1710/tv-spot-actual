@@ -48,6 +48,7 @@ interface SpotStore {
   addSpots: (spots: SpotRecord[]) => void
   deleteSpotsByBatch: (batchId: string) => void
   deleteSpotsByCampaign: (campaignId: string) => void
+  deleteSpotsByCampaignAndType: (campaignId: string, isService: boolean) => void
   addImportBatch: (batch: ImportBatch) => void
   setStationTargets: (campaignId: string, targets: StationTarget[]) => void
   setRegionTargetTrps: (campaignId: string, trps: RegionTargetTrp[]) => void
@@ -80,6 +81,19 @@ export const useSpotStore = create<SpotStore>()(
           spots: state.spots.filter((s) => s.campaignId !== campaignId),
           importBatches: state.importBatches.filter((b) => b.campaignId !== campaignId),
           // campaignDataMap（SPOTプラン・iClimax等）は保持
+        }))
+      },
+      deleteSpotsByCampaignAndType: (campaignId, isService) => {
+        set((state) => ({
+          spots: state.spots.filter((s) =>
+            s.campaignId !== campaignId || (!!s.isService) !== isService
+          ),
+          importBatches: state.importBatches.filter((b) => {
+            if (b.campaignId !== campaignId) return true
+            // バッチのファイル名でサービス判定
+            const batchIsService = b.fileName.includes('サービス')
+            return batchIsService !== isService
+          }),
         }))
       },
       addImportBatch: (batch) => {

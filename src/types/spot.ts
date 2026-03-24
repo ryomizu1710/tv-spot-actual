@@ -21,6 +21,8 @@ export interface SpotRecord {
   tgRating: number
   /** 発注TRP (Sharest S列) */
   targetTrp?: number
+  /** サービス枠フラグ */
+  isService?: boolean
 }
 
 /** 局別の発注目標値（SPOTプランから読込） */

@@ -11,15 +11,19 @@ export interface StationActual {
   stationCode: string
   /** 発注PRP (SPOTプラン H列) */
   targetPrp: number
-  /** 実績PRP (= ALL) */
+  /** 実績PRP (= ALL) — 本案のみ */
   actualPrp: number
-  /** PRP アクチュアル % */
+  /** サービス枠PRP */
+  servicePrp: number
+  /** PRP アクチュアル % — (本案+サービス)/発注 */
   prpAchievement: number
   /** 発注TRP (局別: Sharest S列合計) */
   targetTrp: number
-  /** 実績TG (男女35-99才) */
+  /** 実績TG (男女35-99才) — 本案のみ */
   actualTg: number
-  /** TG アクチュアル % */
+  /** サービス枠TG */
+  serviceTg: number
+  /** TG アクチュアル % — (本案+サービス)/発注 */
   tgAchievement: number
   /** プライム帯PRP (19-24時) */
   primePrp: number
@@ -39,10 +43,12 @@ export interface RegionSubtotal {
   regionLabel: string
   targetPrp: number
   actualPrp: number
+  servicePrp: number
   prpAchievement: number
   /** 発注TRP (小計: SPOTプラン L列合計) */
   targetTrp: number
   actualTg: number
+  serviceTg: number
   tgAchievement: number
   primePrp: number
   primeTg: number
@@ -196,9 +202,19 @@ export function useStationActuals(): StationActualsData | null {
       const spotsList = stationSpotMap.get(key) ?? []
       const target = targetMap.get(key)
 
-      const actualPrp = round2(spotsList.reduce((sum, s) => sum + getPrp(s), 0))
-      const actualTg = round2(spotsList.reduce((sum, s) => sum + getTg(s), 0))
+      // 本案・サービスを分離
+      const mainSpots = spotsList.filter((s) => !s.isService)
+      const serviceSpots = spotsList.filter((s) => !!s.isService)
+
+      const actualPrp = round2(mainSpots.reduce((sum, s) => sum + getPrp(s), 0))
+      const actualTg = round2(mainSpots.reduce((sum, s) => sum + getTg(s), 0))
+      const servicePrp = round2(serviceSpots.reduce((sum, s) => sum + getPrp(s), 0))
+      const serviceTg = round2(serviceSpots.reduce((sum, s) => sum + getTg(s), 0))
       const targetPrp = target?.targetPrp ?? 0
+
+      // 達成率は本案+サービスの合計で計算
+      const totalPrp = round2(actualPrp + servicePrp)
+      const totalTg = round2(actualTg + serviceTg)
 
       // iClimaxデータ参照
       const iclimaxEntry = iclimaxMap.get(key)
@@ -219,15 +235,17 @@ export function useStationActuals(): StationActualsData | null {
         stationCode,
         targetPrp,
         actualPrp,
-        prpAchievement: targetPrp > 0 ? round1(actualPrp / targetPrp * 100) : 0,
+        servicePrp,
+        prpAchievement: targetPrp > 0 ? round1(totalPrp / targetPrp * 100) : 0,
         targetTrp,
         actualTg,
-        tgAchievement: targetTrp > 0 ? round1(actualTg / targetTrp * 100) : 0,
+        serviceTg,
+        tgAchievement: targetTrp > 0 ? round1(totalTg / targetTrp * 100) : 0,
         primePrp,
         primeTg,
         primeShare: (() => {
           // Prime Time Share分母: iClimaxのT列全時間帯合計を優先
-          const denom = iclimaxEntry ? iclimaxEntry.totalPrp : actualPrp
+          const denom = iclimaxEntry ? iclimaxEntry.totalPrp : totalPrp
           return denom > 0 ? round1(primePrp / denom * 100) : 0
         })(),
         spotCount: spotsList.length,
@@ -248,9 +266,13 @@ export function useStationActuals(): StationActualsData | null {
       const regionStations = stationActuals.filter((s) => s.region === region)
       const targetPrp = round2(regionStations.reduce((s, st) => s + st.targetPrp, 0))
       const actualPrp = round2(regionStations.reduce((s, st) => s + st.actualPrp, 0))
+      const servicePrp = round2(regionStations.reduce((s, st) => s + st.servicePrp, 0))
       const actualTg = round2(regionStations.reduce((s, st) => s + st.actualTg, 0))
+      const serviceTg = round2(regionStations.reduce((s, st) => s + st.serviceTg, 0))
       const primePrp = round2(regionStations.reduce((s, st) => s + st.primePrp, 0))
       const primeTg = round2(regionStations.reduce((s, st) => s + st.primeTg, 0))
+      const totalPrpForRegion = round2(actualPrp + servicePrp)
+      const totalTgForRegion = round2(actualTg + serviceTg)
 
       // エリア小計の発注TRP: SPOTプラン M列 (M17/M23/M29) を優先
       const regionTrpEntry = regionTargetTrps.find((r) => r.region === region)
@@ -261,16 +283,18 @@ export function useStationActuals(): StationActualsData | null {
         regionLabel: REGION_LABELS[region],
         targetPrp,
         actualPrp,
-        prpAchievement: targetPrp > 0 ? round1(actualPrp / targetPrp * 100) : 0,
+        servicePrp,
+        prpAchievement: targetPrp > 0 ? round1(totalPrpForRegion / targetPrp * 100) : 0,
         targetTrp,
         actualTg,
-        tgAchievement: targetTrp > 0 ? round1(actualTg / targetTrp * 100) : 0,
+        serviceTg,
+        tgAchievement: targetTrp > 0 ? round1(totalTgForRegion / targetTrp * 100) : 0,
         primePrp,
         primeTg,
         primeShare: (() => {
           // Prime Time Share分母: iClimaxのT列エリア合計を優先
           const iclimaxRegionEntry = iclimaxRegionData.find((r) => r.region === region)
-          const denom = iclimaxRegionEntry ? iclimaxRegionEntry.totalPrp : actualPrp
+          const denom = iclimaxRegionEntry ? iclimaxRegionEntry.totalPrp : totalPrpForRegion
           return denom > 0 ? round1(primePrp / denom * 100) : 0
         })(),
         spotCount: regionStations.reduce((s, st) => s + st.spotCount, 0),
@@ -281,29 +305,36 @@ export function useStationActuals(): StationActualsData | null {
     // 全体合計
     const totalTargetPrp = round2(regionSubtotals.reduce((s, r) => s + r.targetPrp, 0))
     const totalActualPrp = round2(regionSubtotals.reduce((s, r) => s + r.actualPrp, 0))
+    const totalServicePrp = round2(regionSubtotals.reduce((s, r) => s + r.servicePrp, 0))
     const totalActualTg = round2(regionSubtotals.reduce((s, r) => s + r.actualTg, 0))
+    const totalServiceTg = round2(regionSubtotals.reduce((s, r) => s + r.serviceTg, 0))
     const totalSpotCount = regionSubtotals.reduce((s, r) => s + r.spotCount, 0)
     const totalPrimePrp = round2(regionSubtotals.reduce((s, r) => s + r.primePrp, 0))
     const totalPrimeTg = round2(regionSubtotals.reduce((s, r) => s + r.primeTg, 0))
     const totalPrimeSpotCount = regionSubtotals.reduce((s, r) => s + r.primeSpotCount, 0)
     const totalTargetTrp = round2(regionSubtotals.reduce((s, r) => s + r.targetTrp, 0))
 
+    const totalCombinedPrp = round2(totalActualPrp + totalServicePrp)
+    const totalCombinedTg = round2(totalActualTg + totalServiceTg)
+
     const grandTotal: RegionSubtotal = {
       region: 'kanto', // placeholder
       regionLabel: '合計',
       targetPrp: totalTargetPrp,
       actualPrp: totalActualPrp,
-      prpAchievement: totalTargetPrp > 0 ? round1(totalActualPrp / totalTargetPrp * 100) : 0,
+      servicePrp: totalServicePrp,
+      prpAchievement: totalTargetPrp > 0 ? round1(totalCombinedPrp / totalTargetPrp * 100) : 0,
       targetTrp: totalTargetTrp,
       actualTg: totalActualTg,
-      tgAchievement: totalTargetTrp > 0 ? round1(totalActualTg / totalTargetTrp * 100) : 0,
+      serviceTg: totalServiceTg,
+      tgAchievement: totalTargetTrp > 0 ? round1(totalCombinedTg / totalTargetTrp * 100) : 0,
       primePrp: totalPrimePrp,
       primeTg: totalPrimeTg,
       primeShare: (() => {
         const iclimaxTotalPrp = iclimaxRegionData.length > 0
           ? round2(iclimaxRegionData.reduce((s, r) => s + r.totalPrp, 0))
           : 0
-        const denom = iclimaxTotalPrp > 0 ? iclimaxTotalPrp : totalActualPrp
+        const denom = iclimaxTotalPrp > 0 ? iclimaxTotalPrp : totalCombinedPrp
         return denom > 0 ? round1(totalPrimePrp / denom * 100) : 0
       })(),
       spotCount: totalSpotCount,

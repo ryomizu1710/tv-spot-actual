@@ -22,7 +22,7 @@ import type { ImportBatch, StationTarget } from '../../types'
 export function ImportPage() {
   const campaigns = useCampaignStore((s) => s.campaigns)
   const addSpots = useSpotStore((s) => s.addSpots)
-  const deleteSpotsByCampaign = useSpotStore((s) => s.deleteSpotsByCampaign)
+  const deleteSpotsByCampaignAndType = useSpotStore((s) => s.deleteSpotsByCampaignAndType)
   const addImportBatch = useSpotStore((s) => s.addImportBatch)
   const setStationTargets = useSpotStore((s) => s.setStationTargets)
   const setRegionTargetTrps = useSpotStore((s) => s.setRegionTargetTrps)
@@ -31,11 +31,17 @@ export function ImportPage() {
 
   const [campaignId, setCampaignId] = useState('')
 
-  // Sharest files
+  // Sharest files (本案)
   const [sharestFiles, setSharestFiles] = useState<File[]>([])
   const [sharestResults, setSharestResults] = useState<SharestParseResult[]>([])
   const [sharestImporting, setSharestImporting] = useState(false)
   const [sharestDone, setSharestDone] = useState(false)
+
+  // Sharest files (サービス)
+  const [serviceFiles, setServiceFiles] = useState<File[]>([])
+  const [serviceResults, setServiceResults] = useState<SharestParseResult[]>([])
+  const [serviceImporting, setServiceImporting] = useState(false)
+  const [serviceDone, setServiceDone] = useState(false)
 
   // SPOTプラン file
   const [spotPlanFile, setSpotPlanFile] = useState<File | null>(null)
@@ -72,8 +78,8 @@ export function ImportPage() {
     setSharestImporting(true)
     const results: SharestParseResult[] = []
 
-    // 同キャンペーンの既存データを削除（追加ではなく置換）
-    deleteSpotsByCampaign(campaignId)
+    // 同キャンペーンの既存本案データを削除（追加ではなく置換）
+    deleteSpotsByCampaignAndType(campaignId, false)
 
     for (const file of sharestFiles) {
       try {
@@ -120,6 +126,72 @@ export function ImportPage() {
 
     const totalSpots = results.reduce((s, r) => s + r.spots.length, 0)
     toast.success(`${totalSpots}件のスポットデータをインポートしました`)
+  }
+
+  // --- Sharest サービス handlers ---
+  const handleServiceFilesSelect = (files: FileList | File[] | null) => {
+    if (!files) return
+    setServiceFiles(Array.from(files))
+    setServiceResults([])
+    setServiceDone(false)
+  }
+
+  const handleServiceImport = async () => {
+    if (!campaignId) { toast.error('キャンペーンを選択してください'); return }
+    if (serviceFiles.length === 0) { toast.error('サービスファイルを選択してください'); return }
+
+    setServiceImporting(true)
+    const results: SharestParseResult[] = []
+
+    // 同キャンペーンの既存サービスデータを削除
+    deleteSpotsByCampaignAndType(campaignId, true)
+
+    for (const file of serviceFiles) {
+      try {
+        const batchId = uuidv4()
+        const result = await parseSharestFile(file, campaignId, batchId)
+        // サービスフラグを付与
+        const serviceSpots = result.spots.map((s) => ({ ...s, isService: true }))
+        results.push({ ...result, spots: serviceSpots })
+
+        addSpots(serviceSpots)
+        const batch: ImportBatch = {
+          id: batchId,
+          campaignId,
+          region: result.region,
+          fileName: file.name,
+          fileType: 'xlsx',
+          importedAt: new Date().toISOString(),
+          rowCount: result.rowCount,
+          successCount: result.spots.length,
+          errorCount: result.errorCount,
+          errors: result.errors.map((msg, i) => ({
+            rowIndex: i, columnName: '', value: '', message: msg,
+          })),
+          columnMapping: {
+            stationName: 'Col5', broadcastDate: 'Col6', broadcastTime: 'Col8',
+            programName: 'Col10', creativeName: 'Col15', creativeLength: 'Col12',
+            householdRating: 'Col16', individualRating: 'Col17',
+          },
+        }
+        addImportBatch(batch)
+      } catch (err) {
+        results.push({
+          region: 'kanto',
+          spots: [],
+          rowCount: 0,
+          errorCount: 1,
+          errors: [`${file.name}: ${err instanceof Error ? err.message : '読込エラー'}`],
+        })
+      }
+    }
+
+    setServiceResults(results)
+    setServiceImporting(false)
+    setServiceDone(true)
+
+    const totalSpots = results.reduce((s, r) => s + r.spots.length, 0)
+    toast.success(`${totalSpots}件のサービス枠データをインポートしました`)
   }
 
   // --- SPOTプラン handlers ---
@@ -226,6 +298,9 @@ export function ImportPage() {
     setSharestFiles([])
     setSharestResults([])
     setSharestDone(false)
+    setServiceFiles([])
+    setServiceResults([])
+    setServiceDone(false)
     setSpotPlanFile(null)
     setSpotPlanSheets([])
     setSelectedSheet('')
@@ -438,11 +513,11 @@ export function ImportPage() {
           </div>
       </div>
 
-      {/* セクション3: Sharest（実績データ）*/}
+      {/* セクション3: Sharest 本案（実績データ）*/}
       <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
         <div className="mb-4 flex items-center gap-2">
           <Upload size={18} className="text-prime" />
-          <h2 className="text-sm font-bold text-gray-800">Sharest（実績データ）</h2>
+          <h2 className="text-sm font-bold text-gray-800">Sharest — 本案（実績データ）</h2>
           {sharestDone && (
             <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
               インポート済
@@ -450,12 +525,12 @@ export function ImportPage() {
           )}
         </div>
         <p className="mb-3 text-xs text-gray-500">
-          関東・関西・名古屋のSharestファイルを選択してください（複数選択可）。地域はシート名・ファイル名から自動判定します。
+          関東・関西・名古屋のSharestファイル（本案）を選択してください（複数選択可）。地域はシート名・ファイル名から自動判定します。
         </p>
 
         <FileDropZone
           displayName={sharestFiles.length > 0 ? `${sharestFiles.length}ファイル選択中` : ''}
-          placeholder="Sharestファイルを選択またはドロップ...（複数可）"
+          placeholder="Sharest 本案ファイルを選択またはドロップ...（複数可）"
           multiple
           onFilesSelect={(files) => handleSharestFilesSelect(files)}
         />
@@ -500,8 +575,70 @@ export function ImportPage() {
         )}
       </div>
 
+      {/* セクション4: Sharest サービス（実績データ）*/}
+      <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="mb-4 flex items-center gap-2">
+          <Upload size={18} className="text-teal-600" />
+          <h2 className="text-sm font-bold text-gray-800">Sharest — サービス（実績データ）</h2>
+          {serviceDone && (
+            <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+              インポート済
+            </span>
+          )}
+        </div>
+        <p className="mb-3 text-xs text-gray-500">
+          放送局からのサービス枠のSharestファイルを選択してください（複数選択可）。サービスPRP/TRPは局別アクチュアル表に別列で表示されます。
+        </p>
+
+        <FileDropZone
+          displayName={serviceFiles.length > 0 ? `${serviceFiles.length}ファイル選択中` : ''}
+          placeholder="Sharest サービスファイルを選択またはドロップ...（複数可）"
+          multiple
+          onFilesSelect={(files) => handleServiceFilesSelect(files)}
+        />
+        {/* 選択ファイル一覧 */}
+        {serviceFiles.length > 0 && !serviceDone && (
+          <div className="mt-2 space-y-1">
+            {serviceFiles.map((f, i) => (
+              <div key={i} className="flex items-center gap-2 text-xs text-gray-600">
+                <Upload size={12} /> {f.name}
+              </div>
+            ))}
+          </div>
+        )}
+        <div className="mt-3 flex items-end gap-3">
+          <button onClick={handleServiceImport}
+            disabled={serviceFiles.length === 0 || serviceImporting}
+            className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 disabled:opacity-40">
+            {serviceImporting ? '読込中...' : 'インポート'}
+          </button>
+        </div>
+
+        {/* インポート結果 */}
+        {serviceDone && serviceResults.length > 0 && (
+          <div className="mt-4 space-y-2">
+            {serviceResults.map((r, i) => (
+              <div key={i} className={`flex items-center gap-3 rounded-lg p-3 text-sm ${
+                r.errorCount === 0 ? 'bg-green-50' : 'bg-yellow-50'
+              }`}>
+                {r.errorCount === 0
+                  ? <CheckCircle size={16} className="text-green-500" />
+                  : <AlertCircle size={16} className="text-yellow-500" />}
+                <div>
+                  <span className="font-medium">{REGION_LABELS[r.region]}</span>
+                  <span className="ml-2 text-gray-500">
+                    {r.spots.length}件成功
+                    {r.errorCount > 0 && ` / ${r.errorCount}件エラー`}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* リセット */}
-      {(sharestDone || spotPlanDone || iclimaxDone) && (
+      {(sharestDone || serviceDone || spotPlanDone || iclimaxDone) && (
         <div className="text-center">
           <button onClick={reset}
             className="text-sm text-prime hover:underline">
