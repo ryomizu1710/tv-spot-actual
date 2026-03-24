@@ -52,15 +52,16 @@ function xAxisBottomMargin(count: number): number {
 
 /** 棒グラフ上部にラベルを表示するカスタムレンダラー（白背景付きで折れ線と重なっても読める） */
 function BarLabel({ x, y, width, value, suffix }: { x?: number; y?: number; width?: number; value?: number; suffix?: string; [key: string]: unknown }) {
-  if (!value || value === 0) return null
+  if (value == null) return null
   const label = suffix === '%' ? `${value.toFixed(1)}%` : value.toFixed(1)
   const cx = (x ?? 0) + (width ?? 0) / 2
-  const cy = (y ?? 0) - 6
+  const cy = value === 0 ? (y ?? 0) - 6 : (y ?? 0) - 6
+  const fillColor = value === 0 ? '#9CA3AF' : '#374151'
   const textWidth = label.length * 5.5
   return (
     <g>
       <rect x={cx - textWidth / 2 - 2} y={cy - 8} width={textWidth + 4} height={12} rx={2} fill="white" fillOpacity={0.85} />
-      <text x={cx} y={cy} textAnchor="middle" fontSize={CHART_FONT.barLabel} fill="#374151" fontWeight={500}>
+      <text x={cx} y={cy} textAnchor="middle" fontSize={CHART_FONT.barLabel} fill={fillColor} fontWeight={value === 0 ? 400 : 500}>
         {label}
       </text>
     </g>
