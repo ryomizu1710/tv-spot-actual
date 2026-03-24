@@ -61,7 +61,7 @@ export function RegionSummaryTable({ regionSubtotals }: Props) {
                 <RateValue rate={rs.primeShare} threshold={60} />
               </div>
               <div className="mt-0.5 text-right">
-                <span className="text-xs text-gray-300">P4P：{P4P_VALUES[rs.region]}％</span>
+                <span className="text-xs text-gray-400">P4P：{P4P_VALUES[rs.region]}％</span>
               </div>
             </div>
           </div>
