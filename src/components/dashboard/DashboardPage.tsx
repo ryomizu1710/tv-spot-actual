@@ -18,7 +18,6 @@ export function DashboardPage() {
   const spots = useSpotStore((s) => s.spots)
   const campaignData = campaignId ? campaignDataMap[campaignId] : null
   const iclimaxSpots = campaignData?.iclimaxSpots ?? []
-  const hasIclimaxData = (campaignData?.iclimaxStationData ?? []).length > 0
   const sharestSpots = campaignId ? spots.filter((s) => s.campaignId === campaignId) : []
 
   if (!campaignId) {

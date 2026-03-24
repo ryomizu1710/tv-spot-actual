@@ -63,6 +63,7 @@ export function SettingsPage() {
                 cd.iclimaxStationData as never,
                 cd.iclimaxRegionData as never,
                 (cd.iclimaxDailyData ?? []) as never,
+                (cd.iclimaxSpots ?? []) as never,
                 (cd.wptStationData ?? []) as never,
                 (cd.wptRegionData ?? []) as never,
               )
@@ -81,6 +82,7 @@ export function SettingsPage() {
                 data.iclimaxStationData,
                 data.iclimaxRegionData,
                 data.iclimaxDailyData ?? [],
+                data.iclimaxSpots ?? [],
                 data.wptStationData ?? [],
                 data.wptRegionData ?? [],
               )
