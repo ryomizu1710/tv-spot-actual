@@ -16,7 +16,7 @@ import {
   type IclimaxParseResult,
 } from '../../lib/parsers/iclimax-parser'
 import { REGION_LABELS } from '../../constants'
-import { generateSharestFiles, SHAREST_TG_OPTIONS } from '../../lib/exporters/sharest-exporter'
+import { generateSharestFiles, SHAREST_TG_OPTIONS, type SharestPlanType } from '../../lib/exporters/sharest-exporter'
 import type { ImportBatch, StationTarget } from '../../types'
 
 export function ImportPage() {
@@ -61,6 +61,7 @@ export function ImportPage() {
 
   // Sharest フォーマット作成
   const [sharestTg, setSharestTg] = useState(SHAREST_TG_OPTIONS[0])
+  const [sharestPlanType, setSharestPlanType] = useState<SharestPlanType>('初案')
   const [sharestExporting, setSharestExporting] = useState(false)
 
   // --- Sharest handlers ---
@@ -248,7 +249,7 @@ export function ImportPage() {
     if (!iclimaxFile) { toast.error('iClimaxファイルを先に選択してください'); return }
     setSharestExporting(true)
     try {
-      const results = await generateSharestFiles(iclimaxFile, sharestTg)
+      const results = await generateSharestFiles(iclimaxFile, sharestTg, sharestPlanType)
       if (results.length === 0) {
         toast.error('エリアデータが見つかりませんでした')
         setSharestExporting(false)
@@ -492,6 +493,16 @@ export function ImportPage() {
               上記iClimaxファイルからSharest用のExcelを関東・関西・名古屋ごとに出力します。Q・R・S列は空欄で出力されます。
             </p>
             <div className="flex items-end gap-3">
+              <div className="w-32">
+                <label className="mb-1 block text-xs text-[#86868b]">案種別</label>
+                <select
+                  value={sharestPlanType}
+                  onChange={(e) => setSharestPlanType(e.target.value as SharestPlanType)}
+                  className="w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-sm text-[#1d1d1f]">
+                  <option value="初案">初案</option>
+                  <option value="改案">改案</option>
+                </select>
+              </div>
               <div className="w-64">
                 <label className="mb-1 block text-xs text-[#86868b]">TG（S列ヘッダー）</label>
                 <select

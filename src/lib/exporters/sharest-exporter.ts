@@ -136,9 +136,12 @@ const dataStyle: Partial<ExcelJS.Style> = {
 /**
  * iClimaxファイルからSharest用Excelを生成（エリア別）
  */
+export type SharestPlanType = '初案' | '改案'
+
 export async function generateSharestFiles(
   iclimaxFile: File,
   selectedTg: string,
+  planType: SharestPlanType = '初案',
   regions: RegionKey[] = ['kanto', 'kansai', 'nagoya'],
 ): Promise<SharestExportResult[]> {
   const buffer = await iclimaxFile.arrayBuffer()
@@ -266,11 +269,20 @@ export async function generateSharestFiles(
 
     results.push({
       region,
-      fileName: `【sharest】${REGION_FILE_LABELS[region]}.xlsx`,
+      fileName: `【sharest】${REGION_FILE_LABELS[region]}_${planType}_${formatDateSuffix()}.xlsx`,
       blob,
       rowCount: rows.length,
     })
   }
 
   return results
+}
+
+/** 今日の日付を YYMMDD 形式で返す (例: 260325) */
+function formatDateSuffix(): string {
+  const now = new Date()
+  const yy = String(now.getFullYear()).slice(-2)
+  const mm = String(now.getMonth() + 1).padStart(2, '0')
+  const dd = String(now.getDate()).padStart(2, '0')
+  return `${yy}${mm}${dd}`
 }
