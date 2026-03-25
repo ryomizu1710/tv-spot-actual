@@ -42,6 +42,7 @@ function applyAchievementStyle(cell: ExcelJS.Cell, rate: number, threshold = 100
 export async function exportStationActualsToExcel(
   stationActuals: StationActual[],
   regionSubtotals: RegionSubtotal[],
+  campaignName?: string,
 ) {
   const wb = new ExcelJS.Workbook()
   const ws = wb.addWorksheet('局別アクチュアル')
@@ -140,7 +141,7 @@ export async function exportStationActualsToExcel(
   ws.getColumn(9).numFmt = '0.0%'
 
   const buf = await wb.xlsx.writeBuffer()
-  downloadExcel(buf, '局別アクチュアル.xlsx')
+  downloadExcel(buf, `【局別アクチュアル】${campaignName ?? ''}_${dateSuffix()}.xlsx`)
 }
 
 /** シート2: 日別PRP推移 Excel出力（横軸=日付、縦軸=エリア・局、累積%なし） */
@@ -149,6 +150,7 @@ export async function exportDailyPrpToExcel(
   stationDailyProgress: StationDailyPrpProgress[],
   regionStationDailyProgress: Record<Region, StationDailyPrpProgress[]>,
   isAllRegion: boolean,
+  campaignName?: string,
 ) {
   const wb = new ExcelJS.Workbook()
 
@@ -168,7 +170,7 @@ export async function exportDailyPrpToExcel(
   }
 
   const buf = await wb.xlsx.writeBuffer()
-  downloadExcel(buf, '日別PRP推移.xlsx')
+  downloadExcel(buf, `【日別PRP推移】${campaignName ?? ''}_${dateSuffix()}.xlsx`)
 }
 
 /** エリア別日別シート（横軸=日付、縦軸=関東/関西/名古屋） */
@@ -270,6 +272,15 @@ function addStationHorizontalSheet(wb: ExcelJS.Workbook, sheetName: string, stat
   for (let i = 2; i <= allDates.length + 1; i++) ws.getColumn(i).numFmt = '0.0%'
 }
 
+/** 今日の日付を YYMMDD 形式で返す */
+function dateSuffix(): string {
+  const now = new Date()
+  const yy = String(now.getFullYear()).slice(-2)
+  const mm = String(now.getMonth() + 1).padStart(2, '0')
+  const dd = String(now.getDate()).padStart(2, '0')
+  return `${yy}${mm}${dd}`
+}
+
 function downloadExcel(buffer: ExcelJS.Buffer, filename: string) {
   const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
   const url = URL.createObjectURL(blob)
@@ -291,6 +302,7 @@ function normalizeTime(t: string): string {
 export async function exportKaianToExcel(
   iclimaxSpots: IclimaxSpotRow[],
   sharestSpots: SpotRecord[],
+  campaignName?: string,
 ) {
   if (iclimaxSpots.length === 0) return
 
@@ -459,5 +471,5 @@ export async function exportKaianToExcel(
   }
 
   const buffer = await wb.xlsx.writeBuffer()
-  downloadExcel(buffer, '改案枠出力.xlsx')
+  downloadExcel(buffer, `【改案枠】${campaignName ?? ''}_${dateSuffix()}.xlsx`)
 }

@@ -1,6 +1,7 @@
 import { Download } from 'lucide-react'
 import { useUiStore } from '../../stores/ui-store'
 import { useSpotStore } from '../../stores/spot-store'
+import { useCampaignStore } from '../../stores/campaign-store'
 import { useStationActuals } from '../../hooks/use-station-actuals'
 import { exportStationActualsToExcel, exportDailyPrpToExcel, exportKaianToExcel } from '../../lib/exporters/dashboard-exporter'
 import { PrpSummaryCards } from './PrpSummaryCards'
@@ -16,6 +17,8 @@ export function DashboardPage() {
   const isAllRegion = selectedRegion === 'all'
   const campaignDataMap = useSpotStore((s) => s.campaignDataMap)
   const spots = useSpotStore((s) => s.spots)
+  const campaign = useCampaignStore((s) => s.campaigns.find((c) => c.id === campaignId))
+  const campaignName = campaign?.name ?? ''
   const campaignData = campaignId ? campaignDataMap[campaignId] : null
   const iclimaxSpots = campaignData?.iclimaxSpots ?? []
   const sharestSpots = campaignId ? spots.filter((s) => s.campaignId === campaignId) : []
@@ -65,14 +68,14 @@ export function DashboardPage() {
                   alert('Sharestデータがありません。\n「データ取込」からSharestファイルを読み込んでください。')
                   return
                 }
-                exportKaianToExcel(iclimaxSpots, sharestSpots)
+                exportKaianToExcel(iclimaxSpots, sharestSpots, campaignName)
               }}
               className="flex items-center gap-1.5 rounded-full bg-[#AF52DE]/10 px-3.5 py-1.5 text-[12px] font-medium text-[#AF52DE] transition-all hover:bg-[#AF52DE]/20"
             >
               <Download size={13} /> 改案枠出力
             </button>
             <button
-              onClick={() => exportStationActualsToExcel(actualsData.stationActuals, actualsData.regionSubtotals)}
+              onClick={() => exportStationActualsToExcel(actualsData.stationActuals, actualsData.regionSubtotals, campaignName)}
               className="flex items-center gap-1.5 rounded-full bg-black/[0.04] px-3.5 py-1.5 text-[12px] font-medium text-[#1d1d1f] transition-all hover:bg-black/[0.08]"
             >
               <Download size={13} /> Excel出力
@@ -96,6 +99,7 @@ export function DashboardPage() {
               actualsData.stationDailyPrpProgress,
               actualsData.regionStationDailyPrpProgress,
               isAllRegion,
+              campaignName,
             )}
             className="flex items-center gap-1.5 rounded-full bg-black/[0.04] px-3.5 py-1.5 text-[12px] font-medium text-[#1d1d1f] transition-all hover:bg-black/[0.08]"
           >
