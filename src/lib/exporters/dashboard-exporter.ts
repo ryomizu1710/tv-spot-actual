@@ -141,7 +141,7 @@ export async function exportStationActualsToExcel(
   ws.getColumn(9).numFmt = '0.0%'
 
   const buf = await wb.xlsx.writeBuffer()
-  downloadExcel(buf, `【局別アクチュアル】${campaignName ?? ''}_${dateSuffix()}.xlsx`)
+  downloadExcel(buf, `【局別アクチュアル】${campaignName ?? ''}.xlsx`)
 }
 
 /** シート2: 日別PRP推移 Excel出力（横軸=日付、縦軸=エリア・局、累積%なし） */
@@ -170,7 +170,7 @@ export async function exportDailyPrpToExcel(
   }
 
   const buf = await wb.xlsx.writeBuffer()
-  downloadExcel(buf, `【日別PRP推移】${campaignName ?? ''}_${dateSuffix()}.xlsx`)
+  downloadExcel(buf, `【日別PRP推移】${campaignName ?? ''}.xlsx`)
 }
 
 /** エリア別日別シート（横軸=日付、縦軸=関東/関西/名古屋） */
@@ -270,15 +270,6 @@ function addStationHorizontalSheet(wb: ExcelJS.Workbook, sheetName: string, stat
 
   // 数値フォーマット
   for (let i = 2; i <= allDates.length + 1; i++) ws.getColumn(i).numFmt = '0.0%'
-}
-
-/** 今日の日付を YYMMDD 形式で返す */
-function dateSuffix(): string {
-  const now = new Date()
-  const yy = String(now.getFullYear()).slice(-2)
-  const mm = String(now.getMonth() + 1).padStart(2, '0')
-  const dd = String(now.getDate()).padStart(2, '0')
-  return `${yy}${mm}${dd}`
 }
 
 function downloadExcel(buffer: ExcelJS.Buffer, filename: string) {
@@ -471,5 +462,5 @@ export async function exportKaianToExcel(
   }
 
   const buffer = await wb.xlsx.writeBuffer()
-  downloadExcel(buffer, `【改案枠】${campaignName ?? ''}_${dateSuffix()}.xlsx`)
+  downloadExcel(buffer, `【改案枠】${campaignName ?? ''}.xlsx`)
 }
