@@ -598,7 +598,7 @@ export function ImportPage() {
           )}
         </div>
         <p className="mb-3 text-xs text-[#86868b]">
-          放送局からのサービス枠のSharestファイルを選択してください（複数選択可）。サービスPRP/TRPは局別アクチュアル表に別列で表示されます。
+          関東・関西・名古屋のSharestファイル（サービス）を選択してください（複数選択可）。地域はシート名・ファイル名から自動判定します。
         </p>
 
         <FileDropZone
