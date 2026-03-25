@@ -14,12 +14,6 @@ const P4P_VALUES: Record<Region, number> = {
   nagoya: 47.4,
 }
 
-const REGION_GRADIENT: Record<Region, string> = {
-  kanto: 'from-[#007AFF] to-[#0055D4]',
-  kansai: 'from-[#FF9500] to-[#CC7700]',
-  nagoya: 'from-[#AF52DE] to-[#8B3FB2]',
-}
-
 function RateValue({ rate, threshold }: { rate: number; threshold: number }) {
   if (rate === 0) return <span className="text-[28px] font-bold text-[#d2d2d7]">—</span>
   const isGood = rate >= threshold
@@ -43,14 +37,9 @@ export function RegionSummaryTable({ regionSubtotals }: Props) {
           className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl"
         >
           <div className="mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <span className={`inline-flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-b ${REGION_GRADIENT[rs.region]} text-[10px] font-bold text-white`}>
-                {REGION_LABELS[rs.region].charAt(0)}
-              </span>
-              <span className="text-[15px] font-semibold text-[#1d1d1f]">
-                {REGION_LABELS[rs.region]}
-              </span>
-            </div>
+            <span className="text-[15px] font-semibold text-[#1d1d1f]">
+              {REGION_LABELS[rs.region]}
+            </span>
             <span className="text-[12px] text-[#86868b]">{rs.spotCount.toLocaleString()}本</span>
           </div>
 
