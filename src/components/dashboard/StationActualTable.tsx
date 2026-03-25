@@ -220,8 +220,8 @@ function RegionBlock({
               {sa.targetPrp > 0 ? sa.targetPrp.toFixed(1) : <span className="text-[#d2d2d7]">—</span>}
             </td>
             <td className="px-2 py-2 text-center font-bold text-[#1d1d1f]">{sa.actualPrp.toFixed(1)}</td>
-            <td className="px-2 py-2 text-center text-teal-600">
-              {sa.servicePrp > 0 ? sa.servicePrp.toFixed(1) : <span className="text-[#d2d2d7]">—</span>}
+            <td className="px-2 py-2 text-center font-bold text-[#1d1d1f]">
+              {sa.servicePrp > 0 ? sa.servicePrp.toFixed(1) : <span className="text-[#d2d2d7] font-normal">—</span>}
             </td>
             <td className="px-2 py-2 text-center">
               <AchievementBadge rate={sa.prpAchievement} />
@@ -231,8 +231,8 @@ function RegionBlock({
               {sa.targetTrp > 0 ? sa.targetTrp.toFixed(1) : <span className="text-[#d2d2d7]">—</span>}
             </td>
             <td className="px-2 py-2 text-center font-bold text-[#1d1d1f]">{sa.actualTg.toFixed(1)}</td>
-            <td className="px-2 py-2 text-center text-teal-600">
-              {sa.serviceTg > 0 ? sa.serviceTg.toFixed(1) : <span className="text-[#d2d2d7]">—</span>}
+            <td className="px-2 py-2 text-center font-bold text-[#1d1d1f]">
+              {sa.serviceTg > 0 ? sa.serviceTg.toFixed(1) : <span className="text-[#d2d2d7] font-normal">—</span>}
             </td>
             <td className="px-2 py-2 text-center">
               <AchievementBadge rate={sa.tgAchievement} />
@@ -271,8 +271,8 @@ function RegionBlock({
             {/* PRP */}
             <td className={`${CATEGORY_STYLES.prp.cellBorder} px-2 py-2.5 text-center font-bold text-[#6e6e73]`}>{subtotal.targetPrp.toFixed(1)}</td>
             <td className="px-2 py-2.5 text-center font-bold text-[#1d1d1f]">{subtotal.actualPrp.toFixed(1)}</td>
-            <td className="px-2 py-2.5 text-center font-bold text-teal-600">
-              {subtotal.servicePrp > 0 ? subtotal.servicePrp.toFixed(1) : <span className="text-[#d2d2d7]">—</span>}
+            <td className="px-2 py-2.5 text-center font-bold text-[#1d1d1f]">
+              {subtotal.servicePrp > 0 ? subtotal.servicePrp.toFixed(1) : <span className="text-[#d2d2d7] font-normal">—</span>}
             </td>
             <td className="px-2 py-2.5 text-center">
               <AchievementBadge rate={subtotal.prpAchievement} />
@@ -282,8 +282,8 @@ function RegionBlock({
               {subtotal.targetTrp > 0 ? subtotal.targetTrp.toFixed(1) : <span className="text-[#d2d2d7]">—</span>}
             </td>
             <td className="px-2 py-2.5 text-center font-bold text-[#1d1d1f]">{subtotal.actualTg.toFixed(1)}</td>
-            <td className="px-2 py-2.5 text-center font-bold text-teal-600">
-              {subtotal.serviceTg > 0 ? subtotal.serviceTg.toFixed(1) : <span className="text-[#d2d2d7]">—</span>}
+            <td className="px-2 py-2.5 text-center font-bold text-[#1d1d1f]">
+              {subtotal.serviceTg > 0 ? subtotal.serviceTg.toFixed(1) : <span className="text-[#d2d2d7] font-normal">—</span>}
             </td>
             <td className="px-2 py-2.5 text-center">
               <AchievementBadge rate={subtotal.tgAchievement} />
