@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { idbStorage } from '../lib/idb-storage'
 import type { SpotRecord, ImportBatch, StationTarget } from '../types'
 import type { RegionTargetTrp } from '../lib/parsers/spot-plan-parser'
 import type { IclimaxStationData, IclimaxRegionData, IclimaxDailyPrp, IclimaxSpotRow, WptStationData, WptRegionData } from '../lib/parsers/iclimax-parser'
@@ -141,6 +142,6 @@ export const useSpotStore = create<SpotStore>()(
         set({ spots: [], importBatches: [], campaignDataMap: {} })
       },
     }),
-    { name: 'tv-spot-data' },
+    { name: 'tv-spot-data', storage: idbStorage },
   ),
 )

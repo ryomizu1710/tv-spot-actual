@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { idbStorage } from '../lib/idb-storage'
 import { v4 as uuidv4 } from 'uuid'
 import type { Campaign } from '../types'
 
@@ -45,6 +46,6 @@ export const useCampaignStore = create<CampaignStore>()(
       },
       getCampaign: (id) => get().campaigns.find((c) => c.id === id),
     }),
-    { name: 'tv-spot-campaigns' },
+    { name: 'tv-spot-campaigns', storage: idbStorage },
   ),
 )
