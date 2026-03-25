@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { Download, Upload, Trash2, Database } from 'lucide-react'
 import { useSpotStore } from '../../stores/spot-store'
 import { useCampaignStore } from '../../stores/campaign-store'
@@ -104,15 +105,18 @@ export function SettingsPage() {
     toast.success('全データを削除しました')
   }
 
-  const storageUsed = (() => {
-    let total = 0
-    for (const key of ['tv-spot-campaigns', 'tv-spot-data']) {
-      const item = localStorage.getItem(key)
-      if (item) total += item.length * 2 // UTF-16
+  const [storageUsed, setStorageUsed] = useState(0)
+  const storageLimit = 500 * 1024 * 1024 // 500 MB
+  useEffect(() => {
+    async function estimateUsage() {
+      if (navigator.storage && navigator.storage.estimate) {
+        const est = await navigator.storage.estimate()
+        setStorageUsed(est.usage ?? 0)
+      }
     }
-    return total
-  })()
-  const storagePct = Math.round((storageUsed / (5 * 1024 * 1024)) * 100)
+    estimateUsage()
+  }, [spots, campaigns])
+  const storagePct = Math.round((storageUsed / storageLimit) * 100)
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -126,7 +130,7 @@ export function SettingsPage() {
         </div>
         <div className="space-y-2">
           <div className="flex justify-between text-xs text-gray-500">
-            <span>{(storageUsed / 1024).toFixed(1)} KB / 5 MB</span>
+            <span>{(storageUsed / (1024 * 1024)).toFixed(1)} MB / 500 MB</span>
             <span>{storagePct}%</span>
           </div>
           <div className="h-2 rounded-full bg-gray-200">
