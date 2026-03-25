@@ -12,8 +12,7 @@ const navItems = [
 export function Sidebar() {
   return (
     <aside className="flex w-[220px] flex-col border-r border-black/[0.08] bg-[#e2e2ea]/95 backdrop-blur-xl">
-      <div className="flex h-14 items-center gap-2.5 px-5">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-b from-[#007AFF] to-[#0055D4] text-[11px] font-bold text-white shadow-sm">TV</div>
+      <div className="flex h-14 items-center px-5">
         <span className="text-[13px] font-semibold text-[#1d1d1f] tracking-tight">TV Campaign Actual Management</span>
       </div>
       <nav className="mt-1 flex-1 space-y-0.5 px-3">
