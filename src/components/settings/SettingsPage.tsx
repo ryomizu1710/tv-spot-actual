@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Download, Upload, Trash2, Database } from 'lucide-react'
 import { useSpotStore } from '../../stores/spot-store'
 import { useCampaignStore } from '../../stores/campaign-store'
+import { markBackupDone } from '../../lib/auto-backup'
 import { toast } from 'sonner'
 
 export function SettingsPage() {
@@ -27,6 +28,7 @@ export function SettingsPage() {
     a.download = `tv-spot-backup-${new Date().toISOString().slice(0, 10)}.json`
     a.click()
     URL.revokeObjectURL(url)
+    markBackupDone()
     toast.success('バックアップをエクスポートしました')
   }
 

@@ -6,11 +6,13 @@ import { CampaignListPage } from './components/campaign/CampaignListPage'
 import { ImportPage } from './components/import/ImportPage'
 import { SpotListPage } from './components/spots/SpotListPage'
 import { SettingsPage } from './components/settings/SettingsPage'
+import { BackupReminder } from './components/BackupReminder'
 
 export default function App() {
   return (
     <HashRouter>
       <Toaster position="top-right" richColors />
+      <BackupReminder />
       <AppShell>
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />

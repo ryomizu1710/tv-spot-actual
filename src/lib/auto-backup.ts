@@ -1,15 +1,35 @@
 import { useSpotStore } from '../stores/spot-store'
 import { useCampaignStore } from '../stores/campaign-store'
 
-/** データ取込完了後に自動バックアップJSONをダウンロードする */
-export function downloadAutoBackup() {
+const BACKUP_REMINDER_KEY = 'tv-spot-last-backup'
+const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000
+
+/** 前回バックアップから7日以上経っているか判定 */
+export function shouldRemindBackup(): boolean {
+  const last = localStorage.getItem(BACKUP_REMINDER_KEY)
+  if (!last) return true
+  return Date.now() - Number(last) > ONE_WEEK_MS
+}
+
+/** バックアップ日時を記録（エクスポート実行時に呼ぶ） */
+export function markBackupDone() {
+  localStorage.setItem(BACKUP_REMINDER_KEY, String(Date.now()))
+}
+
+/** リマインダーをスキップ（「後で」押下時） */
+export function snoozeBackupReminder() {
+  // 1日後に再表示
+  localStorage.setItem(BACKUP_REMINDER_KEY, String(Date.now() - ONE_WEEK_MS + 24 * 60 * 60 * 1000))
+}
+
+/** バックアップJSONをダウンロードする */
+export function downloadBackup() {
   const { spots, importBatches, campaignDataMap } = useSpotStore.getState()
   const { campaigns } = useCampaignStore.getState()
 
   const data = {
     version: 3,
     exportedAt: new Date().toISOString(),
-    autoBackup: true,
     campaigns,
     spots,
     importBatches,
@@ -31,4 +51,6 @@ export function downloadAutoBackup() {
   a.download = `tv-spot-backup_${dateSuffix}.json`
   a.click()
   URL.revokeObjectURL(url)
+
+  markBackupDone()
 }
