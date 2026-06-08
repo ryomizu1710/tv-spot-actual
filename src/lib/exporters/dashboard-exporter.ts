@@ -47,14 +47,16 @@ export async function exportStationActualsToExcel(
   const wb = new ExcelJS.Workbook()
   const ws = wb.addWorksheet('局別アクチュアル')
 
-  // カラム定義（エリア列を削除、局がA列）
+  // カラム定義
   const columns = [
     { header: '局', key: 'station', width: 12 },
     { header: 'PRP\n発注', key: 'prpTarget', width: 10 },
-    { header: 'PRP\n予測', key: 'prpActual', width: 10 },
+    { header: 'PRP\n本案予測', key: 'prpActual', width: 10 },
+    { header: 'PRP\nサービス予測', key: 'prpService', width: 12 },
     { header: 'PRP\n達成率', key: 'prpRate', width: 10 },
     { header: 'TRP\n発注', key: 'trpTarget', width: 10 },
-    { header: 'TRP\n予測', key: 'trpActual', width: 10 },
+    { header: 'TRP\n本案予測', key: 'trpActual', width: 10 },
+    { header: 'TRP\nサービス予測', key: 'trpService', width: 12 },
     { header: 'TRP\n達成率', key: 'trpRate', width: 10 },
     { header: 'Prime\nPRP', key: 'primePrp', width: 10 },
     { header: 'Prime\nShare', key: 'primeShare', width: 10 },
@@ -86,9 +88,11 @@ export async function exportStationActualsToExcel(
         sa.stationCode,
         sa.targetPrp > 0 ? sa.targetPrp : null,
         sa.actualPrp,
+        sa.servicePrp,
         sa.prpAchievement > 0 ? sa.prpAchievement / 100 : null,
         sa.targetTrp > 0 ? sa.targetTrp : null,
         sa.actualTg,
+        sa.serviceTg,
         sa.tgAchievement > 0 ? sa.tgAchievement / 100 : null,
         sa.primePrp,
         sa.primeShare > 0 ? sa.primeShare / 100 : null,
@@ -99,9 +103,9 @@ export async function exportStationActualsToExcel(
         cell.alignment = CENTER
         cell.border = THIN_BORDER
       })
-      if (sa.prpAchievement > 0) applyAchievementStyle(row.getCell(4), sa.prpAchievement)
-      if (sa.tgAchievement > 0) applyAchievementStyle(row.getCell(7), sa.tgAchievement)
-      if (sa.primeShare > 0) applyAchievementStyle(row.getCell(9), sa.primeShare, 60)
+      if (sa.prpAchievement > 0) applyAchievementStyle(row.getCell(5), sa.prpAchievement)
+      if (sa.tgAchievement > 0) applyAchievementStyle(row.getCell(9), sa.tgAchievement)
+      if (sa.primeShare > 0) applyAchievementStyle(row.getCell(11), sa.primeShare, 60)
     }
 
     // エリア小計（A列に「関東 小計」）
@@ -110,9 +114,11 @@ export async function exportStationActualsToExcel(
         `${REGION_LABELS[region]} 小計`,
         subtotal.targetPrp,
         subtotal.actualPrp,
+        subtotal.servicePrp,
         subtotal.prpAchievement > 0 ? subtotal.prpAchievement / 100 : null,
         subtotal.targetTrp > 0 ? subtotal.targetTrp : null,
         subtotal.actualTg,
+        subtotal.serviceTg,
         subtotal.tgAchievement > 0 ? subtotal.tgAchievement / 100 : null,
         subtotal.primePrp,
         subtotal.primeShare > 0 ? subtotal.primeShare / 100 : null,
@@ -124,21 +130,23 @@ export async function exportStationActualsToExcel(
         cell.border = THIN_BORDER
         cell.fill = SUBTOTAL_FILL
       })
-      if (subtotal.prpAchievement > 0) applyAchievementStyle(row.getCell(4), subtotal.prpAchievement)
-      if (subtotal.tgAchievement > 0) applyAchievementStyle(row.getCell(7), subtotal.tgAchievement)
-      if (subtotal.primeShare > 0) applyAchievementStyle(row.getCell(9), subtotal.primeShare, 60)
+      if (subtotal.prpAchievement > 0) applyAchievementStyle(row.getCell(5), subtotal.prpAchievement)
+      if (subtotal.tgAchievement > 0) applyAchievementStyle(row.getCell(9), subtotal.tgAchievement)
+      if (subtotal.primeShare > 0) applyAchievementStyle(row.getCell(11), subtotal.primeShare, 60)
     }
   }
 
   // 数値フォーマット
-  ws.getColumn(2).numFmt = '0.0'
-  ws.getColumn(3).numFmt = '0.0'
-  ws.getColumn(4).numFmt = '0.0%'
-  ws.getColumn(5).numFmt = '0.0'
-  ws.getColumn(6).numFmt = '0.0'
-  ws.getColumn(7).numFmt = '0.0%'
-  ws.getColumn(8).numFmt = '0.0'
-  ws.getColumn(9).numFmt = '0.0%'
+  ws.getColumn(2).numFmt = '0.0'   // PRP 発注
+  ws.getColumn(3).numFmt = '0.0'   // PRP 本案予測
+  ws.getColumn(4).numFmt = '0.0'   // PRP サービス予測
+  ws.getColumn(5).numFmt = '0.0%'  // PRP 達成率
+  ws.getColumn(6).numFmt = '0.0'   // TRP 発注
+  ws.getColumn(7).numFmt = '0.0'   // TRP 本案予測
+  ws.getColumn(8).numFmt = '0.0'   // TRP サービス予測
+  ws.getColumn(9).numFmt = '0.0%'  // TRP 達成率
+  ws.getColumn(10).numFmt = '0.0'  // Prime PRP
+  ws.getColumn(11).numFmt = '0.0%' // Prime Share
 
   const buf = await wb.xlsx.writeBuffer()
   downloadExcel(buf, `【局別アクチュアル】${campaignName ?? ''}.xlsx`)
