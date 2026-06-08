@@ -17,6 +17,7 @@ import {
 } from '../../lib/parsers/iclimax-parser'
 import { REGION_LABELS } from '../../constants'
 import { generateSharestFiles, SHAREST_TG_OPTIONS, type SharestPlanType } from '../../lib/exporters/sharest-exporter'
+import { downloadAutoBackup } from '../../lib/auto-backup'
 import type { ImportBatch, StationTarget } from '../../types'
 
 export function ImportPage() {
@@ -127,6 +128,7 @@ export function ImportPage() {
 
     const totalSpots = results.reduce((s, r) => s + r.spots.length, 0)
     toast.success(`${totalSpots}件のスポットデータをインポートしました`)
+    downloadAutoBackup()
   }
 
   // --- Sharest サービス handlers ---
@@ -193,6 +195,7 @@ export function ImportPage() {
 
     const totalSpots = results.reduce((s, r) => s + r.spots.length, 0)
     toast.success(`${totalSpots}件のサービス枠データをインポートしました`)
+    downloadAutoBackup()
   }
 
   // --- SPOTプラン handlers ---
@@ -222,6 +225,7 @@ export function ImportPage() {
       setRegionTargetTrps(campaignId, result.regionTargetTrps)
       setSpotPlanDone(true)
       toast.success(`${result.targets.length}局の発注PRP目標を読み込みました`)
+      downloadAutoBackup()
     } catch (err) {
       toast.error(`読込エラー: ${err instanceof Error ? err.message : '不明'}`)
     }
@@ -289,6 +293,7 @@ export function ImportPage() {
         ? `${selectedHeader.columnLetter}列 — ${selectedHeader.label}`
         : ICLIMAX_TRP_COLUMNS.find(c => c.value === iclimaxTrpColumn)?.label ?? ''
       toast.success(`${result.stationData.length}局の発注TRP・Prime PRPを読み込みました（${colLabel}）`)
+      downloadAutoBackup()
     } catch (err) {
       toast.error(`読込エラー: ${err instanceof Error ? err.message : '不明'}`)
     }
