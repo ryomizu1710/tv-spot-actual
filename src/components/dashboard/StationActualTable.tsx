@@ -107,10 +107,10 @@ export function StationActualTable({ stationActuals, regionSubtotals }: Props) {
           <tr>
             <th colSpan={2} className="rounded-tl-xl bg-[#f5f5f7] px-3 py-2.5">
             </th>
-            <th colSpan={4} className={`${CATEGORY_STYLES.prp.headerBg} border-l ${CATEGORY_STYLES.prp.headerBorder} px-2 py-2.5 text-center text-[11px] font-bold tracking-wider ${CATEGORY_STYLES.prp.headerText}`}>
+            <th colSpan={5} className={`${CATEGORY_STYLES.prp.headerBg} border-l ${CATEGORY_STYLES.prp.headerBorder} px-2 py-2.5 text-center text-[11px] font-bold tracking-wider ${CATEGORY_STYLES.prp.headerText}`}>
               PRP
             </th>
-            <th colSpan={4} className={`${CATEGORY_STYLES.trp.headerBg} border-l ${CATEGORY_STYLES.trp.headerBorder} px-2 py-2.5 text-center text-[11px] font-bold tracking-wider ${CATEGORY_STYLES.trp.headerText}`}>
+            <th colSpan={5} className={`${CATEGORY_STYLES.trp.headerBg} border-l ${CATEGORY_STYLES.trp.headerBorder} px-2 py-2.5 text-center text-[11px] font-bold tracking-wider ${CATEGORY_STYLES.trp.headerText}`}>
               TRP
             </th>
             <th colSpan={2} className={`${CATEGORY_STYLES.prime.headerBg} border-l ${CATEGORY_STYLES.prime.headerBorder} px-2 py-2.5 text-center text-[11px] font-bold tracking-wider ${CATEGORY_STYLES.prime.headerText}`}>
@@ -131,10 +131,12 @@ export function StationActualTable({ stationActuals, regionSubtotals }: Props) {
             <th className={`${CATEGORY_STYLES.prp.cellBorder} px-2 py-2 text-center text-xs font-semibold text-[#86868b]`}>発注</th>
             <th className="px-2 py-2 text-center text-xs font-semibold text-[#86868b]">本案予測</th>
             <th className="px-2 py-2 text-center text-xs font-semibold text-[#86868b]">サービス予測</th>
+            <th className="px-2 py-2 text-center text-xs font-semibold text-[#1d1d1f]">合計</th>
             <th className="px-2 py-2 text-center text-xs font-semibold text-[#86868b]">達成率</th>
             <th className={`${CATEGORY_STYLES.trp.cellBorder} px-2 py-2 text-center text-xs font-semibold text-[#86868b]`}>発注</th>
             <th className="px-2 py-2 text-center text-xs font-semibold text-[#86868b]">本案予測</th>
             <th className="px-2 py-2 text-center text-xs font-semibold text-[#86868b]">サービス予測</th>
+            <th className="px-2 py-2 text-center text-xs font-semibold text-[#1d1d1f]">合計</th>
             <th className="px-2 py-2 text-center text-xs font-semibold text-[#86868b]">達成率</th>
             <th className={`${CATEGORY_STYLES.prime.cellBorder} px-2 py-2 text-center text-xs font-semibold text-[#86868b]`}>PRP</th>
             <th className="px-2 py-2 text-center text-xs font-semibold text-[#86868b]">Share</th>
@@ -223,6 +225,7 @@ function RegionBlock({
             </td>
             <td className="px-2 py-2 text-center font-bold text-[#1d1d1f]">{sa.actualPrp.toFixed(1)}</td>
             <td className="px-2 py-2 text-center font-bold text-[#1d1d1f]">{sa.servicePrp.toFixed(1)}</td>
+            <td className="bg-black/[0.02] px-2 py-2 text-center font-bold text-[#1d1d1f]">{sa.totalPrp.toFixed(1)}</td>
             <td className="px-2 py-2 text-center">
               <AchievementBadge rate={sa.prpAchievement} />
             </td>
@@ -232,6 +235,7 @@ function RegionBlock({
             </td>
             <td className="px-2 py-2 text-center font-bold text-[#1d1d1f]">{sa.actualTg.toFixed(1)}</td>
             <td className="px-2 py-2 text-center font-bold text-[#1d1d1f]">{sa.serviceTg.toFixed(1)}</td>
+            <td className="bg-black/[0.02] px-2 py-2 text-center font-bold text-[#1d1d1f]">{sa.totalTg.toFixed(1)}</td>
             <td className="px-2 py-2 text-center">
               <AchievementBadge rate={sa.tgAchievement} />
             </td>
@@ -273,6 +277,7 @@ function RegionBlock({
             <td className={`${CATEGORY_STYLES.prp.cellBorder} px-2 py-2.5 text-center font-bold text-[#6e6e73]`}>{subtotal.targetPrp.toFixed(1)}</td>
             <td className="px-2 py-2.5 text-center font-bold text-[#1d1d1f]">{subtotal.actualPrp.toFixed(1)}</td>
             <td className="px-2 py-2.5 text-center font-bold text-[#1d1d1f]">{subtotal.servicePrp.toFixed(1)}</td>
+            <td className="bg-black/[0.03] px-2 py-2.5 text-center font-bold text-[#1d1d1f]">{subtotal.totalPrp.toFixed(1)}</td>
             <td className="px-2 py-2.5 text-center">
               <AchievementBadge rate={subtotal.prpAchievement} />
             </td>
@@ -282,6 +287,7 @@ function RegionBlock({
             </td>
             <td className="px-2 py-2.5 text-center font-bold text-[#1d1d1f]">{subtotal.actualTg.toFixed(1)}</td>
             <td className="px-2 py-2.5 text-center font-bold text-[#1d1d1f]">{subtotal.serviceTg.toFixed(1)}</td>
+            <td className="bg-black/[0.03] px-2 py-2.5 text-center font-bold text-[#1d1d1f]">{subtotal.totalTg.toFixed(1)}</td>
             <td className="px-2 py-2.5 text-center">
               <AchievementBadge rate={subtotal.tgAchievement} />
             </td>

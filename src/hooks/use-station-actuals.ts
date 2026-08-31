@@ -16,6 +16,8 @@ export interface StationActual {
   actualPrp: number
   /** サービス枠PRP */
   servicePrp: number
+  /** 本案+サービスの合計PRP */
+  totalPrp: number
   /** PRP アクチュアル % — (本案+サービス)/発注 */
   prpAchievement: number
   /** 発注TRP (局別: Sharest S列合計) */
@@ -24,6 +26,8 @@ export interface StationActual {
   actualTg: number
   /** サービス枠TG */
   serviceTg: number
+  /** 本案+サービスの合計TG */
+  totalTg: number
   /** TG アクチュアル % — (本案+サービス)/発注 */
   tgAchievement: number
   /** プライム帯PRP (19-24時) */
@@ -53,11 +57,13 @@ export interface RegionSubtotal {
   targetPrp: number
   actualPrp: number
   servicePrp: number
+  totalPrp: number
   prpAchievement: number
   /** 発注TRP (小計: SPOTプラン L列合計) */
   targetTrp: number
   actualTg: number
   serviceTg: number
+  totalTg: number
   tgAchievement: number
   primePrp: number
   primeTg: number
@@ -264,10 +270,12 @@ export function useStationActuals(): StationActualsData | null {
         targetPrp,
         actualPrp,
         servicePrp,
+        totalPrp,
         prpAchievement: targetPrp > 0 ? round1(totalPrp / targetPrp * 100) : 0,
         targetTrp,
         actualTg,
         serviceTg,
+        totalTg,
         tgAchievement: targetTrp > 0 ? round1(totalTg / targetTrp * 100) : 0,
         primePrp,
         primeTg,
@@ -314,10 +322,12 @@ export function useStationActuals(): StationActualsData | null {
         targetPrp,
         actualPrp,
         servicePrp,
+        totalPrp: totalPrpForRegion,
         prpAchievement: targetPrp > 0 ? round1(totalPrpForRegion / targetPrp * 100) : 0,
         targetTrp,
         actualTg,
         serviceTg,
+        totalTg: totalTgForRegion,
         tgAchievement: targetTrp > 0 ? round1(totalTgForRegion / targetTrp * 100) : 0,
         primePrp,
         primeTg,
@@ -366,10 +376,12 @@ export function useStationActuals(): StationActualsData | null {
       targetPrp: totalTargetPrp,
       actualPrp: totalActualPrp,
       servicePrp: totalServicePrp,
+      totalPrp: totalCombinedPrp,
       prpAchievement: totalTargetPrp > 0 ? round1(totalCombinedPrp / totalTargetPrp * 100) : 0,
       targetTrp: totalTargetTrp,
       actualTg: totalActualTg,
       serviceTg: totalServiceTg,
+      totalTg: totalCombinedTg,
       tgAchievement: totalTargetTrp > 0 ? round1(totalCombinedTg / totalTargetTrp * 100) : 0,
       primePrp: totalPrimePrp,
       primeTg: totalPrimeTg,
