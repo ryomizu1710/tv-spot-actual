@@ -75,6 +75,7 @@ const CATEGORY_STYLES = {
 
 export function StationActualTable({ stationActuals, regionSubtotals }: Props) {
   const campaignId = useUiStore((s) => s.selectedCampaignId)
+  const basis = useUiStore((s) => s.primeShareBasis)
   const campaignDataMap = useSpotStore((s) => s.campaignDataMap)
   const campaignData = campaignId ? (campaignDataMap[campaignId] ?? null) : null
   const wptStationData = campaignData?.wptStationData ?? []
@@ -139,7 +140,10 @@ export function StationActualTable({ stationActuals, regionSubtotals }: Props) {
             <th className="px-2 py-2 text-center text-xs font-semibold text-[#1d1d1f]">合計</th>
             <th className="px-2 py-2 text-center text-xs font-semibold text-[#86868b]">達成率</th>
             <th className={`${CATEGORY_STYLES.prime.cellBorder} px-2 py-2 text-center text-xs font-semibold text-[#86868b]`}>PRP</th>
-            <th className="px-2 py-2 text-center text-xs font-semibold text-[#86868b]">Share</th>
+            <th className="px-2 py-2 text-center text-xs font-semibold text-[#86868b]">
+              Share
+              <div className="text-[10px] font-normal text-[#1d1d1f]">{PRIME_SHARE_BASIS_LABELS[basis]}</div>
+            </th>
             <th className={`${CATEGORY_STYLES.spots.cellBorder} px-2 py-2 text-center text-xs font-semibold text-[#86868b]`}>本数</th>
             {hasWpt && (
               <>
