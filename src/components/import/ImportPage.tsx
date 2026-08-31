@@ -330,7 +330,7 @@ export function ImportPage() {
       </div>
 
       {/* 取込セクション: 広い画面では2列に並べ、スクロールせず全体を把握できるようにする */}
-      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
 
       {/* セクション1: SPOTプラン（目標値）*/}
       <div className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
