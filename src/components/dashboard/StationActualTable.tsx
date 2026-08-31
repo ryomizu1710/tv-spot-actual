@@ -193,6 +193,8 @@ function RegionBlock({
   hasWpt: boolean
 }) {
   const accent = REGION_ACCENT[region]
+  const primeShareBasis = useUiStore((s) => s.primeShareBasis)
+  const altLabel = primeShareBasis === 'forecast' ? 'iClimax基準' : '予測基準'
 
   return (
     <>
@@ -237,6 +239,9 @@ function RegionBlock({
             <td className={`${CATEGORY_STYLES.prime.cellBorder} px-2 py-2 text-center font-bold text-[#1d1d1f]`}>{sa.primePrp.toFixed(1)}</td>
             <td className="px-2 py-2 text-center">
               <PrimeShareBadge rate={sa.primeShare} />
+              <div className="mt-0.5 text-[10px] text-[#a1a1a6]">
+                {altLabel} {(primeShareBasis === 'forecast' ? sa.primeShareIclimax : sa.primeShareForecast).toFixed(1)}%
+              </div>
             </td>
             {/* 出稿 */}
             <td className={`${CATEGORY_STYLES.spots.cellBorder} px-2 py-2 text-center text-[#86868b]`}>{sa.spotCount}</td>
@@ -284,6 +289,9 @@ function RegionBlock({
             <td className={`${CATEGORY_STYLES.prime.cellBorder} px-2 py-2.5 text-center font-bold text-[#1d1d1f]`}>{subtotal.primePrp.toFixed(1)}</td>
             <td className="px-2 py-2.5 text-center">
               <PrimeShareBadge rate={subtotal.primeShare} />
+              <div className="mt-0.5 text-[10px] text-[#a1a1a6]">
+                {altLabel} {(primeShareBasis === 'forecast' ? subtotal.primeShareIclimax : subtotal.primeShareForecast).toFixed(1)}%
+              </div>
             </td>
             {/* 出稿 */}
             <td className={`${CATEGORY_STYLES.spots.cellBorder} px-2 py-2.5 text-center font-bold text-[#6e6e73]`}>{subtotal.spotCount}</td>

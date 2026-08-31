@@ -9,6 +9,7 @@ import { RegionSummaryTable } from './RegionSummaryTable'
 import { StationActualTable } from './StationActualTable'
 import { DailyPrpTrendChart } from './DailyPrpTrendChart'
 import { DailyPrpTable } from './DailyPrpTable'
+import { PrimeShareBasisToggle } from './PrimeShareBasisToggle'
 
 export function DashboardPage() {
   const campaignId = useUiStore((s) => s.selectedCampaignId)
@@ -43,6 +44,10 @@ export function DashboardPage() {
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-6">
+      <div className="rounded-2xl bg-white/80 px-5 py-3 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
+        <PrimeShareBasisToggle />
+      </div>
+
       {isAllRegion ? (
         <section>
           <h3 className="mb-3 text-[13px] font-semibold text-[#86868b] uppercase tracking-wider">エリア別サマリー</h3>
@@ -75,7 +80,7 @@ export function DashboardPage() {
               <Download size={13} /> 改案枠出力
             </button>
             <button
-              onClick={() => exportStationActualsToExcel(actualsData.stationActuals, actualsData.regionSubtotals, campaignName)}
+              onClick={() => exportStationActualsToExcel(actualsData.stationActuals, actualsData.regionSubtotals, campaignName, actualsData.primeShareBasis)}
               className="flex items-center gap-1.5 rounded-full bg-black/[0.04] px-3.5 py-1.5 text-[12px] font-medium text-[#1d1d1f] transition-all hover:bg-black/[0.08]"
             >
               <Download size={13} /> Excel出力

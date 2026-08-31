@@ -28,7 +28,7 @@ export function PrpSummaryCards({ data }: Props) {
       label: 'Prime Time Share',
       value: data.totalPrimeShare > 0 ? `${data.totalPrimeShare.toFixed(1)}%` : '—',
       sub: data.totalPrimePrp > 0
-        ? `Prime PRP: ${data.totalPrimePrp.toFixed(1)}`
+        ? `Prime PRP: ${data.totalPrimePrp.toFixed(1)} / ${data.primeShareBasis === 'forecast' ? 'iClimax基準' : '予測基準'}: ${(data.primeShareBasis === 'forecast' ? data.totalPrimeShareIclimax : data.totalPrimeShareForecast).toFixed(1)}%`
         : null,
       rate: null,
       isHighlight: false,

@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useSpotStore } from '../stores/spot-store'
 import { useUiStore } from '../stores/ui-store'
+import type { PrimeShareBasis } from '../stores/ui-store'
 import { REGIONS, REGION_LABELS, isPrimeTime, getStationSortOrder } from '../constants'
 import type { Region, SpotRecord, StationTarget } from '../types'
 
@@ -29,8 +30,16 @@ export interface StationActual {
   primePrp: number
   /** プライム帯TG (19-24時) */
   primeTg: number
-  /** プライムタイムシェア % (primePrp / actualPrp) */
+  /** プライムタイムシェア % — 選択中の算出基準に従う */
   primeShare: number
+  /** iClimax基準: プライム帯PRP */
+  primePrpIclimax: number
+  /** iClimax基準: シェア % (iClimaxプライムPRP / iClimax全時間帯PRP) */
+  primeShareIclimax: number
+  /** 予測基準: プライム帯PRP (本案+サービスのうち19-24時) */
+  primePrpForecast: number
+  /** 予測基準: シェア % (上記 / 本案+サービス合計PRP) */
+  primeShareForecast: number
   /** 出稿本数 */
   spotCount: number
   /** プライム帯本数 */
@@ -53,6 +62,10 @@ export interface RegionSubtotal {
   primePrp: number
   primeTg: number
   primeShare: number
+  primePrpIclimax: number
+  primeShareIclimax: number
+  primePrpForecast: number
+  primeShareForecast: number
   spotCount: number
   primeSpotCount: number
 }
@@ -132,6 +145,12 @@ export interface StationActualsData {
   totalPrimePrp: number
   /** 全体プライムシェア % */
   totalPrimeShare: number
+  /** 全体プライムシェア % (iClimax基準) */
+  totalPrimeShareIclimax: number
+  /** 全体プライムシェア % (予測基準) */
+  totalPrimeShareForecast: number
+  /** 適用中のPrime Time Share算出基準 */
+  primeShareBasis: PrimeShareBasis
 }
 
 export function useStationActuals(): StationActualsData | null {
@@ -139,6 +158,7 @@ export function useStationActuals(): StationActualsData | null {
   const campaignDataMap = useSpotStore((s) => s.campaignDataMap)
   const campaignId = useUiStore((s) => s.selectedCampaignId)
   const selectedRegion = useUiStore((s) => s.selectedRegion)
+  const primeShareBasis = useUiStore((s) => s.primeShareBasis)
   const campaignData = campaignId ? (campaignDataMap[campaignId] ?? null) : null
   const stationTargets = campaignData?.stationTargets ?? []
   const regionTargetTrps = campaignData?.regionTargetTrps ?? []
@@ -222,11 +242,19 @@ export function useStationActuals(): StationActualsData | null {
       // 発注TRP: iClimaxデータ優先、なければSPOTプラン L列
       const targetTrp = iclimaxEntry?.targetTrp ?? target?.targetTrp ?? 0
 
-      // Prime PRP: iClimaxデータ優先、なければSharest実績から計算
+      // 予測基準のPrime PRP: 本案+サービスのうちプライム帯(19-24時)のPRP合計
       const primeSpots = spotsList.filter((s) => isPrimeTime(s.broadcastTime))
-      const primePrp = iclimaxEntry
-        ? round2(iclimaxEntry.primePrp)
-        : round2(primeSpots.reduce((sum, s) => sum + getPrp(s), 0))
+      const primePrpForecast = round2(primeSpots.reduce((sum, s) => sum + getPrp(s), 0))
+      const primeShareForecast = totalPrp > 0 ? round1(primePrpForecast / totalPrp * 100) : 0
+
+      // iClimax基準のPrime PRP: iClimaxデータ優先、なければ予測基準にフォールバック
+      const primePrpIclimax = iclimaxEntry ? round2(iclimaxEntry.primePrp) : primePrpForecast
+      // 分母: iClimaxのT列全時間帯合計を優先
+      const iclimaxDenom = iclimaxEntry ? iclimaxEntry.totalPrp : totalPrp
+      const primeShareIclimax = iclimaxDenom > 0 ? round1(primePrpIclimax / iclimaxDenom * 100) : 0
+
+      const useForecast = primeShareBasis === 'forecast'
+      const primePrp = useForecast ? primePrpForecast : primePrpIclimax
       const primeTg = round2(primeSpots.reduce((sum, s) => sum + getTg(s), 0))
 
       stationActuals.push({
@@ -243,11 +271,11 @@ export function useStationActuals(): StationActualsData | null {
         tgAchievement: targetTrp > 0 ? round1(totalTg / targetTrp * 100) : 0,
         primePrp,
         primeTg,
-        primeShare: (() => {
-          // Prime Time Share分母: iClimaxのT列全時間帯合計を優先
-          const denom = iclimaxEntry ? iclimaxEntry.totalPrp : totalPrp
-          return denom > 0 ? round1(primePrp / denom * 100) : 0
-        })(),
+        primeShare: useForecast ? primeShareForecast : primeShareIclimax,
+        primePrpIclimax,
+        primeShareIclimax,
+        primePrpForecast,
+        primeShareForecast,
         spotCount: spotsList.length,
         primeSpotCount: primeSpots.length,
       })
@@ -270,6 +298,8 @@ export function useStationActuals(): StationActualsData | null {
       const actualTg = round2(regionStations.reduce((s, st) => s + st.actualTg, 0))
       const serviceTg = round2(regionStations.reduce((s, st) => s + st.serviceTg, 0))
       const primePrp = round2(regionStations.reduce((s, st) => s + st.primePrp, 0))
+      const primePrpIclimax = round2(regionStations.reduce((s, st) => s + st.primePrpIclimax, 0))
+      const primePrpForecast = round2(regionStations.reduce((s, st) => s + st.primePrpForecast, 0))
       const primeTg = round2(regionStations.reduce((s, st) => s + st.primeTg, 0))
       const totalPrpForRegion = round2(actualPrp + servicePrp)
       const totalTgForRegion = round2(actualTg + serviceTg)
@@ -292,11 +322,22 @@ export function useStationActuals(): StationActualsData | null {
         primePrp,
         primeTg,
         primeShare: (() => {
+          if (primeShareBasis === 'forecast') {
+            return totalPrpForRegion > 0 ? round1(primePrpForecast / totalPrpForRegion * 100) : 0
+          }
           // Prime Time Share分母: iClimaxのT列エリア合計を優先
           const iclimaxRegionEntry = iclimaxRegionData.find((r) => r.region === region)
           const denom = iclimaxRegionEntry ? iclimaxRegionEntry.totalPrp : totalPrpForRegion
-          return denom > 0 ? round1(primePrp / denom * 100) : 0
+          return denom > 0 ? round1(primePrpIclimax / denom * 100) : 0
         })(),
+        primePrpIclimax,
+        primeShareIclimax: (() => {
+          const iclimaxRegionEntry = iclimaxRegionData.find((r) => r.region === region)
+          const denom = iclimaxRegionEntry ? iclimaxRegionEntry.totalPrp : totalPrpForRegion
+          return denom > 0 ? round1(primePrpIclimax / denom * 100) : 0
+        })(),
+        primePrpForecast,
+        primeShareForecast: totalPrpForRegion > 0 ? round1(primePrpForecast / totalPrpForRegion * 100) : 0,
         spotCount: regionStations.reduce((s, st) => s + st.spotCount, 0),
         primeSpotCount: regionStations.reduce((s, st) => s + st.primeSpotCount, 0),
       }
@@ -310,6 +351,8 @@ export function useStationActuals(): StationActualsData | null {
     const totalServiceTg = round2(regionSubtotals.reduce((s, r) => s + r.serviceTg, 0))
     const totalSpotCount = regionSubtotals.reduce((s, r) => s + r.spotCount, 0)
     const totalPrimePrp = round2(regionSubtotals.reduce((s, r) => s + r.primePrp, 0))
+    const totalPrimePrpIclimax = round2(regionSubtotals.reduce((s, r) => s + r.primePrpIclimax, 0))
+    const totalPrimePrpForecast = round2(regionSubtotals.reduce((s, r) => s + r.primePrpForecast, 0))
     const totalPrimeTg = round2(regionSubtotals.reduce((s, r) => s + r.primeTg, 0))
     const totalPrimeSpotCount = regionSubtotals.reduce((s, r) => s + r.primeSpotCount, 0)
     const totalTargetTrp = round2(regionSubtotals.reduce((s, r) => s + r.targetTrp, 0))
@@ -330,16 +373,35 @@ export function useStationActuals(): StationActualsData | null {
       tgAchievement: totalTargetTrp > 0 ? round1(totalCombinedTg / totalTargetTrp * 100) : 0,
       primePrp: totalPrimePrp,
       primeTg: totalPrimeTg,
-      primeShare: (() => {
+      primeShare: 0, // 下で基準に応じて設定
+      primePrpIclimax: totalPrimePrpIclimax,
+      primeShareIclimax: (() => {
         const iclimaxTotalPrp = iclimaxRegionData.length > 0
           ? round2(iclimaxRegionData.reduce((s, r) => s + r.totalPrp, 0))
           : 0
         const denom = iclimaxTotalPrp > 0 ? iclimaxTotalPrp : totalCombinedPrp
-        return denom > 0 ? round1(totalPrimePrp / denom * 100) : 0
+        return denom > 0 ? round1(totalPrimePrpIclimax / denom * 100) : 0
       })(),
+      primePrpForecast: totalPrimePrpForecast,
+      primeShareForecast: totalCombinedPrp > 0 ? round1(totalPrimePrpForecast / totalCombinedPrp * 100) : 0,
       spotCount: totalSpotCount,
       primeSpotCount: totalPrimeSpotCount,
     }
+    grandTotal.primeShare = primeShareBasis === 'forecast'
+      ? grandTotal.primeShareForecast
+      : grandTotal.primeShareIclimax
+
+    // 全体シェア（サマリーカード用）: 従来はiClimax全体合計を分母に使用
+    const totalPrimeShareIclimax = (() => {
+      const iclimaxTotalPrp = iclimaxRegionData.length > 0
+        ? round2(iclimaxRegionData.reduce((s, r) => s + r.totalPrp, 0))
+        : 0
+      const denom = iclimaxTotalPrp > 0 ? iclimaxTotalPrp : totalActualPrp
+      return denom > 0 ? round1(totalPrimePrpIclimax / denom * 100) : 0
+    })()
+    const totalPrimeShareForecast = totalCombinedPrp > 0
+      ? round1(totalPrimePrpForecast / totalCombinedPrp * 100)
+      : 0
 
     // --- 日別PRP推移 ---
     const filteredSpots = selectedRegion === 'all'
@@ -601,15 +663,14 @@ export function useStationActuals(): StationActualsData | null {
       totalActualTg,
       totalSpotCount,
       totalPrimePrp,
-      totalPrimeShare: (() => {
-        const iclimaxTotalPrp = iclimaxRegionData.length > 0
-          ? round2(iclimaxRegionData.reduce((s, r) => s + r.totalPrp, 0))
-          : 0
-        const denom = iclimaxTotalPrp > 0 ? iclimaxTotalPrp : totalActualPrp
-        return denom > 0 ? round1(totalPrimePrp / denom * 100) : 0
-      })(),
+      totalPrimeShare: primeShareBasis === 'forecast'
+        ? totalPrimeShareForecast
+        : totalPrimeShareIclimax,
+      totalPrimeShareIclimax,
+      totalPrimeShareForecast,
+      primeShareBasis,
     }
-  }, [spots, campaignDataMap, campaignId, selectedRegion])
+  }, [spots, campaignDataMap, campaignId, selectedRegion, primeShareBasis])
 }
 
 /** prpRating取得（旧データ互換: undefinedの場合individualRatingにフォールバック） */

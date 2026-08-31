@@ -1,5 +1,6 @@
 import type { RegionSubtotal } from '../../hooks/use-station-actuals'
 import { REGION_LABELS } from '../../constants'
+import { useUiStore } from '../../stores/ui-store'
 import type { Region } from '../../types'
 
 interface Props {
@@ -32,6 +33,7 @@ function RateValue({ rate, threshold }: { rate: number; threshold: number }) {
 }
 
 export function RegionSummaryTable({ regionSubtotals }: Props) {
+  const basis = useUiStore((s) => s.primeShareBasis)
   const sorted = REGION_ORDER
     .map((r) => regionSubtotals.find((rs) => rs.region === r))
     .filter((rs): rs is RegionSubtotal => rs !== undefined)
@@ -68,6 +70,14 @@ export function RegionSummaryTable({ regionSubtotals }: Props) {
                   <div className="flex items-center justify-between">
                     <span className="text-[13px] text-[#86868b]">Prime Time Share</span>
                     <RateValue rate={rs.primeShare} threshold={60} />
+                  </div>
+                  <div className="mt-0.5 flex items-center justify-between">
+                    <span className="text-[11px] text-[#86868b]">
+                      {basis === 'forecast' ? 'iClimax基準' : '予測基準'}
+                    </span>
+                    <span className="text-[11px] text-[#86868b]">
+                      {(basis === 'forecast' ? rs.primeShareIclimax : rs.primeShareForecast).toFixed(1)}%
+                    </span>
                   </div>
                   <div className="mt-0.5 text-right">
                     <span className="text-[11px] text-[#86868b]">P4P：{P4P_VALUES[rs.region]}%</span>

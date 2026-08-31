@@ -1,6 +1,7 @@
 import ExcelJS from 'exceljs'
 import type { StationActual, RegionSubtotal, StationDailyPrpProgress, RegionDailyPrpProgress } from '../../hooks/use-station-actuals'
 import type { Region } from '../../types'
+import type { PrimeShareBasis } from '../../stores/ui-store'
 import type { SpotRecord } from '../../types/spot'
 import type { IclimaxSpotRow } from '../parsers/iclimax-parser'
 import { REGION_LABELS } from '../../constants'
@@ -43,7 +44,10 @@ export async function exportStationActualsToExcel(
   stationActuals: StationActual[],
   regionSubtotals: RegionSubtotal[],
   campaignName?: string,
+  primeShareBasis: PrimeShareBasis = 'iclimax',
 ) {
+  // どちらの基準で出力したかをヘッダーに明示する
+  const basisLabel = primeShareBasis === 'forecast' ? '予測基準' : 'iClimax基準'
   const wb = new ExcelJS.Workbook()
   const ws = wb.addWorksheet('局別アクチュアル')
 
@@ -58,8 +62,8 @@ export async function exportStationActualsToExcel(
     { header: 'TRP\n本案予測', key: 'trpActual', width: 10 },
     { header: 'TRP\nサービス予測', key: 'trpService', width: 12 },
     { header: 'TRP\n達成率', key: 'trpRate', width: 10 },
-    { header: 'Prime\nPRP', key: 'primePrp', width: 10 },
-    { header: 'Prime\nShare', key: 'primeShare', width: 10 },
+    { header: `Prime\nPRP\n(${basisLabel})`, key: 'primePrp', width: 12 },
+    { header: `Prime\nShare\n(${basisLabel})`, key: 'primeShare', width: 12 },
     { header: '出稿\n本数', key: 'spotCount', width: 8 },
   ]
 
