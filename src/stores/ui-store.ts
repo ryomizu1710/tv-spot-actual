@@ -8,6 +8,12 @@ import type { Region } from '../types'
  */
 export type PrimeShareBasis = 'iclimax' | 'forecast'
 
+/** 画面・Excel出力で共通に使う基準の表示名 */
+export const PRIME_SHARE_BASIS_LABELS: Record<PrimeShareBasis, string> = {
+  iclimax: '予測前（本案のみ）',
+  forecast: '予測後（本案＋サービス）',
+}
+
 interface UiStore {
   selectedCampaignId: string | null
   selectedRegion: Region | 'all'

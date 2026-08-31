@@ -4,6 +4,7 @@ import type { Region } from '../../types'
 import type { SpotRecord } from '../../types/spot'
 import type { IclimaxSpotRow } from '../parsers/iclimax-parser'
 import { REGION_LABELS } from '../../constants'
+import { PRIME_SHARE_BASIS_LABELS } from '../../stores/ui-store'
 
 /** 共通スタイル */
 const FONT_NAME = 'Yu Gothic'
@@ -60,10 +61,10 @@ export async function exportStationActualsToExcel(
     { header: 'TRP\nサービス予測', key: 'trpService', width: 12 },
     { header: 'TRP\n合計', key: 'trpTotal', width: 10 },
     { header: 'TRP\n達成率', key: 'trpRate', width: 10 },
-    { header: 'Prime PRP\n(iClimax基準)', key: 'primePrpIclimax', width: 12 },
-    { header: 'Prime Share\n(iClimax基準)', key: 'primeShareIclimax', width: 13 },
-    { header: 'Prime PRP\n(予測基準)', key: 'primePrpForecast', width: 12 },
-    { header: 'Prime Share\n(予測基準)', key: 'primeShareForecast', width: 13 },
+    { header: `Prime PRP\n${PRIME_SHARE_BASIS_LABELS.iclimax}`, key: 'primePrpIclimax', width: 16 },
+    { header: `Prime Share\n${PRIME_SHARE_BASIS_LABELS.iclimax}`, key: 'primeShareIclimax', width: 16 },
+    { header: `Prime PRP\n${PRIME_SHARE_BASIS_LABELS.forecast}`, key: 'primePrpForecast', width: 20 },
+    { header: `Prime Share\n${PRIME_SHARE_BASIS_LABELS.forecast}`, key: 'primeShareForecast', width: 20 },
     { header: '出稿\n本数', key: 'spotCount', width: 8 },
   ]
 
@@ -161,10 +162,10 @@ export async function exportStationActualsToExcel(
   ws.getColumn(9).numFmt = '0.0'   // TRP サービス予測
   ws.getColumn(10).numFmt = '0.0'  // TRP 合計
   ws.getColumn(11).numFmt = '0.0%' // TRP 達成率
-  ws.getColumn(12).numFmt = '0.0'  // Prime PRP (iClimax基準)
-  ws.getColumn(13).numFmt = '0.0%' // Prime Share (iClimax基準)
-  ws.getColumn(14).numFmt = '0.0'  // Prime PRP (予測基準)
-  ws.getColumn(15).numFmt = '0.0%' // Prime Share (予測基準)
+  ws.getColumn(12).numFmt = '0.0'  // Prime PRP (予測前)
+  ws.getColumn(13).numFmt = '0.0%' // Prime Share (予測前)
+  ws.getColumn(14).numFmt = '0.0'  // Prime PRP (予測後)
+  ws.getColumn(15).numFmt = '0.0%' // Prime Share (予測後)
 
   const buf = await wb.xlsx.writeBuffer()
   downloadExcel(buf, `【局別アクチュアル】${campaignName ?? ''}.xlsx`)

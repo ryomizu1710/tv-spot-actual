@@ -1,15 +1,15 @@
-import { useUiStore } from '../../stores/ui-store'
+import { useUiStore, PRIME_SHARE_BASIS_LABELS } from '../../stores/ui-store'
 import type { PrimeShareBasis } from '../../stores/ui-store'
 
 const OPTIONS: { value: PrimeShareBasis; label: string; hint: string }[] = [
   {
     value: 'iclimax',
-    label: 'iClimax基準',
+    label: PRIME_SHARE_BASIS_LABELS.iclimax,
     hint: '分母: iClimax T列の全時間帯PRP合計 / 分子: そのうちプライム帯(19-24時)のPRP',
   },
   {
     value: 'forecast',
-    label: '予測基準（本案+サービス）',
+    label: PRIME_SHARE_BASIS_LABELS.forecast,
     hint: '分母: 本案予測+サービス予測の合計PRP / 分子: そのうちプライム帯(19-24時)のPRP',
   },
 ]

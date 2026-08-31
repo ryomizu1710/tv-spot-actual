@@ -1,6 +1,6 @@
 import type { RegionSubtotal } from '../../hooks/use-station-actuals'
 import { REGION_LABELS } from '../../constants'
-import { useUiStore } from '../../stores/ui-store'
+import { useUiStore, PRIME_SHARE_BASIS_LABELS } from '../../stores/ui-store'
 import type { Region } from '../../types'
 
 interface Props {
@@ -73,7 +73,7 @@ export function RegionSummaryTable({ regionSubtotals }: Props) {
                   </div>
                   <div className="mt-0.5 flex items-center justify-between">
                     <span className="text-[11px] text-[#86868b]">
-                      {basis === 'forecast' ? 'iClimax基準' : '予測基準'}
+                      {basis === 'forecast' ? PRIME_SHARE_BASIS_LABELS.iclimax : PRIME_SHARE_BASIS_LABELS.forecast}
                     </span>
                     <span className="text-[11px] text-[#86868b]">
                       {(basis === 'forecast' ? rs.primeShareIclimax : rs.primeShareForecast).toFixed(1)}%

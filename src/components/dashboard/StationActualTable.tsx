@@ -1,7 +1,7 @@
 import type { StationActual, RegionSubtotal } from '../../hooks/use-station-actuals'
 import type { WptStationData, WptRegionData } from '../../lib/parsers/iclimax-parser'
 import { useSpotStore } from '../../stores/spot-store'
-import { useUiStore } from '../../stores/ui-store'
+import { useUiStore, PRIME_SHARE_BASIS_LABELS } from '../../stores/ui-store'
 import { REGION_LABELS } from '../../constants'
 import type { Region } from '../../types'
 
@@ -196,7 +196,7 @@ function RegionBlock({
 }) {
   const accent = REGION_ACCENT[region]
   const primeShareBasis = useUiStore((s) => s.primeShareBasis)
-  const altLabel = primeShareBasis === 'forecast' ? 'iClimax基準' : '予測基準'
+  const altLabel = primeShareBasis === 'forecast' ? PRIME_SHARE_BASIS_LABELS.iclimax : PRIME_SHARE_BASIS_LABELS.forecast
 
   return (
     <>
