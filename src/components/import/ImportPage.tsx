@@ -315,14 +315,13 @@ export function ImportPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <h1 className="text-[21px] font-semibold tracking-tight text-[#1d1d1f]">データ取込</h1>
-
-      {/* キャンペーン選択 */}
-      <div className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
-        <label className="mb-1 block text-xs font-medium text-[#86868b]">キャンペーン *</label>
+    <div className="mx-auto max-w-[1400px] space-y-4">
+      {/* 見出しとキャンペーン選択を1行にまとめ、取込カードの表示領域を広く取る */}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl bg-white/80 px-4 py-3 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
+        <h1 className="text-[17px] font-semibold tracking-tight text-[#1d1d1f]">データ取込</h1>
+        <label className="text-xs font-medium text-[#86868b]">キャンペーン *</label>
         <select value={campaignId} onChange={(e) => setCampaignId(e.target.value)}
-          className="w-full max-w-md rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-sm text-[#1d1d1f]">
+          className="min-w-0 flex-1 rounded-lg border border-black/[0.08] bg-white px-3 py-1.5 text-sm text-[#1d1d1f]">
           <option value="">選択してください</option>
           {campaigns.map((c) => (
             <option key={c.id} value={c.id}>{c.name}</option>
@@ -330,9 +329,12 @@ export function ImportPage() {
         </select>
       </div>
 
+      {/* 取込セクション: 広い画面では2列に並べ、スクロールせず全体を把握できるようにする */}
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
+
       {/* セクション1: SPOTプラン（目標値）*/}
-      <div className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
-        <div className="mb-4 flex items-center gap-2">
+      <div className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
+        <div className="mb-2 flex items-center gap-2">
           <Target size={18} className="text-[#007AFF]" />
           <h2 className="text-[14px] font-semibold text-[#1d1d1f]">SPOTプラン（発注PRP目標）</h2>
           {(spotPlanDone || (campaignId && getCampaignData(campaignId).stationTargets.length > 0)) && (
@@ -371,7 +373,7 @@ export function ImportPage() {
 
         {/* 読込結果 */}
         {spotPlanDone && spotPlanTargets.length > 0 && (
-          <div className="mt-3 overflow-x-auto">
+          <div className="mt-3 max-h-72 overflow-auto">
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-black/[0.06] bg-[#f5f5f7]">
@@ -395,8 +397,8 @@ export function ImportPage() {
       </div>
 
       {/* セクション2: iClimaxローデータ（発注TRP・Prime PRP）*/}
-      <div className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
-        <div className="mb-4 flex items-center gap-2">
+      <div className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
+        <div className="mb-2 flex items-center gap-2">
           <BarChart3 size={18} className="text-[#007AFF]" />
           <h2 className="text-[14px] font-semibold text-[#1d1d1f]">iClimaxローデータ（発注TRP・Prime PRP）</h2>
           {(iclimaxDone || (campaignId && getCampaignData(campaignId).iclimaxStationData.length > 0)) && (
@@ -450,7 +452,7 @@ export function ImportPage() {
 
         {/* 読込結果 */}
         {iclimaxDone && iclimaxResult && (
-          <div className="mt-3 overflow-x-auto">
+          <div className="mt-3 max-h-72 overflow-auto">
             <div className="mb-2 flex items-center gap-2 text-sm text-[#1d1d1f]">
               <CheckCircle size={16} className="text-[#34C759]" />
               <span>{iclimaxResult.totalRows}行中 {iclimaxResult.stationData.length}局を集計</span>
@@ -525,8 +527,8 @@ export function ImportPage() {
       </div>
 
       {/* セクション3: Sharest 本案（実績データ）*/}
-      <div className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
-        <div className="mb-4 flex items-center gap-2">
+      <div className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
+        <div className="mb-2 flex items-center gap-2">
           <Upload size={18} className="text-[#007AFF]" />
           <h2 className="text-[14px] font-semibold text-[#1d1d1f]">Sharest — 本案（実績データ）</h2>
           {sharestDone && (
@@ -587,8 +589,8 @@ export function ImportPage() {
       </div>
 
       {/* セクション4: Sharest サービス（実績データ）*/}
-      <div className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
-        <div className="mb-4 flex items-center gap-2">
+      <div className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-xl">
+        <div className="mb-2 flex items-center gap-2">
           <Upload size={18} className="text-teal-600" />
           <h2 className="text-[14px] font-semibold text-[#1d1d1f]">Sharest — サービス（実績データ）</h2>
           {serviceDone && (
@@ -646,6 +648,8 @@ export function ImportPage() {
             ))}
           </div>
         )}
+      </div>
+
       </div>
 
       {/* リセット */}
