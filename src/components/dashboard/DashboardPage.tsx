@@ -80,7 +80,7 @@ export function DashboardPage() {
               <Download size={13} /> 改案枠出力
             </button>
             <button
-              onClick={() => exportStationActualsToExcel(actualsData.stationActuals, actualsData.regionSubtotals, campaignName, actualsData.primeShareBasis)}
+              onClick={() => exportStationActualsToExcel(actualsData.stationActuals, actualsData.regionSubtotals, campaignName)}
               className="flex items-center gap-1.5 rounded-full bg-black/[0.04] px-3.5 py-1.5 text-[12px] font-medium text-[#1d1d1f] transition-all hover:bg-black/[0.08]"
             >
               <Download size={13} /> Excel出力
