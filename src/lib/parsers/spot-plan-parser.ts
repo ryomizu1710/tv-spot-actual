@@ -139,6 +139,9 @@ export function parseSpotPlanFile(
 
         // データ行をパース
         let currentRegion: Region | null = null
+        // エリア別発注TRP: エリア小計行のM列から動的に拾う（行位置は案件ごとに変わる）
+        const mColIdx = 12 // M列 (0-indexed = 12)
+        const regionTrpMap = new Map<Region, number>()
 
         for (let i = headerRowIdx + 1; i < rawRows.length; i++) {
           const row = rawRows[i]
@@ -163,6 +166,12 @@ export function parseSpotPlanFile(
           // 局コード解決
           const code = resolveCode(stationShort) ?? resolveCode(stationName)
           if (!code) {
+            // エリア小計行のM列をそのエリアの発注TRPとして採用（全体合計行は対象外）
+            const isRegionSubtotal = stationName.includes('小計') || stationShort.includes('小計')
+            if (isRegionSubtotal && !regionTrpMap.has(currentRegion)) {
+              const mVal = parseFloat(String(row[mColIdx] ?? ''))
+              if (!isNaN(mVal) && mVal > 0) regionTrpMap.set(currentRegion, mVal)
+            }
             // 小計行や不明局はスキップ
             if (!stationName.includes('小計') && !stationName.includes('合計')) {
               errors.push(`行${i + 1}: 局コード不明 (${stationName}/${stationShort})`)
@@ -186,16 +195,16 @@ export function parseSpotPlanFile(
           })
         }
 
-        // エリア別発注TRP: M列の特定行 (Excel M17=関東, M23=関西, M29=名古屋)
-        const mColIdx = 12 // M列 (0-indexed = 12)
-        const regionTrpRows: { row: number; region: Region }[] = [
+        // 小計行から拾えなかったエリアは、従来の固定セル (M17=関東/M23=関西/M29=名古屋) で補う
+        const fallbackRows: { row: number; region: Region }[] = [
           { row: 17, region: 'kanto' },
           { row: 23, region: 'kansai' },
           { row: 29, region: 'nagoya' },
         ]
-        const regionTargetTrps: RegionTargetTrp[] = regionTrpRows.map(({ row, region }) => {
-          const idx = row - 1 // Excel 1-indexed → 0-indexed
-          const rowData = rawRows[idx]
+        const regionTargetTrps: RegionTargetTrp[] = fallbackRows.map(({ row, region }) => {
+          const fromSubtotal = regionTrpMap.get(region)
+          if (fromSubtotal !== undefined) return { region, targetTrp: fromSubtotal }
+          const rowData = rawRows[row - 1] // Excel 1-indexed → 0-indexed
           const val = rowData ? parseFloat(String(rowData[mColIdx] ?? '')) : NaN
           return { region, targetTrp: isNaN(val) ? 0 : val }
         })

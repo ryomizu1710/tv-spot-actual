@@ -312,9 +312,12 @@ export function useStationActuals(): StationActualsData | null {
       const totalPrpForRegion = round2(actualPrp + servicePrp)
       const totalTgForRegion = round2(actualTg + serviceTg)
 
-      // エリア小計の発注TRP: SPOTプラン M列 (M17/M23/M29) を優先
+      // エリア小計の発注TRP: SPOTプランのエリア小計M列を優先。
+      // 未取込・未記入なら局別の発注TRP（iClimax U列 or SPOTプラン L列）の合計で補う
       const regionTrpEntry = regionTargetTrps.find((r) => r.region === region)
-      const targetTrp = regionTrpEntry?.targetTrp ?? 0
+      const targetTrp = (regionTrpEntry?.targetTrp ?? 0) > 0
+        ? (regionTrpEntry?.targetTrp ?? 0)
+        : round2(regionStations.reduce((s, st) => s + st.targetTrp, 0))
 
       return {
         region,
