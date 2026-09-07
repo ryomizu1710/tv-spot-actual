@@ -147,11 +147,12 @@ export function parseSpotPlanFile(
           const row = rawRows[i]
           if (!row || row.length === 0) continue
 
-          // エリア列でリージョン更新
+          // エリア列でリージョン更新。
+          // 対象外エリア（福岡など）が来たらブロックの区切りとして扱い、
+          // その行以降を直前のエリアに誤って足し込まないようにする
           const areaVal = String(row[areaColIdx] ?? '').trim()
           if (areaVal) {
-            const newRegion = parseRegion(areaVal)
-            if (newRegion) currentRegion = newRegion
+            currentRegion = parseRegion(areaVal)
           }
 
           // 関東・関西・名古屋以外はスキップ
@@ -161,17 +162,21 @@ export function parseSpotPlanFile(
           const stationName = stationColIdx >= 0 ? String(row[stationColIdx] ?? '').trim() : ''
           const stationShort = codeColIdx >= 0 ? String(row[codeColIdx] ?? '').trim() : ''
 
+          // エリア小計行のM列をそのエリアの発注TRPとして採用する。
+          // 小計行は「小計」と明記される場合と、局名が空で数値だけが入る場合がある
+          // （チェンソーマンの M19/M25/M31 など）。各エリア最初の1行だけを採用する
+          const isLabeledSubtotal = stationName.includes('小計') || stationShort.includes('小計')
+          const isUnlabeledSubtotal = !stationName && !stationShort
+          if ((isLabeledSubtotal || isUnlabeledSubtotal) && !regionTrpMap.has(currentRegion)) {
+            const mVal = parseFloat(String(row[mColIdx] ?? '').replace(/,/g, ''))
+            if (!isNaN(mVal) && mVal > 0) regionTrpMap.set(currentRegion, mVal)
+          }
+
           if (!stationName && !stationShort) continue
 
           // 局コード解決
           const code = resolveCode(stationShort) ?? resolveCode(stationName)
           if (!code) {
-            // エリア小計行のM列をそのエリアの発注TRPとして採用（全体合計行は対象外）
-            const isRegionSubtotal = stationName.includes('小計') || stationShort.includes('小計')
-            if (isRegionSubtotal && !regionTrpMap.has(currentRegion)) {
-              const mVal = parseFloat(String(row[mColIdx] ?? ''))
-              if (!isNaN(mVal) && mVal > 0) regionTrpMap.set(currentRegion, mVal)
-            }
             // 小計行や不明局はスキップ
             if (!stationName.includes('小計') && !stationName.includes('合計')) {
               errors.push(`行${i + 1}: 局コード不明 (${stationName}/${stationShort})`)
