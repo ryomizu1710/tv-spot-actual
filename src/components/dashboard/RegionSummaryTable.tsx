@@ -71,7 +71,8 @@ export function RegionSummaryTable({ regionSubtotals }: Props) {
                   {/* 選択中の基準を主数値の側に明記し、下段のもう一方と取り違えないようにする */}
                   <div className="flex items-end justify-between">
                     <span className="text-[11px] text-[#1d1d1f]">{PRIME_SHARE_BASIS_LABELS[basis]}</span>
-                    <RateValue rate={rs.primeShare} threshold={60} />
+                    {/* 良否の基準はエリアごとのP4P値（60%固定ではない） */}
+                    <RateValue rate={rs.primeShare} threshold={P4P_VALUES[rs.region]} />
                   </div>
                   <div className="mt-0.5 flex items-center justify-between border-t border-black/[0.06] pt-1">
                     <span className="text-[11px] text-[#86868b]">
