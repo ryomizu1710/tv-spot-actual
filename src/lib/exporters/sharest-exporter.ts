@@ -151,12 +151,29 @@ export function detectPlanTypeFromFileName(
   }
 }
 
+/**
+ * iClimaxファイル名からCP名を取り出す。
+ * 先頭の【】ブロック、末尾の注記（（関西のみ）など）と日付6桁を除いた部分をCP名とみなす。
+ * 例: 【iClimax改案】ガンダム260820.xlsx        -> ガンダム
+ *     【iClimax最終案】Boxing15 260416（Pのみ）  -> Boxing15
+ *     【iClimax初案】8月マルチタイトル犯罪者260803 -> 8月マルチタイトル犯罪者
+ */
+export function detectCampaignNameFromFileName(fileName: string): string {
+  let s = fileName.replace(/\.[^.]+$/, '')       // 拡張子
+  s = s.replace(/^【[^】]*】/, '')                 // 先頭の【iClimax改案】など
+  s = s.replace(/(（[^（）]*）|\([^()]*\))\s*$/g, '') // 末尾の注記（繰り返し除去は下のループで）
+  s = s.replace(/(（[^（）]*）|\([^()]*\))\s*$/g, '')
+  s = s.replace(/[\s_-]*\d{6}\s*$/, '')          // 末尾の日付6桁（先頭の「8月」等は消さない）
+  return s.trim()
+}
+
 export async function generateSharestFiles(
   iclimaxFile: File,
   selectedTg: string,
   planType: SharestPlanType = '初案',
   regions: RegionKey[] = ['kanto', 'kansai', 'nagoya'],
   isService = false,
+  campaignName = '',
 ): Promise<SharestExportResult[]> {
   const buffer = await iclimaxFile.arrayBuffer()
   const wb = XLSX.read(buffer, { type: 'array' })
@@ -283,8 +300,9 @@ export async function generateSharestFiles(
 
     results.push({
       region,
-      // サービス枠は案種別の後ろに「サービス」を付ける（例: 関東_改案サービス_260910）
-      fileName: `【sharest】${REGION_FILE_LABELS[region]}_${planType}${isService ? 'サービス' : ''}_${formatDateSuffix()}.xlsx`,
+      // サービス枠は案種別の後ろに「サービス」、末尾にCP名を付ける
+      // 例: 【sharest】関東_改案サービス_260910（Boxing）.xlsx
+      fileName: `【sharest】${REGION_FILE_LABELS[region]}_${planType}${isService ? 'サービス' : ''}_${formatDateSuffix()}${campaignName ? `（${campaignName}）` : ''}.xlsx`,
       blob,
       rowCount: rows.length,
     })

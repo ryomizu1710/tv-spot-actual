@@ -16,7 +16,7 @@ import {
   type IclimaxParseResult,
 } from '../../lib/parsers/iclimax-parser'
 import { REGION_LABELS } from '../../constants'
-import { generateSharestFiles, detectPlanTypeFromFileName, SHAREST_TG_OPTIONS, type SharestPlanType } from '../../lib/exporters/sharest-exporter'
+import { generateSharestFiles, detectPlanTypeFromFileName, detectCampaignNameFromFileName, SHAREST_TG_OPTIONS, type SharestPlanType } from '../../lib/exporters/sharest-exporter'
 import type { ImportBatch, StationTarget } from '../../types'
 
 export function ImportPage() {
@@ -63,6 +63,7 @@ export function ImportPage() {
   const [sharestTg, setSharestTg] = useState(SHAREST_TG_OPTIONS[0])
   const [sharestPlanType, setSharestPlanType] = useState<SharestPlanType>('初案')
   const [sharestIsService, setSharestIsService] = useState(false)
+  const [sharestCampaignName, setSharestCampaignName] = useState('')
   const [sharestExporting, setSharestExporting] = useState(false)
 
   // --- Sharest handlers ---
@@ -236,6 +237,7 @@ export function ImportPage() {
     const detected = detectPlanTypeFromFileName(file.name)
     if (detected.planType) setSharestPlanType(detected.planType)
     setSharestIsService(detected.isService)
+    setSharestCampaignName(detectCampaignNameFromFileName(file.name))
     setIclimaxResult(null)
     setIclimaxColumnHeaders([])
     setIclimaxSelectedColIdx(null)
@@ -254,7 +256,7 @@ export function ImportPage() {
     if (!iclimaxFile) { toast.error('iClimaxファイルを先に選択してください'); return }
     setSharestExporting(true)
     try {
-      const results = await generateSharestFiles(iclimaxFile, sharestTg, sharestPlanType, undefined, sharestIsService)
+      const results = await generateSharestFiles(iclimaxFile, sharestTg, sharestPlanType, undefined, sharestIsService, sharestCampaignName.trim())
       if (results.length === 0) {
         toast.error('エリアデータが見つかりませんでした')
         setSharestExporting(false)
@@ -521,6 +523,16 @@ export function ImportPage() {
                   ))}
                 </select>
               </div>
+              <div className="w-40">
+                <label className="mb-1 block text-xs text-[#86868b]">CP名</label>
+                <input
+                  type="text"
+                  value={sharestCampaignName}
+                  onChange={(e) => setSharestCampaignName(e.target.value)}
+                  placeholder="例: Boxing"
+                  className="w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-sm text-[#1d1d1f]"
+                />
+              </div>
               <label className="flex cursor-pointer items-center gap-1.5 pb-2 text-xs text-[#1d1d1f]">
                 <input
                   type="checkbox"
@@ -538,7 +550,8 @@ export function ImportPage() {
             </div>
             {/* 出力されるファイル名を事前に確認できるようにする */}
             <p className="mt-2 text-[11px] text-[#86868b]">
-              出力ファイル名: 【sharest】関東_{sharestPlanType}{sharestIsService ? 'サービス' : ''}_YYMMDD.xlsx（関西・名古屋も同様）
+              出力ファイル名: 【sharest】関東_{sharestPlanType}{sharestIsService ? 'サービス' : ''}_YYMMDD
+              {sharestCampaignName.trim() ? `（${sharestCampaignName.trim()}）` : ''}.xlsx（関西・名古屋も同様）
             </p>
           </div>
       </div>
