@@ -63,8 +63,9 @@ export function ImportPage() {
   const [sharestTg, setSharestTg] = useState(SHAREST_TG_OPTIONS[0])
   const [sharestPlanType, setSharestPlanType] = useState<SharestPlanType>('初案')
   const [sharestIsService, setSharestIsService] = useState(false)
-  const [sharestCampaignName, setSharestCampaignName] = useState('')
   const [sharestExporting, setSharestExporting] = useState(false)
+  // CP名はiClimaxファイル名から自動で決まる（手入力はしない）
+  const sharestCampaignName = iclimaxFile ? detectCampaignNameFromFileName(iclimaxFile.name) : ''
 
   // --- Sharest handlers ---
   const handleSharestFilesSelect = (files: FileList | File[] | null) => {
@@ -237,7 +238,6 @@ export function ImportPage() {
     const detected = detectPlanTypeFromFileName(file.name)
     if (detected.planType) setSharestPlanType(detected.planType)
     setSharestIsService(detected.isService)
-    setSharestCampaignName(detectCampaignNameFromFileName(file.name))
     setIclimaxResult(null)
     setIclimaxColumnHeaders([])
     setIclimaxSelectedColIdx(null)
@@ -522,16 +522,6 @@ export function ImportPage() {
                     <option key={tg} value={tg}>{tg}</option>
                   ))}
                 </select>
-              </div>
-              <div className="w-40">
-                <label className="mb-1 block text-xs text-[#86868b]">CP名</label>
-                <input
-                  type="text"
-                  value={sharestCampaignName}
-                  onChange={(e) => setSharestCampaignName(e.target.value)}
-                  placeholder="例: Boxing"
-                  className="w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-sm text-[#1d1d1f]"
-                />
               </div>
               <label className="flex cursor-pointer items-center gap-1.5 pb-2 text-xs text-[#1d1d1f]">
                 <input
