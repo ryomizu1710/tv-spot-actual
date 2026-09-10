@@ -138,11 +138,25 @@ const dataStyle: Partial<ExcelJS.Style> = {
  */
 export type SharestPlanType = '初案' | '改案'
 
+/**
+ * iClimaxファイル名から案種別・サービス枠かどうかを判定する。
+ * 例: 【iClimax改案サービス】トモダチ260831.xlsx -> { planType: '改案', isService: true }
+ */
+export function detectPlanTypeFromFileName(
+  fileName: string,
+): { planType: SharestPlanType | null; isService: boolean } {
+  return {
+    planType: fileName.includes('改案') ? '改案' : fileName.includes('初案') ? '初案' : null,
+    isService: fileName.includes('サービス'),
+  }
+}
+
 export async function generateSharestFiles(
   iclimaxFile: File,
   selectedTg: string,
   planType: SharestPlanType = '初案',
   regions: RegionKey[] = ['kanto', 'kansai', 'nagoya'],
+  isService = false,
 ): Promise<SharestExportResult[]> {
   const buffer = await iclimaxFile.arrayBuffer()
   const wb = XLSX.read(buffer, { type: 'array' })
@@ -269,7 +283,8 @@ export async function generateSharestFiles(
 
     results.push({
       region,
-      fileName: `【sharest】${REGION_FILE_LABELS[region]}_${planType}_${formatDateSuffix()}.xlsx`,
+      // サービス枠は案種別の後ろに「サービス」を付ける（例: 関東_改案サービス_260910）
+      fileName: `【sharest】${REGION_FILE_LABELS[region]}_${planType}${isService ? 'サービス' : ''}_${formatDateSuffix()}.xlsx`,
       blob,
       rowCount: rows.length,
     })

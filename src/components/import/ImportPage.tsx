@@ -16,7 +16,7 @@ import {
   type IclimaxParseResult,
 } from '../../lib/parsers/iclimax-parser'
 import { REGION_LABELS } from '../../constants'
-import { generateSharestFiles, SHAREST_TG_OPTIONS, type SharestPlanType } from '../../lib/exporters/sharest-exporter'
+import { generateSharestFiles, detectPlanTypeFromFileName, SHAREST_TG_OPTIONS, type SharestPlanType } from '../../lib/exporters/sharest-exporter'
 import type { ImportBatch, StationTarget } from '../../types'
 
 export function ImportPage() {
@@ -62,6 +62,7 @@ export function ImportPage() {
   // Sharest フォーマット作成
   const [sharestTg, setSharestTg] = useState(SHAREST_TG_OPTIONS[0])
   const [sharestPlanType, setSharestPlanType] = useState<SharestPlanType>('初案')
+  const [sharestIsService, setSharestIsService] = useState(false)
   const [sharestExporting, setSharestExporting] = useState(false)
 
   // --- Sharest handlers ---
@@ -231,6 +232,10 @@ export function ImportPage() {
   const handleIclimaxFileSelect = async (file: File) => {
     setIclimaxFile(file)
     setIclimaxDone(false)
+    // ファイル名から案種別・サービス枠を判定して初期値にする（手動で変更も可能）
+    const detected = detectPlanTypeFromFileName(file.name)
+    if (detected.planType) setSharestPlanType(detected.planType)
+    setSharestIsService(detected.isService)
     setIclimaxResult(null)
     setIclimaxColumnHeaders([])
     setIclimaxSelectedColIdx(null)
@@ -249,7 +254,7 @@ export function ImportPage() {
     if (!iclimaxFile) { toast.error('iClimaxファイルを先に選択してください'); return }
     setSharestExporting(true)
     try {
-      const results = await generateSharestFiles(iclimaxFile, sharestTg, sharestPlanType)
+      const results = await generateSharestFiles(iclimaxFile, sharestTg, sharestPlanType, undefined, sharestIsService)
       if (results.length === 0) {
         toast.error('エリアデータが見つかりませんでした')
         setSharestExporting(false)
@@ -516,6 +521,14 @@ export function ImportPage() {
                   ))}
                 </select>
               </div>
+              <label className="flex cursor-pointer items-center gap-1.5 pb-2 text-xs text-[#1d1d1f]">
+                <input
+                  type="checkbox"
+                  checked={sharestIsService}
+                  onChange={(e) => setSharestIsService(e.target.checked)}
+                />
+                サービス枠
+              </label>
               <button onClick={handleSharestExport}
                 disabled={!iclimaxFile || sharestExporting}
                 className="flex items-center gap-2 rounded-full bg-[#34C759] px-5 py-2 text-[13px] font-medium text-white transition-all hover:bg-[#34C759]/80 disabled:opacity-40">
@@ -523,6 +536,10 @@ export function ImportPage() {
                 {sharestExporting ? '出力中...' : 'フォーマット出力'}
               </button>
             </div>
+            {/* 出力されるファイル名を事前に確認できるようにする */}
+            <p className="mt-2 text-[11px] text-[#86868b]">
+              出力ファイル名: 【sharest】関東_{sharestPlanType}{sharestIsService ? 'サービス' : ''}_YYMMDD.xlsx（関西・名古屋も同様）
+            </p>
           </div>
       </div>
 
